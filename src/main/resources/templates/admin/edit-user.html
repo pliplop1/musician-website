@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modifier Utilisateur - Administration</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+  .modal {
+    display: none; /* Caché par défaut */
+  }
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+	<!-- Header de l'administration -->
+	<header class="bg-white shadow-md">
+		<div
+			class="container mx-auto px-6 py-4 flex justify-between items-center">
+			<h1 class="text-2xl font-bold text-gray-800">Administration</h1>
+			<div>
+				<a th:href="@{/admin/users}"
+					class="px-4 text-gray-600 hover:text-indigo-600">Retour à la liste</a>
+				<form th:action="@{/logout}" method="post" class="inline">
+					<button type="submit"
+						class="px-4 text-gray-600 hover:text-indigo-600">Déconnexion</button>
+				</form>
+			</div>
+		</div>
+	</header>
+
+	<!-- Contenu principal -->
+	<main class="container mx-auto px-6 py-8">
+
+		<h2 class="text-3xl font-bold mb-6" th:text="|Modifier l'utilisateur : ${user.username}|"></h2>
+		
+		<div class="bg-white p-8 rounded-lg shadow-md max-w-lg mx-auto">
+			<form id="editUserForm" th:action="@{/admin/users/update}" th:object="${user}" method="post" class="space-y-6">
+				<input type="hidden" th:field="*{id}" />
+				
+				<div>
+					<label for="username" class="block text-sm font-medium">Nom d'utilisateur</label>
+					<input type="text" id="username" th:field="*{username}" required
+						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+				</div>
+
+				<div>
+					<label for="email" class="block text-sm font-medium">Email</label>
+					<input type="email" id="email" th:field="*{email}" required
+						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+				</div>
+				
+				<fieldset class="border-t border-gray-200 pt-6">
+					<legend class="text-lg font-medium">Attribuer un rôle</legend>
+					<div class="mt-4 space-y-4">
+						<div th:each="role : ${allRoles}" class="flex items-start">
+							<div class="flex items-center h-5">
+								<input th:id="|role-${role.id}|" name="roleId" th:value="${role.id}" type="radio"
+								       th:checked="${!user.roles.isEmpty() and user.roles.iterator().next().id == role.id}"
+								       th:attr="data-initial-checked=${#sets.contains(user.roles.![id], role.id)}, data-role-name=${role.name}"
+								       class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+							</div>
+							<div class="ml-3 text-sm">
+								<label th:for="|role-${role.id}|" class="font-medium text-gray-700" th:text="${role.name.replace('ROLE_', '')}"></label>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+				
+				<div>
+					<button type="submit"
+						class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out">Mettre à jour</button>
+				</div>
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			</form>
+		</div>
+
+	</main>
+	
+	<!-- Fenêtre Modale pour la confirmation de changement de rôle ADMIN -->
+	<div id="roleChangeConfirmModal" class="modal fixed z-20 inset-0 overflow-y-auto" aria-labelledby="modal-title-role-change" role="dialog" aria-modal="true">
+	  <div class="flex items-center justify-center min-h-screen">
+	    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+	    <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+	      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+	        <div class="sm:flex sm:items-start">
+	          <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+				<svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+	          </div>
+	          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+	            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-role-change">Attention</h3>
+	            <div class="mt-2">
+	              <p class="text-sm text-gray-500">Vous êtes sur le point de modifier les droits d'administrateur de cet utilisateur. Êtes-vous sûr ?</p>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+	        <button type="button" id="confirmRoleChangeBtn" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto">
+	          Valider le changement
+	        </button>
+	        <button type="button" id="cancelRoleChangeBtn" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+	          Annuler
+	        </button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const form = document.getElementById('editUserForm');
+			const roleChangeModal = document.getElementById('roleChangeConfirmModal');
+			const confirmBtn = document.getElementById('confirmRoleChangeBtn');
+			const cancelBtn = document.getElementById('cancelRoleChangeBtn');
+
+			form.addEventListener('submit', function (event) {
+				const adminRoleCheckbox = document.querySelector('input[data-role-name="ROLE_ADMIN"]');
+				
+				if (adminRoleCheckbox) {
+					const wasAdmin = adminRoleCheckbox.dataset.initialChecked === 'true';
+					const isAdmin = adminRoleCheckbox.checked;
+
+					// Si le statut d'admin a changé, on affiche la modale
+					if (wasAdmin !== isAdmin) {
+						event.preventDefault(); // On bloque la soumission du formulaire
+						roleChangeModal.style.display = 'block';
+					}
+				}
+			});
+
+			// Si on confirme dans la modale, on soumet le formulaire
+			confirmBtn.addEventListener('click', function() {
+				form.submit();
+			});
+
+			// Si on annule, on cache la modale
+			cancelBtn.addEventListener('click', function() {
+				roleChangeModal.style.display = 'none';
+			});
+		});
+	</script>
+
+</body>
+</html>
+

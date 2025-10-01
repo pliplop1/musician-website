@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Officiel du Musicien</title>
+
+    <!--
+      IMPORTANT : On ne charge QUE la feuille de style compilée par Maven.
+      La balise <script src="https://cdn.tailwindcss.com"></script> a été supprimée.
+    -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <!-- Police Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Header -->
+    <header class="p-4 text-center">
+        <h1 class="text-5xl font-bold">Nom de l'Artiste</h1>
+        <p class="text-xl text-gray-400">Musicien / Compositeur</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-8 space-y-16">
+
+        <!-- Section Prochaines Dates -->
+        <section id="dates">
+            <h2 class="text-4xl font-bold mb-8 text-center">Prochaines Dates</h2>
+            
+            <div th:if="${concerts.isEmpty()}" class="text-center text-gray-400">
+                <p>Aucune date de concert n'est prévue pour le moment. Revenez bientôt !</p>
+            </div>
+
+            <div th:unless="${concerts.isEmpty()}" class="space-y-6">
+                <!-- Boucle sur chaque concert -->
+                <div th:each="concert : ${concerts}" class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <p class="text-2xl font-bold" th:text="${concert.location}">Lieu du Concert</p>
+                        <p class="text-indigo-400" th:text="${#temporals.format(concert.date, 'dd MMMM yyyy')}">01 Janvier 2025</p>
+                        <p class="text-gray-400 mt-2" th:text="${concert.description}">Description de l'événement.</p>
+                    </div>
+                    <!-- Ici on utilise la classe .btn-primary définie dans notre fichier input.css -->
+                    <a href="#" class="btn-primary mt-4 md:mt-0">
+                        Billets
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Contact -->
+        <section id="contact">
+            <h2 class="text-4xl font-bold mb-8 text-center">Contact</h2>
+            
+            <div class="max-w-xl mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
+                
+                <div th:if="${successMessage}" class="bg-green-500 text-white p-4 rounded-md mb-6 text-center">
+                    <p th:text="${successMessage}">Votre message a bien été envoyé !</p>
+                </div>
+
+                <form th:action="@{/contact}" th:object="${message}" method="post" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300">Votre Nom</label>
+                        <input type="text" id="name" th:field="*{name}" required class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                     <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Votre Email</label>
+                        <input type="email" id="email" th:field="*{email}" required class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="content" class="block text-sm font-medium text-gray-300">Votre Message</label>
+                        <textarea id="content" th:field="*{content}" rows="4" required class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full btn-primary">
+                            Envoyer le Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center p-8 text-gray-500">
+        <p>&copy; 2025 Nom de l'Artiste. Tous droits réservés.</p>
+    </footer>
+
+</body>
+</html>
+

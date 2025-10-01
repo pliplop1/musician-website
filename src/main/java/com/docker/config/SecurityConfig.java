@@ -1,0 +1,83 @@
+package com.docker.config;
+
+import java.util.Set;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.authenticationProvider(authenticationProvider());
+        
+        http
+            .authorizeHttpRequests(authorizeRequests ->
+                authorizeRequests
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/user/**").hasRole("USER")
+                    .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/contact", "/register").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .formLogin(formLogin ->
+                formLogin
+                    .loginPage("/login")
+                    .successHandler((request, response, authentication) -> {
+                        // Lignes de débogage pour voir ce qui se passe
+                        System.out.println("--- Authentication Success Handler ---");
+                        System.out.println("User: " + authentication.getName());
+                        Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+                        System.out.println("Roles: " + roles);
+
+                        if (roles.contains("ROLE_ADMIN")) {
+                            System.out.println("Redirecting to /admin/dashboard");
+                            response.sendRedirect("/admin/dashboard");
+                        } else if (roles.contains("ROLE_USER")) {
+                            System.out.println("Redirecting to /user/profile");
+                            response.sendRedirect("/user/profile");
+                        } else {
+                            System.out.println("No specific role found, redirecting to /");
+                            response.sendRedirect("/");
+                        }
+                    })
+                    .permitAll()
+            )
+            .logout(logout ->
+                logout
+                    .logoutSuccessUrl("/login?logout")
+                    .permitAll()
+            );
+
+        return http.build();
+    }
+}
+
