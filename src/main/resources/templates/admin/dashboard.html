@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de Bord - Administration</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+  .modal {
+    display: none; /* Caché par défaut */
+    position: absolute; /* Positionné par rapport à la page */
+  }
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+	<header class="bg-white shadow-md">
+		<div
+			class="container mx-auto px-6 py-4 flex justify-between items-center">
+			<h1 class="text-2xl font-bold text-gray-800">Administration</h1>
+			<div>
+				<a th:href="@{/}"
+					class="px-4 text-gray-600 hover:text-indigo-600">Retour au site</a>
+				<form th:action="@{/logout}" method="post" class="inline">
+					<button type="submit"
+						class="px-4 text-gray-600 hover:text-indigo-600">Déconnexion</button>
+				</form>
+			</div>
+		</div>
+	</header>
+
+	<main class="container mx-auto px-6 py-8">
+
+		<div class="mb-8">
+			<h2 class="text-xl font-semibold mb-4">Navigation</h2>
+			<div class="bg-white p-4 rounded-lg shadow-md">
+				<a th:href="@{/admin/users}" class="text-indigo-600 hover:underline">Gérer les utilisateurs</a>
+			</div>
+		</div>
+
+		<div th:if="${successMessage}"
+			class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-8 shadow-sm">
+			<p class="font-bold">Succès !</p>
+			<span th:text="${successMessage}"></span>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+			<section>
+				<h2 class="text-3xl font-bold mb-6">Ajouter un nouveau concert</h2>
+				<div class="bg-white p-8 rounded-lg shadow-md">
+					<form th:action="@{/admin/concerts/add}" th:object="${concert}"
+						method="post" class="space-y-6">
+						<div>
+							<label for="location" class="block text-sm font-medium">Lieu</label>
+							<input type="text" id="location" th:field="*{location}" required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+						</div>
+						<div>
+							<label for="date" class="block text-sm font-medium">Date</label>
+							<input type="date" id="date" th:field="*{date}" required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+						</div>
+						<div>
+							<label for="description" class="block text-sm font-medium">Description</label>
+							<textarea id="description" th:field="*{description}" rows="3"
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+						</div>
+						<div>
+							<button type="submit"
+								class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out">Ajouter
+								le concert</button>
+						</div>
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+					</form>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="text-3xl font-bold mb-6">Concerts programmés</h2>
+				<div class="bg-white rounded-lg shadow-md overflow-x-auto">
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+							</tr>
+						</thead>
+						<tbody class="bg-white divide-y divide-gray-200">
+							<tr th:if="${#lists.isEmpty(concerts)}">
+								<td colspan="4" class="px-6 py-4 text-center text-gray-500">Aucun
+									concert programmé.</td>
+							</tr>
+							<tr th:each="c : ${concerts}">
+								<td class="px-6 py-4 whitespace-nowrap"
+									th:text="${#temporals.format(c.date, 'dd/MM/yyyy')}"></td>
+								<td class="px-6 py-4 whitespace-nowrap" th:text="${c.location}"></td>
+								<td class="px-6 py-4"
+									th:text="${#strings.abbreviate(c.description, 40)}"></td>
+								<td class="px-6 py-4 text-sm font-medium">
+								  <div class="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-4">
+									<a th:href="@{/admin/concerts/edit/{id}(id=${c.id})}"
+									   class="text-indigo-600 hover:text-indigo-900">Modifier</a>
+									<a th:href="@{/admin/concerts/delete/{id}(id=${c.id})}"
+									   class="text-red-600 hover:text-red-900 delete-link">Supprimer</a>
+								  </div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+		</div>
+
+		<section class="mt-16">
+			<h2 class="text-3xl font-bold mb-6">Messages Reçus</h2>
+			<div class="bg-white rounded-lg shadow-md overflow-hidden">
+				<table class="min-w-full divide-y divide-gray-200">
+					<thead class="bg-gray-50">
+						<tr>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="bg-white divide-y divide-gray-200">
+						<tr th:if="${#lists.isEmpty(messages)}">
+							<td colspan="5" class="px-6 py-4 text-center text-gray-500">Aucun
+								message reçu.</td>
+						</tr>
+						<tr th:each="message : ${messages}">
+							<td class="px-6 py-4 whitespace-nowrap"
+								th:text="${#temporals.format(message.timestamp, 'dd/MM/yyyy HH:mm')}"></td>
+							<td class="px-6 py-4 whitespace-nowrap" th:text="${message.name}"></td>
+							<td class="px-6 py-4 whitespace-nowrap" th:text="${message.email}"></td>
+							<td class="px-6 py-4"
+								th:text="${#strings.abbreviate(message.content, 50)}"></td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+								<button type="button" class="text-blue-600 hover:text-blue-900 view-message-btn"
+									th:data-name="${message.name}"
+									th:data-email="${message.email}"
+									th:data-timestamp="${#temporals.format(message.timestamp, 'dd MMMM yy à HH:mm')}"
+									th:data-content="${message.content}">
+									Voir
+								</button>
+								<a th:href="@{/admin/messages/delete/{id}(id=${message.id})}"
+								class="text-red-600 hover:text-red-900 ml-4 delete-link">Supprimer</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+	</main>
+	
+	<div id="messageModal" class="modal fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title-message" role="dialog" aria-modal="true">
+	  <div class="flex items-center justify-center min-h-screen">
+	    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+	    <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+	      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+	        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-message">Détails du Message</h3>
+            <div class="mt-4">
+              <p class="text-sm text-gray-500"><strong>De :</strong> <span id="modal-name"></span></p>
+              <p class="text-sm text-gray-500"><strong>Email :</strong> <span id="modal-email"></span></p>
+              <p class="text-sm text-gray-500"><strong>Date :</strong> <span id="modal-timestamp"></span></p>
+              <hr class="my-4">
+              <p class="text-base text-gray-800 whitespace-pre-wrap" id="modal-content"></p>
+            </div>
+	      </div>
+	      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+	        <button type="button" id="closeMessageModalBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+	          Fermer
+	        </button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div id="deleteConfirmModal" class="modal z-20" aria-labelledby="modal-title-delete" role="dialog" aria-modal="true">
+	    <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+	      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+	        <div class="sm:flex sm:items-start">
+	          <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+				<svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+	          </div>
+	          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+	            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-delete">Confirmer la suppression</h3>
+	            <div class="mt-2">
+	              <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+	        <a href="#" id="confirmDeleteBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm">
+	          Supprimer
+	        </a>
+	        <button type="button" id="cancelDeleteBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">
+	          Annuler
+	        </button>
+	      </div>
+	    </div>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+		
+			// --- Logique pour la modale de visualisation des messages ---
+			const messageModal = document.getElementById('messageModal');
+			if (messageModal) {
+				const closeMessageModalBtn = document.getElementById('closeMessageModalBtn');
+				document.body.addEventListener('click', function(event) {
+					const viewBtn = event.target.closest('.view-message-btn');
+					if (viewBtn) {
+						document.getElementById('modal-name').textContent = viewBtn.dataset.name;
+						document.getElementById('modal-email').textContent = viewBtn.dataset.email;
+						document.getElementById('modal-timestamp').textContent = viewBtn.dataset.timestamp;
+						document.getElementById('modal-content').textContent = viewBtn.dataset.content;
+						messageModal.style.display = 'block';
+					}
+				});
+				closeMessageModalBtn.addEventListener('click', () => { messageModal.style.display = 'none'; });
+				// Fermer en cliquant en dehors
+				window.addEventListener('click', (e) => {
+					if (e.target === messageModal) { messageModal.style.display = 'none'; }
+				});
+			}
+
+			// --- Logique pour la modale de confirmation de suppression ---
+			const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+			if (deleteConfirmModal) {
+				const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+				const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+				
+				document.body.addEventListener('click', function(event) {
+					const deleteLink = event.target.closest('.delete-link');
+					if (deleteLink) {
+						event.preventDefault();
+						
+						const deleteUrl = deleteLink.getAttribute('href');
+						confirmDeleteBtn.setAttribute('href', deleteUrl);
+
+						// Correction du positionnement de la modale en haut à droite du curseur
+						deleteConfirmModal.style.display = 'block'; // Rendre visible pour calculer la hauteur
+						const modalHeight = deleteConfirmModal.offsetHeight;
+						
+						let topPosition = event.pageY - modalHeight - 20; // 20px au-dessus du curseur
+						if (topPosition < window.scrollY) { // Empêche de sortir de l'écran en haut
+							topPosition = window.scrollY + 10;
+						}
+						
+						deleteConfirmModal.style.left = (event.pageX + 20) + 'px'; // 20px à droite du curseur
+						deleteConfirmModal.style.top = topPosition + 'px';
+					}
+				});
+
+				cancelDeleteBtn.addEventListener('click', () => { deleteConfirmModal.style.display = 'none'; });
+			}
+		});
+	</script>
+
+</body>
+</html>
