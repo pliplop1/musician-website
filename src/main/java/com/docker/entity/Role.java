@@ -17,15 +17,14 @@ public class Role {
     private Long id;
     private String name;
 
-    // Constructeur sans argument (requis par JPA)
+    // Constructeurs
     public Role() {
     }
 
-    // Constructeur avec argument que nous utilisons dans DataInitializer
     public Role(String name) {
         this.name = name;
     }
-    
+
     // Getters et Setters pour la compatibilité
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
