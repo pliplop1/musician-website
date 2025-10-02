@@ -18,14 +18,13 @@
 		class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-lg shadow-lg">
 		<h2 class="text-3xl font-bold text-center">Créer un compte</h2>
 
-		<!-- Formulaire d'inscription -->
 		<form th:action="@{/register}" th:object="${user}" method="post"
 			class="space-y-6">
 
-			<!-- Message d'erreur -->
-			<div th:if="${param.error}"
-				class="bg-red-500 text-white p-3 rounded-md text-center">Un
-				utilisateur avec ce nom ou cet email existe déjà.</div>
+			<div th:if="${errorMessage}"
+				class="bg-red-500 text-white p-3 rounded-md text-center">
+				<p class="whitespace-pre-wrap" th:text="${errorMessage}"></p>
+			</div>
 
 			<div>
 				<label for="username"
@@ -54,7 +53,15 @@
 						required
 						class="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
 				</div>
+                <div class="mt-2 text-xs text-gray-400">
+                    Doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&).
+                </div>
 			</div>
+            
+            <div class="flex items-center">
+                <input id="showPassword" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                <label for="showPassword" class="ml-2 block text-sm text-gray-400">Afficher le mot de passe</label>
+            </div>
 
 			<div>
 				<button type="submit"
@@ -70,6 +77,16 @@
 		</div>
 	</div>
 
+    <script>
+        document.getElementById('showPassword').addEventListener('change', function(event) {
+            const passwordInput = document.getElementById('password');
+            if (event.target.checked) {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        });
+    </script>
+
 </body>
 </html>
-

@@ -31,5 +31,8 @@ public class ConcertService {
     public void deleteConcert(Long id) {
         concertRepository.deleteById(id);
     }
+    public long countConcerts() {
+        return concertRepository.count();
+    }
 }
 

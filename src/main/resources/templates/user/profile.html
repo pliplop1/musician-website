@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,34 +8,59 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-	<!-- Header -->
 	<header class="bg-white shadow-md">
 		<div
 			class="container mx-auto px-6 py-4 flex justify-between items-center">
 			<h1 class="text-2xl font-bold text-gray-800">Mon Espace</h1>
-			<nav>
-				<a th:href="@{/}" class="px-4 hover:text-indigo-600">Retour au
-					site</a>
+			<div>
+				<a th:href="@{/}"
+					class="px-4 text-gray-600 hover:text-indigo-600">Retour au site</a>
 				<form th:action="@{/logout}" method="post" class="inline">
 					<button type="submit"
-						class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md ml-4">Déconnexion</button>
+						class="px-4 text-gray-600 hover:text-indigo-600">Déconnexion</button>
 				</form>
-			</nav>
+			</div>
 		</div>
 	</header>
 
-	<!-- Main Content -->
-	<main class="container mx-auto px-6 py-12">
-		<div class="bg-white p-8 rounded-lg shadow-lg max-w-2xl mx-auto">
-			<h2 class="text-3xl font-bold mb-6 text-center">
-				Bienvenue, <span class="text-indigo-600" th:text="${username}"></span>
-				!
-			</h2>
-			<p class="text-center text-gray-600">Cette section est en cours
-				de construction. Bientôt, vous pourrez y retrouver des informations
-				personnalisées.</p>
-		</div>
-	</main>
+	<main class="container mx-auto px-6 py-8">
 
-</body>
-</html>
+		<div th:if="${successMessage}"
+			class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-8 shadow-sm">
+			<p class="font-bold">Succès !</p>
+			<span th:text="${successMessage}"></span>
+		</div>
+
+		<h2 class="text-3xl font-bold mb-6">
+			Bienvenue, <span th:text="${username}"></span> !
+		</h2>
+		
+		<div class="mb-8">
+            <a th:href="@{/user/profile/edit}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">
+                Modifier mon profil
+            </a>
+        </div>
+        
+		<section>
+			<h3 class="text-2xl font-semibold mb-4">Mes Concerts Favoris</h3>
+			<div class="bg-white rounded-lg shadow-md p-6">
+				<div th:if="${#lists.isEmpty(favoriteConcerts)}">
+					<p class="text-gray-500">Vous n'avez pas encore de concert en favori. Parcourez la <a th:href="@{/}" class="text-indigo-600 hover:underline">liste des concerts</a> !</p>
+				</div>
+				<ul th:unless="${#lists.isEmpty(favoriteConcerts)}" class="space-y-4">
+					<li th:each="concert : ${favoriteConcerts}" class="border-b pb-4 flex justify-between items-center">
+						<div>
+							<p class="font-bold text-lg" th:text="${concert.location}"></p>
+							<p class="text-gray-600" th:text="${#temporals.format(concert.date, 'dd MMMM yyyy')}"></p>
+							<p class="text-sm text-gray-500 mt-1" th:text="${concert.description}"></p>
+						</div>
+						<form th:action="@{/user/favorites/remove/{id}(id=${concert.id})}" method="post" class="ml-4">
+							<button type="submit" class="bg-gray-500 hover:bg-gray-600 text-white text-sm font-bold py-2 px-4 rounded-md transition-colors">
+								Ne m'intéresse plus
+							</button>
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						</form>
+					</li>
+				</ul>
+			</div>
+		</section>

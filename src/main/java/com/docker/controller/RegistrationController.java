@@ -27,19 +27,26 @@ public class RegistrationController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
-        if (userService.findByUsername(user.getUsername()) != null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ce nom d'utilisateur existe déjà.");
+        // On utilise un bloc try-catch pour gérer les erreurs de validation
+        try {
+            if (userService.findByUsername(user.getUsername()) != null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Ce nom d'utilisateur existe déjà.");
+                return "redirect:/register";
+            }
+            if (userService.findByEmail(user.getEmail()) != null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Cet email est déjà utilisé.");
+                return "redirect:/register";
+            }
+            
+            userService.saveUser(user);
+            
+            redirectAttributes.addFlashAttribute("successMessage", "Inscription réussie ! Vous pouvez maintenant vous connecter.");
+            return "redirect:/login";
+
+        } catch (IllegalArgumentException e) {
+            // Ici, on récupère le message d'erreur détaillé du service (pour le mot de passe)
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/register";
         }
-        if (userService.findByEmail(user.getEmail()) != null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Cet email est déjà utilisé.");
-            return "redirect:/register";
-        }
-        
-        userService.saveUser(user);
-        
-        redirectAttributes.addFlashAttribute("successMessage", "Inscription réussie ! Vous pouvez maintenant vous connecter.");
-        return "redirect:/login";
     }
 }
-

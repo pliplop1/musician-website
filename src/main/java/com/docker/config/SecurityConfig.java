@@ -44,15 +44,15 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
                     .requestMatchers("/admin/**").hasRole("ADMIN")
-                    .requestMatchers("/user/**").hasRole("USER")
-                    .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/contact", "/register").permitAll()
+                    // LA CORRECTION EST ICI : on utilise hasAnyRole
+                    .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") 
+                    .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/contact", "/register", "/actualites").permitAll()
                     .anyRequest().authenticated()
             )
             .formLogin(formLogin ->
                 formLogin
                     .loginPage("/login")
                     .successHandler((request, response, authentication) -> {
-                        // Lignes de débogage pour voir ce qui se passe
                         System.out.println("--- Authentication Success Handler ---");
                         System.out.println("User: " + authentication.getName());
                         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
@@ -80,4 +80,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-

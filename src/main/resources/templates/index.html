@@ -1,95 +1,124 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Officiel du Musicien</title>
-
-    <!--
-      IMPORTANT : On ne charge QUE la feuille de style compilée par Maven.
-      La balise <script src="https://cdn.tailwindcss.com"></script> a été supprimée.
-    -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    
-    <!-- Police Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Officiel du Musicien</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="bg-gray-900 text-white">
 
-    <!-- Header -->
-    <header class="p-4 text-center">
-        <h1 class="text-5xl font-bold">Nom de l'Artiste</h1>
-        <p class="text-xl text-gray-400">Musicien / Compositeur</p>
-    </header>
+	<header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+		<div
+			class="container mx-auto px-6 py-4 flex justify-between items-center">
+			<h1 class="text-3xl font-bold tracking-wider">LE NOM DE
+				L'ARTISTE</h1>
+			<nav>
+				<a href="#concerts" class="px-4 hover:text-indigo-400">Concerts</a>
+				<a th:href="@{/actualites}" class="px-4 hover:text-indigo-400">Actualités</a>
+				<a href="#contact" class="px-4 hover:text-indigo-400">Contact</a>
+				
+				<div sec:authorize="!isAuthenticated()" class="inline">
+					<a th:href="@{/login}" class="px-4 hover:text-indigo-400">Connexion</a>
+				</div>
+				<div sec:authorize="isAuthenticated()" class="inline">
+					<a th:href="@{/user/profile}" sec:authentication="name" class="px-4 font-bold text-indigo-400 hover:underline"></a>
+					<a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md ml-4">Admin</a>
+					<form th:action="@{/logout}" method="post" class="inline ml-4">
+						<button type="submit" class="px-4 text-gray-400 hover:text-white">Déconnexion</button>
+					</form>
+				</div>
+			</nav>
+		</div>
+	</header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto p-8 space-y-16">
+	<main class="container mx-auto px-6 py-12">
 
-        <!-- Section Prochaines Dates -->
-        <section id="dates">
-            <h2 class="text-4xl font-bold mb-8 text-center">Prochaines Dates</h2>
-            
-            <div th:if="${concerts.isEmpty()}" class="text-center text-gray-400">
-                <p>Aucune date de concert n'est prévue pour le moment. Revenez bientôt !</p>
-            </div>
+		<section class="text-center my-16">
+			<h2 class="text-5xl font-black mb-4">LA MUSIQUE QUI VOUS
+				TRANSPORTE</h2>
+			<p class="text-xl text-gray-400">Découvrez les dernières
+				actualités et dates de tournée.</p>
+		</section>
 
-            <div th:unless="${concerts.isEmpty()}" class="space-y-6">
-                <!-- Boucle sur chaque concert -->
-                <div th:each="concert : ${concerts}" class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div>
-                        <p class="text-2xl font-bold" th:text="${concert.location}">Lieu du Concert</p>
-                        <p class="text-indigo-400" th:text="${#temporals.format(concert.date, 'dd MMMM yyyy')}">01 Janvier 2025</p>
-                        <p class="text-gray-400 mt-2" th:text="${concert.description}">Description de l'événement.</p>
-                    </div>
-                    <!-- Ici on utilise la classe .btn-primary définie dans notre fichier input.css -->
-                    <a href="#" class="btn-primary mt-4 md:mt-0">
-                        Billets
-                    </a>
-                </div>
-            </div>
-        </section>
+		<div th:if="${successMessage}"
+			class="bg-green-500 text-white p-4 rounded-md mb-12 text-center shadow-lg">
+			<p th:text="${successMessage}"></p>
+		</div>
 
-        <!-- Section Contact -->
-        <section id="contact">
-            <h2 class="text-4xl font-bold mb-8 text-center">Contact</h2>
-            
-            <div class="max-w-xl mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
-                
-                <div th:if="${successMessage}" class="bg-green-500 text-white p-4 rounded-md mb-6 text-center">
-                    <p th:text="${successMessage}">Votre message a bien été envoyé !</p>
-                </div>
+		<section id="concerts" class="mb-20 scroll-mt-20">
+			<h3 class="text-4xl font-bold text-center mb-10">Prochaines
+				Dates</h3>
+			<div class="max-w-4xl mx-auto space-y-6">
+				<div th:if="${#lists.isEmpty(concerts)}"
+					class="bg-gray-800 rounded-lg p-8 text-center shadow-lg">
+					<p class="text-gray-400 text-lg">Aucun concert n'est prévu pour
+						le moment. Revenez bientôt !</p>
+				</div>
+				<div th:each="concert : ${concerts}"
+					class="bg-gray-800 rounded-lg p-6 flex flex-col md:flex-row items-center justify-between shadow-lg">
+					<div class="text-center md:text-left mb-4 md:mb-0">
+						<p class="text-2xl font-bold text-indigo-400"
+							th:text="${#temporals.format(concert.date, 'dd MMMM yyyy')}"></p>
+						<p class="text-xl font-bold" th:text="${concert.location}"></p>
+						<p class="text-gray-400 mt-2" th:text="${concert.description}"></p>
+					</div>
+					
+					<div sec:authorize="isAuthenticated()" class="flex-shrink-0">
+						<form th:action="@{/user/favorites/add/{id}(id=${concert.id})}" method="post" th:if="${!favoriteConcertIds.contains(concert.id)}">
+							<button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition-colors">
+								Ça m'intéresse
+							</button>
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						</form>
+						<form th:action="@{/user/favorites/remove/{id}(id=${concert.id})}" method="post" th:if="${favoriteConcertIds.contains(concert.id)}">
+							<button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-md transition-colors">
+								Ne m'intéresse plus
+							</button>
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
 
-                <form th:action="@{/contact}" th:object="${message}" method="post" class="space-y-6">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-300">Votre Nom</label>
-                        <input type="text" id="name" th:field="*{name}" required class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-300">Votre Email</label>
-                        <input type="email" id="email" th:field="*{email}" required class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label for="content" class="block text-sm font-medium text-gray-300">Votre Message</label>
-                        <textarea id="content" th:field="*{content}" rows="4" required class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                    </div>
-                    <div>
-                        <button type="submit" class="w-full btn-primary">
-                            Envoyer le Message
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
+		<section id="contact" class="max-w-2xl mx-auto scroll-mt-20">
+			<h3 class="text-4xl font-bold text-center mb-10">Contactez-moi</h3>
+			<div class="bg-gray-800 p-8 rounded-lg shadow-lg">
+				<form th:action="@{/contact}" th:object="${message}" method="post"
+					class="space-y-6">
+					<div>
+						<label for="name" class="block text-sm font-medium text-gray-300">Nom</label>
+						<input type="text" id="name" th:field="*{name}" required
+							class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+					</div>
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+						<input type="email" id="email" th:field="*{email}" required
+							class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+					</div>
+					<div>
+						<label for="content"
+							class="block text-sm font-medium text-gray-300">Message</label>
+						<textarea id="content" th:field="*{content}" rows="4" required
+							class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+					</div>
+					<div>
+						<button type="submit"
+							class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out">Envoyer</button>
+					</div>
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				</form>
+			</div>
+		</section>
 
-    </main>
+	</main>
 
-    <!-- Footer -->
-    <footer class="text-center p-8 text-gray-500">
-        <p>&copy; 2025 Nom de l'Artiste. Tous droits réservés.</p>
-    </footer>
+	<footer class="bg-gray-800 mt-20">
+		<div class="container mx-auto px-6 py-4 text-center text-gray-400">
+			<p>&copy; 2025 Le Nom de l'Artiste. Tous droits réservés.</p>
+		</div>
+	</footer>
 
 </body>
 </html>
-
