@@ -1,4 +1,8 @@
-### STS ###
+# =============================================================
+# .gitignore FINAL pour le projet musician-website
+# =============================================================
+
+### STS / Eclipse ###
 .apt_generated
 .classpath
 .factorypath
@@ -28,15 +32,30 @@ build/
 
 ### Maven ###
 /target/
+# AJOUT - Ignore les fichiers temporaires du plugin Maven Release
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
 
 ### Node / Frontend ###
 /frontend/node_modules/
+# AJOUT - Ignore le dossier de build du frontend
+/frontend/dist/
 
 ### Fichiers de log ###
 *.log
+# AJOUT - Ignore le répertoire de logs complet
+logs/
 
 ### Fichiers système ###
 .DS_Store
 Thumbs.db
 
-
+### Fichiers sensibles ou de configuration ###
+# AJOUT IMPORTANT - Ignore les sauvegardes de la base de données
+*.sql
+# AJOUT - Ignore les fichiers de configuration locaux
+application-local.properties

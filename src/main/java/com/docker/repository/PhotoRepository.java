@@ -1,0 +1,11 @@
+// /src/main/java/com/docker/repository/PhotoRepository.java
+
+package com.docker.repository;
+
+import com.docker.entity.Photo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface PhotoRepository extends JpaRepository<Photo, Long> {
+}
