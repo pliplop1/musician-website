@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Page non trouvée (404)</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="text-center">
+        <h1 class="text-6xl font-bold text-indigo-600">404</h1>
+        <p class="text-2xl font-medium text-gray-800 mt-4">Page non trouvée</p>
+        <p class="text-gray-600 mt-2">Désolé, la page que vous cherchez n'existe pas.</p>
+        <a th:href="@{/}" class="mt-6 inline-block bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">
+            Retour à l'accueil
+        </a>
+    </div>
+</body>
+</html>

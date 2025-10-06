@@ -46,7 +46,7 @@ public class SecurityConfig {
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     // LA CORRECTION EST ICI : on utilise hasAnyRole
                     .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") 
-                    .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/contact", "/register", "/actualites").permitAll()
+                    .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/contact", "/register", "/actualites", "/api/**").permitAll()
                     .anyRequest().authenticated()
             )
             .formLogin(formLogin ->

@@ -18,45 +18,71 @@ import com.docker.entity.User;
 import com.docker.service.ConcertService;
 import com.docker.service.MessageService;
 import com.docker.service.UserService;
+import com.docker.service.BiographyService;
+import com.docker.service.PhotoService;
+import com.docker.service.TrackService;
 
 @Controller
 public class MainController {
 
-    private final ConcertService concertService;
-    private final MessageService messageService;
-    private final UserService userService;
+	private final ConcertService concertService;
+	private final MessageService messageService;
+	private final UserService userService;
+	private final BiographyService biographyService;
+	private final PhotoService photoService;
+	private final TrackService trackService;
 
-    public MainController(ConcertService concertService, MessageService messageService, UserService userService) {
-        this.concertService = concertService;
-        this.messageService = messageService;
-        this.userService = userService;
-    }
+	public MainController(ConcertService concertService, MessageService messageService, UserService userService,
+			BiographyService biographyService, PhotoService photoService, TrackService trackService) {
+		this.concertService = concertService;
+		this.messageService = messageService;
+		this.userService = userService;
+		this.biographyService = biographyService;
+		this.photoService = photoService;
+		this.trackService = trackService;
+	}
 
-    @GetMapping("/")
-    public String home(Model model, Principal principal) {
-        model.addAttribute("concerts", concertService.findAllConcerts());
-        if (!model.containsAttribute("message")) {
-            model.addAttribute("message", new Message());
-        }
-        
-        if (principal != null) {
-            User user = userService.findByUsername(principal.getName());
-            Set<Long> favoriteConcertIds = user.getFavoriteConcerts().stream()
-                                               .map(Concert::getId)
-                                               .collect(Collectors.toSet());
-            model.addAttribute("favoriteConcertIds", favoriteConcertIds);
-        } else {
-            model.addAttribute("favoriteConcertIds", Collections.emptySet());
-        }
-        
-        return "index";
-    }
+	@GetMapping("/")
+	public String home(Model model, Principal principal) {
+		model.addAttribute("concerts", concertService.findAllConcerts());
+		if (!model.containsAttribute("message")) {
+			model.addAttribute("message", new Message());
+		}
 
-    @PostMapping("/contact")
-    public String submitContactForm(@ModelAttribute Message message, RedirectAttributes redirectAttributes) {
-        messageService.saveMessage(message);
-        redirectAttributes.addFlashAttribute("successMessage", "Votre message a bien été envoyé !");
-        return "redirect:/";
-    }
+		if (principal != null) {
+			User user = userService.findByUsername(principal.getName());
+			Set<Long> favoriteConcertIds = user.getFavoriteConcerts().stream().map(Concert::getId)
+					.collect(Collectors.toSet());
+			model.addAttribute("favoriteConcertIds", favoriteConcertIds);
+		} else {
+			model.addAttribute("favoriteConcertIds", Collections.emptySet());
+		}
+
+		return "index";
+	}
+
+	@GetMapping("/biographie")
+	public String showBiography(Model model) {
+		model.addAttribute("biography", biographyService.getBiography());
+		return "biographie"; // Le nom de notre nouvelle page HTML
+	}
+
+	@PostMapping("/contact")
+	public String submitContactForm(@ModelAttribute Message message, RedirectAttributes redirectAttributes) {
+		messageService.saveMessage(message);
+		redirectAttributes.addFlashAttribute("successMessage", "Votre message a bien été envoyé !");
+		return "redirect:/";
+	}
+
+	@GetMapping("/galerie")
+	public String showGallery(Model model) {
+		model.addAttribute("photos", photoService.getAllPhotos());
+		return "galerie";
+	}
+
+	@GetMapping("/musique")
+	public String showMusic(Model model) {
+		model.addAttribute("tracks", trackService.getAllTracks());
+		return "musique";
+	}
 }
-

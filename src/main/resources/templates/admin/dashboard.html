@@ -6,21 +6,31 @@
 <title>Tableau de Bord - Administration</title>
 <link rel="stylesheet" th:href="@{/css/style.css}">
 <style>
-  .modal { display: none; }
-  #deleteConfirmModal { position: absolute; }
+.modal {
+	display: none;
+}
+
+#deleteConfirmModal {
+	position: absolute;
+}
 </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
 	<header class="bg-white shadow-md">
-		<div class="container mx-auto px-6 py-4 flex justify-between items-center">
+		<div
+			class="container mx-auto px-6 py-4 flex justify-between items-center">
 			<h1 class="text-2xl font-bold text-gray-800">Administration</h1>
 			<div>
-				<a th:href="@{/user/profile}" class="px-4 text-indigo-600 hover:underline font-semibold">Mon Profil</a>
-				<a th:href="@{/admin/users}" class="px-4 text-gray-600 hover:text-indigo-600">Gérer les utilisateurs</a>
-				<a th:href="@{/}" class="px-4 text-gray-600 hover:text-indigo-600">Retour au site</a>
+				<a th:href="@{/user/profile}"
+					class="px-4 text-indigo-600 hover:underline font-semibold">Mon
+					Profil</a> <a th:href="@{/admin/users}"
+					class="px-4 text-gray-600 hover:text-indigo-600">Gérer les
+					utilisateurs</a> <a th:href="@{/}"
+					class="px-4 text-gray-600 hover:text-indigo-600">Retour au site</a>
 				<form th:action="@{/logout}" method="post" class="inline">
-					<button type="submit" class="px-4 text-gray-600 hover:text-indigo-600">Déconnexion</button>
+					<button type="submit"
+						class="px-4 text-gray-600 hover:text-indigo-600">Déconnexion</button>
 				</form>
 			</div>
 		</div>
@@ -28,7 +38,8 @@
 
 	<main class="container mx-auto px-6 py-8">
 
-		<div th:if="${successMessage}" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-8 shadow-sm">
+		<div th:if="${successMessage}"
+			class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-8 shadow-sm">
 			<p class="font-bold">Succès !</p>
 			<span th:text="${successMessage}"></span>
 		</div>
@@ -36,66 +47,94 @@
 		<section class="mb-8">
 			<h2 class="text-3xl font-bold mb-6">Statistiques</h2>
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-				<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+				<div
+					class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
 					<div>
-						<p class="text-gray-500 text-sm font-medium">Utilisateurs inscrits</p>
+						<p class="text-gray-500 text-sm font-medium">Utilisateurs
+							inscrits</p>
 						<p class="text-3xl font-bold" th:text="${userCount}">0</p>
 					</div>
 					<div class="bg-blue-100 text-blue-600 rounded-full p-3">
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197"></path></svg>
+						<svg class="w-6 h-6" fill="none" stroke="currentColor"
+							viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path stroke-linecap="round" stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197"></path></svg>
 					</div>
 				</div>
-				<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+				<div
+					class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
 					<div>
-						<p class="text-gray-500 text-sm font-medium">Concerts programmés</p>
+						<p class="text-gray-500 text-sm font-medium">Concerts
+							programmés</p>
 						<p class="text-3xl font-bold" th:text="${concertCount}">0</p>
 					</div>
 					<div class="bg-purple-100 text-purple-600 rounded-full p-3">
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path></svg>
+						<svg class="w-6 h-6" fill="none" stroke="currentColor"
+							viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path stroke-linecap="round" stroke-linejoin="round"
+								stroke-width="2"
+								d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path></svg>
 					</div>
 				</div>
-				<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+				<div
+					class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
 					<div>
-						<p class="text-gray-500 text-sm font-medium">Actualités publiées</p>
+						<p class="text-gray-500 text-sm font-medium">Actualités
+							publiées</p>
 						<p class="text-3xl font-bold" th:text="${articleCount}">0</p>
 					</div>
 					<div class="bg-green-100 text-green-600 rounded-full p-3">
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3h2m0 0V4m0 0H9m10 4v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v3h-2z"></path></svg>
+						<svg class="w-6 h-6" fill="none" stroke="currentColor"
+							viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path stroke-linecap="round" stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3h2m0 0V4m0 0H9m10 4v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v3h-2z"></path></svg>
 					</div>
 				</div>
-				<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+				<div
+					class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
 					<div>
 						<p class="text-gray-500 text-sm font-medium">Messages reçus</p>
 						<p class="text-3xl font-bold" th:text="${messageCount}">0</p>
 					</div>
 					<div class="bg-yellow-100 text-yellow-600 rounded-full p-3">
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+						<svg class="w-6 h-6" fill="none" stroke="currentColor"
+							viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path stroke-linecap="round" stroke-linejoin="round"
+								stroke-width="2"
+								d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
 					</div>
 				</div>
 			</div>
 		</section>
 
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
 			<section>
 				<h2 class="text-3xl font-bold mb-6">Gérer les concerts</h2>
 				<div class="bg-white p-8 rounded-lg shadow-md mb-8">
 					<h3 class="text-xl font-semibold mb-4">Ajouter un concert</h3>
-					<form th:action="@{/admin/concerts/add}" th:object="${concert}" method="post" class="space-y-6">
+					<form th:action="@{/admin/concerts/add}" th:object="${concert}"
+						method="post" class="space-y-6">
 						<div>
 							<label for="location" class="block text-sm font-medium">Lieu</label>
-							<input type="text" id="location" th:field="*{location}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							<input type="text" id="location" th:field="*{location}" required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
 						</div>
 						<div>
 							<label for="date" class="block text-sm font-medium">Date</label>
-							<input type="date" id="date" th:field="*{date}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							<input type="date" id="date" th:field="*{date}" required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
 						</div>
 						<div>
 							<label for="description" class="block text-sm font-medium">Description</label>
-							<textarea id="description" th:field="*{description}" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+							<textarea id="description" th:field="*{description}" rows="3"
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
 						</div>
 						<div>
-							<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md">Ajouter le concert</button>
+							<button type="submit"
+								class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md">Ajouter
+								le concert</button>
 						</div>
 					</form>
 				</div>
@@ -103,18 +142,24 @@
 					<table class="min-w-full divide-y divide-gray-200">
 						<thead class="bg-gray-50">
 							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y divide-gray-200">
 							<tr th:each="c : ${concerts}">
-								<td class="px-6 py-4 whitespace-nowrap" th:text="${#temporals.format(c.date, 'dd/MM/yyyy')}"></td>
+								<td class="px-6 py-4 whitespace-nowrap"
+									th:text="${#temporals.format(c.date, 'dd/MM/yyyy')}"></td>
 								<td class="px-6 py-4 whitespace-nowrap" th:text="${c.location}"></td>
-								<td class="px-6 py-4 text-sm font-medium flex space-x-4">
-									<a th:href="@{/admin/concerts/edit/{id}(id=${c.id})}" class="text-indigo-600 hover:text-indigo-900">Modifier</a>
-									<a th:href="@{/admin/concerts/delete/{id}(id=${c.id})}" class="text-red-600 hover:text-red-900 delete-link">Supprimer</a>
+								<td class="px-6 py-4 text-sm font-medium flex space-x-4"><a
+									th:href="@{/admin/concerts/edit/{id}(id=${c.id})}"
+									class="text-indigo-600 hover:text-indigo-900">Modifier</a> <a
+									th:href="@{/admin/concerts/delete/{id}(id=${c.id})}"
+									class="text-red-600 hover:text-red-900 delete-link">Supprimer</a>
 								</td>
 							</tr>
 						</tbody>
@@ -126,17 +171,22 @@
 				<h2 class="text-3xl font-bold mb-6">Gérer les actualités</h2>
 				<div class="bg-white p-8 rounded-lg shadow-md mb-8">
 					<h3 class="text-xl font-semibold mb-4">Ajouter une actualité</h3>
-					<form th:action="@{/admin/articles/add}" th:object="${article}" method="post" class="space-y-6">
+					<form th:action="@{/admin/articles/add}" th:object="${article}"
+						method="post" class="space-y-6">
 						<div>
 							<label for="titre" class="block text-sm font-medium">Titre</label>
-							<input type="text" id="titre" th:field="*{titre}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							<input type="text" id="titre" th:field="*{titre}" required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
 						</div>
 						<div>
 							<label for="contenu" class="block text-sm font-medium">Contenu</label>
-							<textarea id="contenu" th:field="*{contenu}" rows="5" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+							<textarea id="contenu" th:field="*{contenu}" rows="5" required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
 						</div>
 						<div>
-							<button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md">Publier l'actualité</button>
+							<button type="submit"
+								class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md">Publier
+								l'actualité</button>
 						</div>
 					</form>
 				</div>
@@ -144,21 +194,29 @@
 					<table class="min-w-full divide-y divide-gray-200">
 						<thead class="bg-gray-50">
 							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Titre</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Titre</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y divide-gray-200">
 							<tr th:if="${#lists.isEmpty(articles)}">
-								<td colspan="3" class="px-6 py-4 text-center text-gray-500">Aucune actualité publiée.</td>
+								<td colspan="3" class="px-6 py-4 text-center text-gray-500">Aucune
+									actualité publiée.</td>
 							</tr>
 							<tr th:each="a : ${articles}">
-								<td class="px-6 py-4 whitespace-nowrap" th:text="${#temporals.format(a.datePublication, 'dd/MM/yy HH:mm')}"></td>
-								<td class="px-6 py-4" th:text="${#strings.abbreviate(a.titre, 40)}"></td>
-								<td class="px-6 py-4 text-sm font-medium flex space-x-4">
-									<a th:href="@{/admin/articles/edit/{id}(id=${a.id})}" class="text-indigo-600 hover:text-indigo-900">Modifier</a>
-									<a th:href="@{/admin/articles/delete/{id}(id=${a.id})}" class="text-red-600 hover:text-red-900 delete-link">Supprimer</a>
+								<td class="px-6 py-4 whitespace-nowrap"
+									th:text="${#temporals.format(a.datePublication, 'dd/MM/yy HH:mm')}"></td>
+								<td class="px-6 py-4"
+									th:text="${#strings.abbreviate(a.titre, 40)}"></td>
+								<td class="px-6 py-4 text-sm font-medium flex space-x-4"><a
+									th:href="@{/admin/articles/edit/{id}(id=${a.id})}"
+									class="text-indigo-600 hover:text-indigo-900">Modifier</a> <a
+									th:href="@{/admin/articles/delete/{id}(id=${a.id})}"
+									class="text-red-600 hover:text-red-900 delete-link">Supprimer</a>
 								</td>
 							</tr>
 						</tbody>
@@ -168,27 +226,186 @@
 		</div>
 
 		<section class="mt-16">
+			<h2 class="text-3xl font-bold mb-6">Gérer la Musique</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div class="bg-white p-8 rounded-lg shadow-md">
+					<h3 class="text-xl font-semibold mb-4">Option A : Ajouter via
+						code d'intégration</h3>
+					<form th:action="@{/admin/tracks/add-embed}" method="post"
+						class="space-y-4">
+						<div>
+							<label for="embedTitle" class="block text-sm font-medium">Titre
+								du morceau</label> <input type="text" id="embedTitle" name="title"
+								required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+						</div>
+						<div>
+							<label for="embedCode" class="block text-sm font-medium">Code
+								d'intégration (<iframe>...</iframe>)
+							</label>
+							<textarea id="embedCode" name="embedCode" rows="4" required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+						</div>
+						<div>
+							<button type="submit"
+								class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md">Ajouter
+								la piste (Embed)</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="bg-white p-8 rounded-lg shadow-md">
+					<h3 class="text-xl font-semibold mb-4">Option B : Ajouter via
+						fichier audio</h3>
+					<form th:action="@{/admin/tracks/add-upload}" method="post"
+						enctype="multipart/form-data" class="space-y-4">
+						<div>
+							<label for="uploadTitle" class="block text-sm font-medium">Titre
+								du morceau</label> <input type="text" id="uploadTitle" name="title"
+								required
+								class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+						</div>
+						<div>
+							<label for="audioFile" class="block text-sm font-medium">Fichier
+								audio (MP3, WAV...)</label> <input type="file" id="audioFile"
+								name="file" required accept="audio/*"
+								class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+						</div>
+						<div>
+							<button type="submit"
+								class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md">Ajouter
+								la piste (Fichier)</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="mt-8 bg-white rounded-lg shadow-md overflow-x-auto">
+				<table class="min-w-full divide-y divide-gray-200">
+					<thead class="bg-gray-50">
+						<tr>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Titre</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="bg-white divide-y divide-gray-200">
+						<tr th:each="track : ${tracks}">
+							<td class="px-6 py-4" th:text="${track.title}"></td>
+							<td class="px-6 py-4"><span
+								th:text="${track.trackType == T(com.docker.entity.TrackType).EMBED ? 'Embed' : 'Fichier'}"
+								class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+								th:classappend="${track.trackType == T(com.docker.entity.TrackType).EMBED ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}"></span>
+							</td>
+							<td class="px-6 py-4"><a
+								th:href="@{/admin/tracks/delete/{id}(id=${track.id})}"
+								class="text-red-600 hover:text-red-900 delete-link">Supprimer</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="mt-16">
+			<h2 class="text-3xl font-bold mb-6">Gérer la Galerie Photo</h2>
+			<div class="bg-white p-8 rounded-lg shadow-md mb-8">
+				<h3 class="text-xl font-semibold mb-4">Ajouter une photo</h3>
+				<form th:action="@{/admin/photos/upload}" method="post"
+					enctype="multipart/form-data" class="space-y-4">
+					<div>
+						<label for="file" class="block text-sm font-medium">Choisir
+							un fichier image</label> <input type="file" id="file" name="file"
+							required accept="image/*"
+							class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+					</div>
+					<div>
+						<button type="submit"
+							class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md">Envoyer
+							la photo</button>
+					</div>
+				</form>
+			</div>
+			<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+				<div th:each="photo : ${photos}" class="relative group">
+					<img
+						th:src="@{/uploaded-photos/{filename}(filename=${photo.filename})}"
+						alt="Photo de la galerie"
+						class="rounded-lg object-cover w-full h-48">
+					<div
+						class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+						<a th:href="@{/admin/photos/delete/{id}(id=${photo.id})}"
+							class="text-white bg-red-600 hover:bg-red-700 rounded-full p-3 delete-link">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor"
+								viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="mt-16">
+			<h2 class="text-3xl font-bold mb-6">Gérer la Biographie</h2>
+			<div class="bg-white p-8 rounded-lg shadow-md">
+				<form th:action="@{/admin/biography/update}" method="post"
+					class="space-y-6">
+					<div>
+						<label for="bio-content" class="block text-sm font-medium">Contenu
+							de la Biographie</label>
+						<textarea id="bio-content" name="content" rows="12"
+							th:text="${biography.content}" required
+							class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+					</div>
+					<div>
+						<button type="submit"
+							class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md">Enregistrer
+							la biographie</button>
+					</div>
+				</form>
+			</div>
+		</section>
+
+		<section class="mt-16">
 			<h2 class="text-3xl font-bold mb-6">Messages Reçus</h2>
 			<div class="bg-white rounded-lg shadow-md overflow-hidden">
 				<table class="min-w-full divide-y divide-gray-200">
 					<thead class="bg-gray-50">
 						<tr>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y divide-gray-200">
 						<tr th:each="message : ${messages}">
-							<td class="px-6 py-4 whitespace-nowrap" th:text="${#temporals.format(message.timestamp, 'dd/MM/yyyy HH:mm')}"></td>
+							<td class="px-6 py-4 whitespace-nowrap"
+								th:text="${#temporals.format(message.timestamp, 'dd/MM/yyyy HH:mm')}"></td>
 							<td class="px-6 py-4 whitespace-nowrap" th:text="${message.name}"></td>
-							<td class="px-6 py-4 whitespace-nowrap" th:text="${message.email}"></td>
-							<td class="px-6 py-4" th:text="${#strings.abbreviate(message.content, 50)}"></td>
+							<td class="px-6 py-4 whitespace-nowrap"
+								th:text="${message.email}"></td>
+							<td class="px-6 py-4"
+								th:text="${#strings.abbreviate(message.content, 50)}"></td>
 							<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-								<button type="button" class="text-blue-600 hover:text-blue-900 view-message-btn" th:data-name="${message.name}" th:data-email="${message.email}" th:data-timestamp="${#temporals.format(message.timestamp, 'dd MMMM yy à HH:mm')}" th:data-content="${message.content}">Voir</button>
-								<a th:href="@{/admin/messages/delete/{id}(id=${message.id})}" class="text-red-600 hover:text-red-900 ml-4 delete-link">Supprimer</a>
+								<button type="button"
+									class="text-blue-600 hover:text-blue-900 view-message-btn"
+									th:data-name="${message.name}" th:data-email="${message.email}"
+									th:data-timestamp="${#temporals.format(message.timestamp, 'dd MMMM yy à HH:mm')}"
+									th:data-content="${message.content}">Voir</button> <a
+								th:href="@{/admin/messages/delete/{id}(id=${message.id})}"
+								class="text-red-600 hover:text-red-900 ml-4 delete-link">Supprimer</a>
 							</td>
 						</tr>
 					</tbody>
@@ -196,117 +413,147 @@
 			</div>
 		</section>
 	</main>
-	
-	<div id="messageModal" class="modal fixed z-10 inset-0 overflow-y-auto" style="position: fixed;">
-	  <div class="flex items-center justify-center min-h-screen">
-	    <div class="fixed inset-0 bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
-	    <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
-	      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-	        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-message">Détails du Message</h3>
-            <div class="mt-4">
-              <p class="text-sm text-gray-500"><strong>De :</strong> <span id="modal-name"></span></p>
-              <p class="text-sm text-gray-500"><strong>Email :</strong> <span id="modal-email"></span></p>
-              <p class="text-sm text-gray-500"><strong>Date :</strong> <span id="modal-timestamp"></span></p>
-              <hr class="my-4">
-              <p class="text-base text-gray-800 whitespace-pre-wrap" id="modal-content"></p>
-            </div>
-	      </div>
-	      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-	        <button type="button" id="closeMessageModalBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Fermer</button>
-	      </div>
-	    </div>
-	  </div>
+
+	<div id="messageModal" class="modal fixed z-10 inset-0 overflow-y-auto"
+		style="position: fixed;">
+		<div class="flex items-center justify-center min-h-screen">
+			<div class="fixed inset-0 bg-gray-500 bg-opacity-75"
+				aria-hidden="true"></div>
+			<div
+				class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+				<div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+					<h3 class="text-lg leading-6 font-medium text-gray-900"
+						id="modal-title-message">Détails du Message</h3>
+					<div class="mt-4">
+						<p class="text-sm text-gray-500">
+							<strong>De :</strong> <span id="modal-name"></span>
+						</p>
+						<p class="text-sm text-gray-500">
+							<strong>Email :</strong> <span id="modal-email"></span>
+						</p>
+						<p class="text-sm text-gray-500">
+							<strong>Date :</strong> <span id="modal-timestamp"></span>
+						</p>
+						<hr class="my-4">
+						<p class="text-base text-gray-800 whitespace-pre-wrap"
+							id="modal-content"></p>
+					</div>
+				</div>
+				<div
+					class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+					<button type="button" id="closeMessageModalBtn"
+						class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Fermer</button>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<div id="deleteConfirmModal" class="modal z-20">
-	    <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-xs sm:w-full">
-	      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-	        <div class="sm:flex sm:items-start">
-	          <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-				<svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-	          </div>
-	          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-	            <h3 class="text-lg leading-6 font-medium text-gray-900">Confirmer la suppression</h3>
-	            <div class="mt-2"><p class="text-sm text-gray-500">Êtes-vous sûr ? Cette action est irréversible.</p></div>
-	          </div>
-	        </div>
-	      </div>
-	      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-	        <a href="#" id="confirmDeleteBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm">Supprimer</a>
-	        <button type="button" id="cancelDeleteBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">Annuler</button>
-	      </div>
-	    </div>
+		<div
+			class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-xs sm:w-full">
+			<div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+				<div class="sm:flex sm:items-start">
+					<div
+						class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+						<svg class="h-6 w-6 text-red-600"
+							xmlns="http://www.w3.org/2000/svg" fill="none"
+							viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+							<path stroke-linecap="round" stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+					</div>
+					<div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+						<h3 class="text-lg leading-6 font-medium text-gray-900">Confirmer
+							la suppression</h3>
+						<div class="mt-2">
+							<p class="text-sm text-gray-500">Êtes-vous sûr ? Cette action
+								est irréversible.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+				<a href="#" id="confirmDeleteBtn"
+					class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm">Supprimer</a>
+				<button type="button" id="cancelDeleteBtn"
+					class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">Annuler</button>
+			</div>
+		</div>
 	</div>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-		
-			const messageModal = document.getElementById('messageModal');
-			if (messageModal) {
-				const closeMessageModalBtn = document.getElementById('closeMessageModalBtn');
-				
-				document.body.addEventListener('click', function(event) {
-					const viewBtn = event.target.closest('.view-message-btn');
-					if (viewBtn) {
-						document.getElementById('modal-name').textContent = viewBtn.dataset.name;
-						document.getElementById('modal-email').textContent = viewBtn.dataset.email;
-						document.getElementById('modal-timestamp').textContent = viewBtn.dataset.timestamp;
-						document.getElementById('modal-content').textContent = viewBtn.dataset.content;
-						messageModal.style.display = 'block';
-					}
-				});
+    document.addEventListener('DOMContentLoaded', function () {
 
-				closeMessageModalBtn.addEventListener('click', () => { messageModal.style.display = 'none'; });
-				
-				window.addEventListener('click', (e) => {
-					if (e.target === messageModal) { messageModal.style.display = 'none'; }
-				});
-			}
+        const messageModal = document.getElementById('messageModal');
+        if (messageModal) {
+            const closeMessageModalBtn = document.getElementById('closeMessageModalBtn');
 
-			const deleteConfirmModal = document.getElementById('deleteConfirmModal');
-			if (deleteConfirmModal) {
-				const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-				const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-				
-				document.body.addEventListener('click', function(event) {
-					const deleteLink = event.target.closest('.delete-link');
-					if (deleteLink) {
-						event.preventDefault();
-						
-						const deleteUrl = deleteLink.getAttribute('href');
-						confirmDeleteBtn.setAttribute('href', deleteUrl);
+            document.body.addEventListener('click', function (event) {
+                const viewBtn = event.target.closest('.view-message-btn');
+                if (viewBtn) {
+                    document.getElementById('modal-name').textContent = viewBtn.dataset.name;
+                    document.getElementById('modal-email').textContent = viewBtn.dataset.email;
+                    document.getElementById('modal-timestamp').textContent = viewBtn.dataset.timestamp;
+                    document.getElementById('modal-content').textContent = viewBtn.dataset.content;
+                    messageModal.style.display = 'block';
+                }
+            });
 
-						deleteConfirmModal.style.display = 'block'; 
-						const modalHeight = deleteConfirmModal.offsetHeight;
-						const modalWidth = deleteConfirmModal.offsetWidth;
+            closeMessageModalBtn.addEventListener('click', () => {
+                messageModal.style.display = 'none';
+            });
 
-						let topPosition = event.pageY - (modalHeight / 2);
-						let leftPosition = event.pageX + 30;
-						
-						if (leftPosition + modalWidth > window.innerWidth) {
-							leftPosition = event.pageX - modalWidth - 30;
-						}
-						if (topPosition < window.scrollY) {
-							topPosition = window.scrollY + 10;
-						}
-						
-						deleteConfirmModal.style.left = leftPosition + 'px';
-						deleteConfirmModal.style.top = topPosition + 'px';
-					}
-				});
+            window.addEventListener('click', (e) => {
+                if (e.target === messageModal) {
+                    messageModal.style.display = 'none';
+                }
+            });
+        }
 
-				cancelDeleteBtn.addEventListener('click', () => { 
-					deleteConfirmModal.style.display = 'none'; 
-				});
-				
-				document.addEventListener('click', function(event) {
-					if (!deleteConfirmModal.contains(event.target) && !event.target.closest('.delete-link')) {
-						deleteConfirmModal.style.display = 'none';
-					}
-				});
-			}
-		});
-	</script>
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        if (deleteConfirmModal) {
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+            document.body.addEventListener('click', function (event) {
+                const deleteLink = event.target.closest('.delete-link');
+                if (deleteLink) {
+                    event.preventDefault();
+
+                    const deleteUrl = deleteLink.getAttribute('href');
+                    confirmDeleteBtn.setAttribute('href', deleteUrl);
+
+                    deleteConfirmModal.style.display = 'block';
+                    const modalHeight = deleteConfirmModal.offsetHeight;
+                    const modalWidth = deleteConfirmModal.offsetWidth;
+
+                    let topPosition = event.pageY - (modalHeight / 2);
+                    let leftPosition = event.pageX + 30;
+
+                    if (leftPosition + modalWidth > window.innerWidth) {
+                        leftPosition = event.pageX - modalWidth - 30;
+                    }
+                    if (topPosition < window.scrollY) {
+                        topPosition = window.scrollY + 10;
+                    }
+
+                    deleteConfirmModal.style.left = leftPosition + 'px';
+                    deleteConfirmModal.style.top = topPosition + 'px';
+                }
+            });
+
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteConfirmModal.style.display = 'none';
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!deleteConfirmModal.contains(event.target) && !event.target.closest('.delete-link')) {
+                    deleteConfirmModal.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
 
 </body>
 </html>

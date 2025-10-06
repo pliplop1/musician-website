@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musique - MARC DUPONT</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-900 text-white">
+
+<header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a th:href="@{/}" class="text-3xl font-bold tracking-wider hover:text-indigo-400 transition-colors">MARC DUPONT</a>
+        <nav>
+            <a th:href="@{/}" class="px-4 hover:text-indigo-400">Accueil</a>
+            <a th:href="@{/biographie}" class="px-4 hover:text-indigo-400">Biographie</a>
+            <a th:href="@{/galerie}" class="px-4 hover:text-indigo-400">Galerie</a>
+            <a th:href="@{/musique}" class="px-4 text-indigo-400 font-bold">Musique</a>
+            <a th:href="@{/actualites}" class="px-4 hover:text-indigo-400">Actualités</a>
+            <div sec:authorize="!isAuthenticated()" class="inline"><a th:href="@{/login}" class="px-4 hover:text-indigo-400">Connexion</a></div>
+            <div sec:authorize="isAuthenticated()" class="inline">
+                <a th:href="@{/user/profile}" sec:authentication="name" class="px-4 font-bold text-indigo-400 hover:underline"></a>
+                <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md ml-4">Admin</a>
+                <form th:action="@{/logout}" method="post" class="inline ml-4"><button type="submit" class="px-4 text-gray-400 hover:text-white">Déconnexion</button></form>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="container mx-auto px-6 py-12">
+    <section id="music-content">
+        <h2 class="text-4xl font-bold text-center mb-10">Musique</h2>
+        <div id="tracks-container" class="max-w-4xl mx-auto space-y-8">
+            <p id="loading-message" class="text-center text-gray-400">Chargement...</p>
+        </div>
+    </section>
+</main>
+
+<footer class="bg-gray-800 mt-20 py-8">
+    </footer>
+
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/tracks')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La réponse du réseau n\'était pas ok');
+            }
+            return response.json();
+        })
+        .then(tracks => {
+            const container = document.getElementById('tracks-container');
+            container.innerHTML = ''; // Vider le message de chargement
+
+            if (tracks.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400">Aucune musique disponible.</p>';
+                return;
+            }
+
+            tracks.forEach(track => {
+                const trackDiv = document.createElement('div');
+                trackDiv.className = 'bg-gray-800 rounded-lg p-6 shadow-lg';
+                
+                let content = `<h3 class="text-2xl font-bold mb-4">${track.title}</h3>`;
+                
+                if (track.trackType === 'EMBED') {
+                    content += `<div>${track.embedCode}</div>`;
+                } else if (track.trackType === 'UPLOADED_FILE') {
+                    // Utilise la donnée Base64 directement fournie par le service
+                    content += `<audio controls class="w-full"><source src="${track.base64Data}" type="audio/mpeg"></audio>`;
+                }
+                
+                trackDiv.innerHTML = content;
+                container.appendChild(trackDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération des pistes:', error);
+            const container = document.getElementById('tracks-container');
+            container.innerHTML = '<p class="text-center text-red-500">Impossible de charger la musique.</p>';
+        });
+});
+</script>
+
+</body>
+</html>

@@ -1,8 +1,13 @@
 package com.docker.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -48,18 +53,20 @@ public class UserController {
     }
 
     @PostMapping("/profile/update")
-    public String updateProfile(@ModelAttribute User user, Principal principal, RedirectAttributes redirectAttributes, 
-                                HttpServletRequest request, HttpServletResponse response) {
+    public String updateProfile(@ModelAttribute User user, Principal principal, RedirectAttributes redirectAttributes) {
         try {
             userService.updateUserProfile(principal.getName(), user.getUsername(), user.getEmail());
             
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null) {
-                new SecurityContextLogoutHandler().logout(request, response, auth);
-            }
+            // Rafraîchir la session de sécurité avec les nouvelles informations
+            User updatedUser = userService.findByUsername(user.getUsername());
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            updatedUser.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
             
-            redirectAttributes.addFlashAttribute("successMessage", "Votre profil a été mis à jour. Veuillez vous reconnecter.");
-            return "redirect:/login"; 
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUser.getUsername(), updatedUser.getPassword(), authorities);
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+            
+            redirectAttributes.addFlashAttribute("successMessage", "Votre profil a été mis à jour avec succès !");
+            return "redirect:/user/profile"; 
             
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -81,6 +88,7 @@ public class UserController {
         try {
             userService.changeUserPassword(principal.getName(), oldPassword, newPassword, confirmPassword);
 
+            // La déconnexion est une bonne pratique de sécurité après un changement de mot de passe
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null) {
                 new SecurityContextLogoutHandler().logout(request, response, auth);
