@@ -18,89 +18,75 @@ import java.util.UUID;
 
 @Service
 public class TrackService {
+	private static final List<String> ALLOWED_AUDIO_TYPES = List.of("audio/mpeg", "audio/wav", "audio/ogg");
+	private final TrackRepository trackRepository;
+	private final Path rootLocation = Paths.get("uploaded-music");
 
-    private final TrackRepository trackRepository;
-    private final Path rootLocation = Paths.get("uploaded-music");
+	public TrackService(TrackRepository trackRepository) {
+		this.trackRepository = trackRepository;
+		// Crée le dossier s'il n'existe pas au démarrage
+		try {
+			Files.createDirectories(rootLocation);
+		} catch (IOException e) {
+			throw new RuntimeException("Ne peut pas initialiser le dossier de stockage", e);
+		}
+	}
 
-    public TrackService(TrackRepository trackRepository) {
-        this.trackRepository = trackRepository;
-        // Crée le dossier s'il n'existe pas au démarrage
-        try {
-            Files.createDirectories(rootLocation);
-        } catch (IOException e) {
-            throw new RuntimeException("Ne peut pas initialiser le dossier de stockage", e);
-        }
+	/**
+	 * Récupère toutes les pistes et, pour les fichiers uploadés, lit le fichier
+	 * audio et l'encode en Base64 pour l'injecter dans la page.
+	 */
+	public List<Track> getAllTracks() {
+        return trackRepository.findAll();
     }
 
-    /**
-     * Récupère toutes les pistes et, pour les fichiers uploadés,
-     * lit le fichier audio et l'encode en Base64 pour l'injecter dans la page.
-     */
-    public List<Track> getAllTracks() {
-        List<Track> tracks = trackRepository.findAll();
-        for (Track track : tracks) {
-            if (track.getTrackType() == TrackType.UPLOADED_FILE && track.getFilename() != null) {
-                try {
-                    Path file = rootLocation.resolve(track.getFilename());
-                    if (Files.exists(file)) {
-                        byte[] fileContent = Files.readAllBytes(file);
-                        String encodedString = Base64.getEncoder().encodeToString(fileContent);
-                        // Formatage de la chaîne Data URI pour le lecteur HTML5
-                        track.setBase64Data("data:audio/mpeg;base64," + encodedString);
-                    } else {
-                        track.setBase64Data(""); // Fichier non trouvé
-                    }
-                } catch (IOException e) {
-                    track.setBase64Data(""); // Erreur de lecture
-                    System.err.println("Erreur de lecture du fichier audio: " + track.getFilename());
-                }
-            }
-        }
-        return tracks;
-    }
+	// Méthode pour sauvegarder une piste de type EMBED
+	public void saveEmbedTrack(String title, String embedCode) {
+		Track track = new Track();
+		track.setTitle(title);
+		track.setTrackType(TrackType.EMBED);
+		track.setEmbedCode(embedCode);
+		trackRepository.save(track);
+	}
 
-    // Méthode pour sauvegarder une piste de type EMBED
-    public void saveEmbedTrack(String title, String embedCode) {
-        Track track = new Track();
-        track.setTitle(title);
-        track.setTrackType(TrackType.EMBED);
-        track.setEmbedCode(embedCode);
-        trackRepository.save(track);
-    }
+	// Méthode pour sauvegarder une piste de type UPLOADED_FILE
+	public void saveUploadedTrack(String title, MultipartFile file) throws IOException {
+		if (file.isEmpty()) {
+			throw new IOException("Impossible de sauvegarder un fichier vide.");
+		}
 
-    // Méthode pour sauvegarder une piste de type UPLOADED_FILE
-    public void saveUploadedTrack(String title, MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            throw new IOException("Impossible de sauvegarder un fichier vide.");
-        }
+		String contentType = file.getContentType();
+		if (contentType == null || !ALLOWED_AUDIO_TYPES.contains(contentType)) {
+			throw new IOException("Type de fichier non autorisé. Seuls les fichiers MP3, WAV et OGG sont acceptés.");
+		}
 
-        String originalFilename = file.getOriginalFilename();
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+		String originalFilename = file.getOriginalFilename();
+		String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
 
-        Path destinationFile = this.rootLocation.resolve(Paths.get(uniqueFilename)).normalize().toAbsolutePath();
+		Path destinationFile = this.rootLocation.resolve(Paths.get(uniqueFilename)).normalize().toAbsolutePath();
 
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-        }
+		try (InputStream inputStream = file.getInputStream()) {
+			Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+		}
 
-        Track track = new Track();
-        track.setTitle(title);
-        track.setTrackType(TrackType.UPLOADED_FILE);
-        track.setFilename(uniqueFilename);
-        trackRepository.save(track);
-    }
+		Track track = new Track();
+		track.setTitle(title);
+		track.setTrackType(TrackType.UPLOADED_FILE);
+		track.setFilename(uniqueFilename);
+		trackRepository.save(track);
+	}
 
-    // Méthode pour supprimer une piste
-    public void deleteTrack(Long id) throws IOException {
-        Track track = trackRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Piste non trouvée avec l'id : " + id));
+	// Méthode pour supprimer une piste
+	public void deleteTrack(Long id) throws IOException {
+		Track track = trackRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Piste non trouvée avec l'id : " + id));
 
-        // Si c'est un fichier uploadé, il faut aussi le supprimer du disque dur
-        if (track.getTrackType() == TrackType.UPLOADED_FILE && track.getFilename() != null) {
-            Path fileToDelete = rootLocation.resolve(track.getFilename());
-            Files.deleteIfExists(fileToDelete);
-        }
+		// Si c'est un fichier uploadé, il faut aussi le supprimer du disque dur
+		if (track.getTrackType() == TrackType.UPLOADED_FILE && track.getFilename() != null) {
+			Path fileToDelete = rootLocation.resolve(track.getFilename());
+			Files.deleteIfExists(fileToDelete);
+		}
 
-        trackRepository.deleteById(id);
-    }
+		trackRepository.deleteById(id);
+	}
 }

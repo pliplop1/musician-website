@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion des Messages</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<style>
+.modal {
+	display: none;
+}
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+	<div class="flex min-h-screen">
+		<div th:replace="~{fragments/admin-layout :: sidebar}"></div>
+
+		<main class="flex-grow p-8">
+			<h1 class="text-3xl font-bold mb-6">Messages Reçus</h1>
+
+			<div th:if="${successMessage}"
+				class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-8 shadow-sm">
+				<p class="font-bold">Succès !</p>
+				<span th:text="${successMessage}"></span>
+			</div>
+
+			<div class="bg-white rounded-lg shadow-md overflow-hidden">
+				<table class="min-w-full divide-y divide-gray-200">
+					<thead class="bg-gray-50">
+						<tr>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="bg-white divide-y divide-gray-200">
+						<tr th:if="${#lists.isEmpty(messages)}">
+							<td colspan="5" class="px-6 py-4 text-center text-gray-500">Aucun
+								message reçu.</td>
+						</tr>
+						<tr th:each="message : ${messages}">
+							<td class="px-6 py-4 whitespace-nowrap"
+								th:text="${#temporals.format(message.timestamp, 'dd/MM/yyyy HH:mm')}"></td>
+							<td class="px-6 py-4 whitespace-nowrap" th:text="${message.name}"></td>
+							<td class="px-6 py-4 whitespace-nowrap"
+								th:text="${message.email}"></td>
+							<td class="px-6 py-4"
+								th:text="${#strings.abbreviate(message.content, 50)}"></td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+								<button type="button"
+									class="text-blue-600 hover:text-blue-900 view-message-btn"
+									th:data-name="${message.name}" th:data-email="${message.email}"
+									th:data-timestamp="${#temporals.format(message.timestamp, 'dd MMMM yy à HH:mm')}"
+									th:data-content="${message.content}">Voir</button>
+								<form
+									th:action="@{/admin/messages/delete/{id}(id=${message.id})}"
+									method="post" class="inline">
+									<button type="submit"
+										class="ml-4 text-red-600 hover:text-red-900 bg-transparent border-none p-0 cursor-pointer"
+										onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">Supprimer</button>
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</main>
+	</div>
+
+	<div id="messageModal" class="modal fixed z-10 inset-0 overflow-y-auto">
+		<div class="flex items-center justify-center min-h-screen">
+			<div class="fixed inset-0 bg-gray-500 bg-opacity-75"
+				aria-hidden="true"></div>
+			<div
+				class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+				<div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+					<h3 class="text-lg leading-6 font-medium text-gray-900">Détails
+						du Message</h3>
+					<div class="mt-4">
+						<p class="text-sm text-gray-500">
+							<strong>De :</strong> <span id="modal-name"></span>
+						</p>
+						<p class="text-sm text-gray-500">
+							<strong>Email :</strong> <span id="modal-email"></span>
+						</p>
+						<p class="text-sm text-gray-500">
+							<strong>Date :</strong> <span id="modal-timestamp"></span>
+						</p>
+						<hr class="my-4">
+						<p class="text-base text-gray-800 whitespace-pre-wrap"
+							id="modal-content"></p>
+					</div>
+				</div>
+				<div
+					class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+					<button type="button" id="closeMessageModalBtn"
+						class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Fermer</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const messageModal = document.getElementById('messageModal');
+        if (messageModal) {
+            const closeMessageModalBtn = document.getElementById('closeMessageModalBtn');
+            document.body.addEventListener('click', function (event) {
+                const viewBtn = event.target.closest('.view-message-btn');
+                if (viewBtn) {
+                    document.getElementById('modal-name').textContent = viewBtn.dataset.name;
+                    document.getElementById('modal-email').textContent = viewBtn.dataset.email;
+                    document.getElementById('modal-timestamp').textContent = viewBtn.dataset.timestamp;
+                    document.getElementById('modal-content').textContent = viewBtn.dataset.content;
+                    messageModal.style.display = 'block';
+                }
+            });
+            closeMessageModalBtn.addEventListener('click', () => {
+                messageModal.style.display = 'none';
+            });
+            window.addEventListener('click', (e) => {
+                if (e.target === messageModal) {
+                    messageModal.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

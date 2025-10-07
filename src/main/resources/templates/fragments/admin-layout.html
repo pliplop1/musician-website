@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <nav th:fragment="sidebar" class="w-64 bg-gray-800 text-white p-4 flex-shrink-0">
+        <h2 class="text-2xl font-bold mb-8 text-center border-b border-gray-600 pb-4">Administration</h2>
+        
+        <ul class="space-y-2">
+            <li>
+                <a th:href="@{/admin/dashboard}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.equals(currentUri, '/admin/dashboard')} ? 'bg-gray-900 font-semibold' : ''">
+                   Tableau de Bord
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/concerts}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/concerts')} ? 'bg-gray-900 font-semibold' : ''">
+                   Concerts
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/articles}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/articles')} ? 'bg-gray-900 font-semibold' : ''">
+                   Actualités
+                </a>
+            </li>
+             <li>
+                <a th:href="@{/admin/photos}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/photos')} ? 'bg-gray-900 font-semibold' : ''">
+                   Galerie
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/musique}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/musique')} ? 'bg-gray-900 font-semibold' : ''">
+                   Musique
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/biographie}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/biographie')} ? 'bg-gray-900 font-semibold' : ''">
+                   Biographie
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/messages}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/messages')} ? 'bg-gray-900 font-semibold' : ''">
+                   Messages
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/users}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/users')} ? 'bg-gray-900 font-semibold' : ''">
+                   Utilisateurs
+                </a>
+            </li>
+            <li class="mt-8 border-t border-gray-600 pt-4">
+                <a th:href="@{/}" class="block py-2 px-3 rounded hover:bg-gray-700">
+                   Retour au site
+                </a>
+            </li>
+             <li>
+                <form th:action="@{/logout}" method="post">
+					<button type="submit" class="w-full text-left py-2 px-3 rounded hover:bg-red-800 bg-red-600 mt-4">Déconnexion</button>
+				</form>
+            </li>
+        </ul>
+    </nav>
+
+</body>
+</html>
