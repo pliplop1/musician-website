@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Concerts</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+<div class="flex min-h-screen">
+    <div th:replace="~{fragments/admin-layout :: sidebar}"></div>
+
+    <main class="flex-grow p-8">
+        <h1 class="text-3xl font-bold mb-6">Gérer les Concerts</h1>
+
+        <div th:if="${successMessage}"
+			class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-8 shadow-sm">
+			<p class="font-bold">Succès !</p>
+			<span th:text="${successMessage}"></span>
+		</div>
+
+        <div class="bg-white p-8 rounded-lg shadow-md mb-8 max-w-2xl">
+            <h3 class="text-xl font-semibold mb-4">Ajouter un nouveau concert</h3>
+            <form th:action="@{/admin/concerts/add}" th:object="${concert}" method="post" class="space-y-6">
+                <div>
+                    <label for="location" class="block text-sm font-medium">Lieu</label>
+                    <input type="text" id="location" th:field="*{location}" required
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium">Date</label>
+                    <input type="date" id="date" th:field="*{date}" required
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium">Description</label>
+                    <textarea id="description" th:field="*{description}" rows="3"
+                              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div>
+                    <button type="submit"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md">
+                        Ajouter le concert
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+            <h3 class="text-xl font-semibold p-6">Tous les concerts programmés</h3>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:if="${#lists.isEmpty(concerts)}">
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Aucun concert programmé.</td>
+                    </tr>
+                    <tr th:each="c : ${concerts}">
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${#temporals.format(c.date, 'dd/MM/yyyy')}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${c.location}"></td>
+                        <td class="px-6 py-4" th:text="${#strings.abbreviate(c.description, 50)}"></td>
+                        <td class="px-6 py-4 text-sm font-medium flex space-x-4">
+                            <a th:href="@{/admin/concerts/edit/{id}(id=${c.id})}" class="text-indigo-600 hover:text-indigo-900">Modifier</a>
+                            <form th:action="@{/admin/concerts/delete/{id}(id=${c.id})}" method="post" class="inline">
+                                <button type="submit" class="text-red-600 hover:text-red-900 bg-transparent border-none p-0 cursor-pointer"
+                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce concert ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

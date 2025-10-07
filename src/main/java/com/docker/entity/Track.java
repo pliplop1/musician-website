@@ -23,8 +23,5 @@ public class Track {
     private String embedCode;
 
     private String filename; // Pour stocker le nom du fichier audio si uploadé
-    
-    // AJOUT : Champ pour stocker les données du fichier en Base64
-    @Transient // Ne sera pas sauvegardé en base de données
-    private String base64Data;
+
 }

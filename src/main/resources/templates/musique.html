@@ -8,24 +8,7 @@
 </head>
 <body class="bg-gray-900 text-white">
 
-<header class="bg-gray-800 shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-        <a th:href="@{/}" class="text-3xl font-bold tracking-wider hover:text-indigo-400 transition-colors">MARC DUPONT</a>
-        <nav>
-            <a th:href="@{/}" class="px-4 hover:text-indigo-400">Accueil</a>
-            <a th:href="@{/biographie}" class="px-4 hover:text-indigo-400">Biographie</a>
-            <a th:href="@{/galerie}" class="px-4 hover:text-indigo-400">Galerie</a>
-            <a th:href="@{/musique}" class="px-4 text-indigo-400 font-bold">Musique</a>
-            <a th:href="@{/actualites}" class="px-4 hover:text-indigo-400">Actualités</a>
-            <div sec:authorize="!isAuthenticated()" class="inline"><a th:href="@{/login}" class="px-4 hover:text-indigo-400">Connexion</a></div>
-            <div sec:authorize="isAuthenticated()" class="inline">
-                <a th:href="@{/user/profile}" sec:authentication="name" class="px-4 font-bold text-indigo-400 hover:underline"></a>
-                <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md ml-4">Admin</a>
-                <form th:action="@{/logout}" method="post" class="inline ml-4"><button type="submit" class="px-4 text-gray-400 hover:text-white">Déconnexion</button></form>
-            </div>
-        </nav>
-    </div>
-</header>
+<header th:replace="~{fragments/layout :: header}"></header>
 
 <main class="container mx-auto px-6 py-12">
     <section id="music-content">
@@ -37,7 +20,14 @@
 </main>
 
 <footer class="bg-gray-800 mt-20 py-8">
-    </footer>
+    <div class="container mx-auto px-6 text-center text-gray-400">
+        <div class="flex justify-center space-x-6 mb-6">
+            <a href="https://facebook.com/VOTRE_PAGE" target="_blank" class="hover:text-white transition-colors">Facebook</a>
+            <a href="https://instagram.com/VOTRE_PROFIL" target="_blank" class="hover:text-white transition-colors">Instagram</a>
+        </div>
+        <p>© 2025 MARC DUPONT. Tous droits réservés.</p>
+    </div>
+</footer>
 
 <script th:inline="javascript">
 document.addEventListener('DOMContentLoaded', function() {
@@ -66,8 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (track.trackType === 'EMBED') {
                     content += `<div>${track.embedCode}</div>`;
                 } else if (track.trackType === 'UPLOADED_FILE') {
-                    // Utilise la donnée Base64 directement fournie par le service
-                    content += `<audio controls class="w-full"><source src="${track.base64Data}" type="audio/mpeg"></audio>`;
+                    // On construit l'URL vers notre nouvel endpoint de streaming
+                    const streamUrl = `/api/tracks/stream/${track.id}`;
+                    content += `<audio controls class="w-full" src="${streamUrl}"></audio>`;
                 }
                 
                 trackDiv.innerHTML = content;
