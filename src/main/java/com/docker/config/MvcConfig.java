@@ -1,5 +1,3 @@
-// /src/main/java/com/docker/config/MvcConfig.java
-
 package com.docker.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +14,14 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploaded-photos/**")
                 .addResourceLocations(photoUploadDir);
                 
-        // AJOUT : Règle pour la musique
+        // Règle pour la musique
         String musicUploadDir = "file:///" + System.getProperty("user.dir").replace("\\", "/") + "/uploaded-music/";
         registry.addResourceHandler("/uploaded-music/**")
                 .addResourceLocations(musicUploadDir);
+        
+        // AJOUT : Règle pour les avatars
+        String avatarUploadDir = "file:///" + System.getProperty("user.dir").replace("\\", "/") + "/uploaded-avatars/";
+        registry.addResourceHandler("/uploaded-avatars/**")
+                .addResourceLocations(avatarUploadDir);
     }
 }

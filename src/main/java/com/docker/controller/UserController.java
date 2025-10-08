@@ -1,6 +1,8 @@
 package com.docker.controller;
 
+import java.io.IOException;
 import java.security.Principal;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.docker.entity.User;
@@ -40,8 +43,21 @@ public class UserController {
     public String showProfile(Model model, Authentication authentication) {
         String username = authentication.getName();
         User user = userService.findByUsername(username);
+        
+        // Calcul du nombre de jours depuis l'inscription
+        long daysSinceRegistration = 0;
+        if (user.getCreatedAt() != null) {
+            daysSinceRegistration = ChronoUnit.DAYS.between(
+                user.getCreatedAt().toLocalDate(), 
+                java.time.LocalDate.now()
+            );
+        }
+        
         model.addAttribute("username", username);
+        model.addAttribute("user", user);  // ✅ CORRECTION
         model.addAttribute("favoriteConcerts", user.getFavoriteConcerts());
+        model.addAttribute("daysSinceRegistration", daysSinceRegistration);
+        
         return "user/profile";
     }
 
@@ -115,5 +131,56 @@ public class UserController {
         userService.removeFavoriteConcert(principal.getName(), concertId);
         redirectAttributes.addFlashAttribute("successMessage", "Concert retiré des favoris.");
         return "redirect:" + request.getHeader("Referer");
+    }
+    
+    // ============================================
+    // GESTION DE LA PHOTO DE PROFIL ET BIO
+    // ============================================
+    
+    @GetMapping("/profile/details")
+    public String showProfileDetailsForm(Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        return "user/edit-profile-details";
+    }
+    
+    @PostMapping("/profile/details")
+    public String updateProfileDetails(@RequestParam(required = false) String firstName,
+                                      @RequestParam(required = false) String lastName,
+                                      @RequestParam(required = false) String bio,
+                                      Principal principal,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            userService.updateProfileDetails(principal.getName(), firstName, lastName, bio);
+            redirectAttributes.addFlashAttribute("successMessage", "Vos informations ont été mises à jour avec succès !");
+            return "redirect:/user/profile";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur : " + e.getMessage());
+            return "redirect:/user/profile/details";
+        }
+    }
+    
+    @PostMapping("/profile/upload-avatar")
+    public String uploadAvatar(@RequestParam("file") MultipartFile file,
+                              Principal principal,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            userService.updateAvatar(principal.getName(), file);
+            redirectAttributes.addFlashAttribute("successMessage", "Photo de profil mise à jour avec succès !");
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de l'upload : " + e.getMessage());
+        }
+        return "redirect:/user/profile";
+    }
+    
+    @PostMapping("/profile/delete-avatar")
+    public String deleteAvatar(Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteAvatar(principal.getName());
+            redirectAttributes.addFlashAttribute("successMessage", "Photo de profil supprimée avec succès !");
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la suppression : " + e.getMessage());
+        }
+        return "redirect:/user/profile";
     }
 }

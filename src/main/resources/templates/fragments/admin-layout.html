@@ -3,65 +3,89 @@
 <body>
 
     <nav th:fragment="sidebar" class="w-64 bg-gray-800 text-white p-4 flex-shrink-0">
-        <h2 class="text-2xl font-bold mb-8 text-center border-b border-gray-600 pb-4">Administration</h2>
+        <!-- En-tête avec avatar -->
+        <div class="text-center mb-8 pb-4 border-b border-gray-600">
+            <!-- Avatar de l'admin -->
+            <div class="flex justify-center mb-3">
+                <div th:if="${currentUser != null && currentUser.avatarFilename != null}">
+                    <img th:src="@{/uploaded-avatars/{filename}(filename=${currentUser.avatarFilename})}"
+                         alt="Avatar" 
+                         class="w-20 h-20 rounded-full border-4 border-indigo-500 object-cover">
+                </div>
+                <div th:if="${currentUser == null || currentUser.avatarFilename == null}" 
+                     class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-indigo-500">
+                    <span th:text="${currentUser != null ? currentUser.initials : 'A'}"></span>
+                </div>
+            </div>
+            
+            <h2 class="text-xl font-bold">Administration</h2>
+            <p class="text-sm text-gray-400 mt-1" th:text="${currentUser != null ? currentUser.fullName : 'Administrateur'}"></p>
+        </div>
         
         <ul class="space-y-2">
             <li>
                 <a th:href="@{/admin/dashboard}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.equals(currentUri, '/admin/dashboard')} ? 'bg-gray-900 font-semibold' : ''">
-                   Tableau de Bord
+                   📊 Tableau de Bord
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/concerts}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/concerts')} ? 'bg-gray-900 font-semibold' : ''">
-                   Concerts
+                   🎵 Concerts
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/articles}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/articles')} ? 'bg-gray-900 font-semibold' : ''">
-                   Actualités
+                   📰 Actualités
                 </a>
             </li>
              <li>
                 <a th:href="@{/admin/photos}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/photos')} ? 'bg-gray-900 font-semibold' : ''">
-                   Galerie
+                   🖼️ Galerie
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/musique}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/musique')} ? 'bg-gray-900 font-semibold' : ''">
-                   Musique
+                   🎶 Musique
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/biographie}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/biographie')} ? 'bg-gray-900 font-semibold' : ''">
-                   Biographie
+                   📖 Biographie
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/messages}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/messages')} ? 'bg-gray-900 font-semibold' : ''">
-                   Messages
+                   📧 Messages
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/users}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/users')} ? 'bg-gray-900 font-semibold' : ''">
-                   Utilisateurs
+                   👥 Utilisateurs
                 </a>
             </li>
             <li class="mt-8 border-t border-gray-600 pt-4">
                 <a th:href="@{/}" class="block py-2 px-3 rounded hover:bg-gray-700">
-                   Retour au site
+                   🏠 Retour au site
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/user/profile}" class="block py-2 px-3 rounded hover:bg-gray-700">
+                   👤 Mon profil
                 </a>
             </li>
              <li>
                 <form th:action="@{/logout}" method="post">
-					<button type="submit" class="w-full text-left py-2 px-3 rounded hover:bg-red-800 bg-red-600 mt-4">Déconnexion</button>
+					<button type="submit" class="w-full text-left py-2 px-3 rounded hover:bg-red-800 bg-red-600 mt-2">
+					    🚪 Déconnexion
+					</button>
 				</form>
             </li>
         </ul>

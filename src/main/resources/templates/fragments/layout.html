@@ -5,18 +5,44 @@
     <header th:fragment="header" class="bg-gray-800 shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a th:href="@{/}" class="text-3xl font-bold tracking-wider hover:text-indigo-400 transition-colors">MARC DUPONT</a>
-            <nav>
+            <nav class="flex items-center">
                 <a th:href="@{/}" class="px-4" th:classappend="${currentUri == '/'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Accueil</a>
                 <a th:href="@{/biographie}" class="px-4" th:classappend="${currentUri == '/biographie'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Biographie</a>
                 <a th:href="@{/galerie}" class="px-4" th:classappend="${currentUri == '/galerie'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Galerie</a>
                 <a th:href="@{/musique}" class="px-4" th:classappend="${currentUri == '/musique'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Musique</a>
                 <a th:href="@{/actualites}" class="px-4" th:classappend="${currentUri == '/actualites'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Actualités</a>
                 
-                <div sec:authorize="!isAuthenticated()" class="inline"><a th:href="@{/login}" class="px-4 hover:text-indigo-400">Connexion</a></div>
-                <div sec:authorize="isAuthenticated()" class="inline">
-                    <a th:href="@{/user/profile}" sec:authentication="name" class="px-4 font-bold text-indigo-400 hover:underline"></a>
-                    <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md ml-4">Admin</a>
-                    <form th:action="@{/logout}" method="post" class="inline ml-4"><button type="submit" class="px-4 text-gray-400 hover:text-white">Déconnexion</button></form>
+                <div sec:authorize="!isAuthenticated()" class="inline">
+                    <a th:href="@{/login}" class="px-4 hover:text-indigo-400">Connexion</a>
+                </div>
+                
+                <div sec:authorize="isAuthenticated()" class="inline flex items-center ml-4">
+                    <a th:href="@{/user/profile}" class="flex items-center px-3 py-2 rounded-md hover:bg-gray-700 transition-colors">
+                        <!-- Avatar avec image si disponible -->
+                        <div th:if="${currentUser != null && currentUser.avatarFilename != null}">
+                            <img th:src="@{/uploaded-avatars/{filename}(filename=${currentUser.avatarFilename})}"
+                                 alt="Avatar" 
+                                 class="w-8 h-8 rounded-full mr-2 border-2 border-indigo-400 object-cover"
+                                 style="transition: transform 0.3s ease-in-out; cursor: pointer;"
+                                 onmouseover="this.style.transform='scale(1.3)'"
+                                 onmouseout="this.style.transform='scale(1)'">
+                        </div>
+                        
+                        <!-- Avatar avec initiales sinon -->
+                        <div th:if="${currentUser == null || currentUser.avatarFilename == null}" 
+                             class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm mr-2"
+                             style="transition: transform 0.3s ease-in-out; cursor: pointer;"
+                             onmouseover="this.style.transform='scale(1.3)'"
+                             onmouseout="this.style.transform='scale(1)'">
+                            <span th:text="${currentUser != null ? currentUser.initials : '?'}"></span>
+                        </div>
+                        
+                        <span sec:authentication="name" class="text-indigo-400 font-bold"></span>
+                    </a>
+                    <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md ml-2">Admin</a>
+                    <form th:action="@{/logout}" method="post" class="inline ml-2">
+                        <button type="submit" class="px-4 py-2 text-gray-400 hover:text-white rounded-md hover:bg-gray-700 transition-colors">Déconnexion</button>
+                    </form>
                 </div>
             </nav>
         </div>
