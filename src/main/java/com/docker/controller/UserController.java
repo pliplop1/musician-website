@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.docker.entity.User;
 import com.docker.service.UserService;
+import com.docker.service.BadgeService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,32 +33,40 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-    
-    private final UserService userService;
 
-    public UserController(UserService userService) {
+    private final UserService userService;
+    private final BadgeService badgeService;
+
+    public UserController(UserService userService, BadgeService badgeService) {
         this.userService = userService;
+        this.badgeService = badgeService;
     }
 
     @GetMapping("/profile")
     public String showProfile(Model model, Authentication authentication) {
         String username = authentication.getName();
         User user = userService.findByUsername(username);
-        
+
         // Calcul du nombre de jours depuis l'inscription
         long daysSinceRegistration = 0;
         if (user.getCreatedAt() != null) {
             daysSinceRegistration = ChronoUnit.DAYS.between(
-                user.getCreatedAt().toLocalDate(), 
+                user.getCreatedAt().toLocalDate(),
                 java.time.LocalDate.now()
             );
         }
-        
+
+        // Récupérer les badges de l'utilisateur
+        var userBadges = badgeService.getUserBadges(user);
+        var badgeCount = badgeService.countUserBadges(user);
+
         model.addAttribute("username", username);
-        model.addAttribute("user", user);  // ✅ CORRECTION
+        model.addAttribute("user", user);
         model.addAttribute("favoriteConcerts", user.getFavoriteConcerts());
         model.addAttribute("daysSinceRegistration", daysSinceRegistration);
-        
+        model.addAttribute("userBadges", userBadges);
+        model.addAttribute("badgeCount", badgeCount);
+
         return "user/profile";
     }
 

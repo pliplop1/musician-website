@@ -147,7 +147,7 @@
 							⚙️ Paramètres du compte </a>
 					</div>
 					<!-- Statistiques -->
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+					<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 						<div class="bg-white rounded-lg shadow-md p-6 text-center">
 							<div class="text-3xl font-bold text-indigo-600"
 								th:text="${#lists.size(favoriteConcerts)}">0</div>
@@ -158,6 +158,12 @@
 							<div class="text-3xl font-bold text-green-600"
 								th:text="${daysSinceRegistration}">0</div>
 							<p class="text-gray-600 mt-2">Jours d'ancienneté</p>
+						</div>
+
+						<div class="bg-white rounded-lg shadow-md p-6 text-center">
+							<div class="text-3xl font-bold text-amber-600"
+								th:text="${badgeCount}">0</div>
+							<p class="text-gray-600 mt-2">Badges débloqués</p>
 						</div>
 
 						<div class="bg-white rounded-lg shadow-md p-6 text-center">
@@ -177,6 +183,30 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Badges -->
+		<section class="mb-8">
+			<h3 class="text-2xl font-semibold mb-4">🎖️ Mes Badges</h3>
+			<div class="bg-white rounded-lg shadow-md p-6">
+				<div th:if="${#lists.isEmpty(userBadges)}">
+					<p class="text-gray-500">
+						Vous n'avez pas encore débloqué de badges. Continuez à explorer le site et ajoutez des concerts en favoris pour débloquer des badges !
+					</p>
+				</div>
+				<div th:unless="${#lists.isEmpty(userBadges)}"
+					class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+					<div th:each="userBadge : ${userBadges}"
+						class="bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-lg p-4 text-center hover:shadow-lg transition-shadow">
+						<div class="text-5xl mb-2" th:text="${userBadge.badge.icon}">🎵</div>
+						<h4 class="font-bold text-lg mb-1" th:text="${userBadge.badge.name}">Nom du badge</h4>
+						<p class="text-sm text-gray-600 mb-2" th:text="${userBadge.badge.description}">Description du badge</p>
+						<div class="text-xs text-gray-500">
+							Débloqué le <span th:text="${#temporals.format(userBadge.unlockedAt, 'dd/MM/yyyy')}"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
 
 		<!-- Concerts Favoris -->
 		<section>
