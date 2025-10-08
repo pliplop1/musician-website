@@ -19,6 +19,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
+
 @Service
 public class UserService {
 
@@ -28,7 +38,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
-
+    
+   
+    
     public UserService(UserRepository userRepository, RoleRepository roleRepository, ConcertRepository concertRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -162,5 +174,101 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid concert Id:" + concertId));
         user.getFavoriteConcerts().remove(concert);
         userRepository.save(user);
+    } 
+ // ============================================
+    // GESTION DE LA PHOTO DE PROFIL ET BIO
+    // ============================================
+    
+    private final Path avatarLocation = Paths.get("uploaded-avatars");
+    private static final List<String> ALLOWED_AVATAR_TYPES = List.of("image/jpeg", "image/png", "image/gif", "image/webp");
+    
+    @Transactional
+    public void updateProfileDetails(String currentUsername, String firstName, String lastName, String bio) {
+        User user = userRepository.findByUsername(currentUsername);
+        if (user == null) {
+            throw new IllegalArgumentException("Utilisateur non trouvé.");
+        }
+        
+        // Validation de la longueur
+        if (firstName != null && firstName.length() > 50) {
+            throw new IllegalArgumentException("Le prénom ne peut pas dépasser 50 caractères.");
+        }
+        if (lastName != null && lastName.length() > 50) {
+            throw new IllegalArgumentException("Le nom ne peut pas dépasser 50 caractères.");
+        }
+        if (bio != null && bio.length() > 500) {
+            throw new IllegalArgumentException("La biographie ne peut pas dépasser 500 caractères.");
+        }
+        
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setBio(bio);
+        userRepository.save(user);
+    }
+    
+    @Transactional
+    public void updateAvatar(String username, MultipartFile file) throws IOException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("Utilisateur non trouvé.");
+        }
+        
+        // Validation du fichier
+        if (file.isEmpty()) {
+            throw new IOException("Impossible de sauvegarder un fichier vide.");
+        }
+        
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_AVATAR_TYPES.contains(contentType)) {
+            throw new IOException("Type de fichier non autorisé. Seuls les fichiers JPEG, PNG, GIF et WebP sont acceptés.");
+        }
+        
+        // Vérification de la taille (max 5MB)
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new IOException("Le fichier est trop volumineux. Taille maximale : 5MB.");
+        }
+        
+        // Créer le dossier s'il n'existe pas
+        try {
+            Files.createDirectories(avatarLocation);
+        } catch (IOException e) {
+            throw new RuntimeException("Impossible de créer le dossier de stockage des avatars", e);
+        }
+        
+        // Supprimer l'ancien avatar si existant
+        if (user.getAvatarFilename() != null) {
+            Path oldFile = avatarLocation.resolve(user.getAvatarFilename());
+            Files.deleteIfExists(oldFile);
+        }
+        
+        // Créer un nom de fichier unique
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String uniqueFilename = UUID.randomUUID().toString() + extension;
+        
+        // Sauvegarder le nouveau fichier
+        Path destinationFile = avatarLocation.resolve(uniqueFilename).normalize().toAbsolutePath();
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+        
+        // Mettre à jour la base de données
+        user.setAvatarFilename(uniqueFilename);
+        userRepository.save(user);
+    }
+    
+    @Transactional
+    public void deleteAvatar(String username) throws IOException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("Utilisateur non trouvé.");
+        }
+        
+        if (user.getAvatarFilename() != null) {
+            Path fileToDelete = avatarLocation.resolve(user.getAvatarFilename());
+            Files.deleteIfExists(fileToDelete);
+            user.setAvatarFilename(null);
+            userRepository.save(user);
+        }
     }
 }

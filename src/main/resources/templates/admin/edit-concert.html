@@ -8,50 +8,45 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-	<!-- Header -->
-	<header class="bg-white shadow-md">
-		<div class="container mx-auto px-6 py-4">
-			<h1 class="text-2xl font-bold text-gray-800">Modifier un Concert</h1>
-		</div>
-	</header>
+<div class="flex min-h-screen">
+    <!-- AJOUT : Inclusion de la sidebar -->
+    <div th:replace="~{fragments/admin-layout :: sidebar}"></div>
 
-	<!-- Main Content -->
-	<main class="container mx-auto px-6 py-12">
-		<div class="max-w-2xl mx-auto">
-			<div class="bg-white p-8 rounded-lg shadow-lg">
-				<form th:action="@{/admin/concerts/update/{id}(id=${concert.id})}"
-					th:object="${concert}" method="post" class="space-y-6">
-					<div>
-						<label for="location"
-							class="block text-sm font-medium text-gray-700">Lieu</label> <input
-							type="text" id="location" th:field="*{location}" required
-							class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-					</div>
-					<div>
-						<label for="date" class="block text-sm font-medium text-gray-700">Date</label>
-						<input type="date" id="date" th:field="*{date}" required
-							class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-					</div>
-					<div>
-						<label for="description"
-							class="block text-sm font-medium text-gray-700">Description</label>
-						<textarea id="description" th:field="*{description}" rows="3"
-							required
-							class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-					</div>
-					<div class="flex items-center space-x-4">
-						<button type="submit"
-							class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition duration-300">
-							Enregistrer les modifications</button>
-						<a th:href="@{/admin/dashboard}"
-							class="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-md transition duration-300">
-							Annuler </a>
-					</div>
-				</form>
-			</div>
-		</div>
-	</main>
+    <main class="flex-grow p-8">
+        <h1 class="text-3xl font-bold mb-6">Modifier un Concert</h1>
+
+        <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl">
+            <form th:action="@{/admin/concerts/update/{id}(id=${concert.id})}"
+                th:object="${concert}" method="post" class="space-y-6">
+                <div>
+                    <label for="location" class="block text-sm font-medium text-gray-700">Lieu</label>
+                    <input type="text" id="location" th:field="*{location}" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+                    <input type="date" id="date" th:field="*{date}" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea id="description" th:field="*{description}" rows="3" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button type="submit"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition duration-300">
+                        Enregistrer les modifications
+                    </button>
+                    <a th:href="@{/admin/concerts}"
+                        class="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-md transition duration-300">
+                        Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
 
 </body>
 </html>
-
