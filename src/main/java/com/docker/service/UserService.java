@@ -36,16 +36,23 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final ConcertRepository concertRepository;
     private final PasswordEncoder passwordEncoder;
+    private BadgeService badgeService; // Injection tardive pour éviter les dépendances circulaires
 
     private static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
-    
-   
-    
+
+
+
     public UserService(UserRepository userRepository, RoleRepository roleRepository, ConcertRepository concertRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.concertRepository = concertRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    // Injection du BadgeService après la construction pour éviter les dépendances circulaires
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setBadgeService(BadgeService badgeService) {
+        this.badgeService = badgeService;
     }
 
     public User findByUsername(String username) {
@@ -165,6 +172,11 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid concert Id:" + concertId));
         user.getFavoriteConcerts().add(concert);
         userRepository.save(user);
+
+        // Vérifier et débloquer les badges après l'ajout d'un concert favori
+        if (badgeService != null) {
+            badgeService.checkAndUnlockBadges(user);
+        }
     }
 
     @Transactional

@@ -68,7 +68,7 @@ public class AdminController {
         if (!model.containsAttribute("article")) {
             model.addAttribute("article", new Article());
         }
-        
+
         return "admin/dashboard";
     }
 }

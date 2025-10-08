@@ -13,8 +13,8 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = "favoriteConcerts")
-@ToString(exclude = "favoriteConcerts")
+@EqualsAndHashCode(exclude = {"favoriteConcerts", "badges"})
+@ToString(exclude = {"favoriteConcerts", "badges"})
 @Table(name = "users")
 public class User {
 
@@ -58,7 +58,10 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "concert_id")
     )
     private Set<Concert> favoriteConcerts = new HashSet<>();
-    
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<UserBadge> badges = new HashSet<>();
+
     // Définit automatiquement la date de création
     @PrePersist
     protected void onCreate() {
