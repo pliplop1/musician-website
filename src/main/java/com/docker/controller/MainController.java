@@ -21,6 +21,9 @@ import com.docker.service.UserService;
 import com.docker.service.BiographyService;
 import com.docker.service.PhotoService;
 import com.docker.service.TrackService;
+import com.docker.service.VideoService;
+import com.docker.service.CommentService;
+import com.docker.entity.CommentType;
 
 @Controller
 public class MainController {
@@ -31,20 +34,36 @@ public class MainController {
 	private final BiographyService biographyService;
 	private final PhotoService photoService;
 	private final TrackService trackService;
+	private final VideoService videoService;
+	private final CommentService commentService;
 
 	public MainController(ConcertService concertService, MessageService messageService, UserService userService,
-			BiographyService biographyService, PhotoService photoService, TrackService trackService) {
+			BiographyService biographyService, PhotoService photoService, TrackService trackService, VideoService videoService,
+			CommentService commentService) {
 		this.concertService = concertService;
 		this.messageService = messageService;
 		this.userService = userService;
 		this.biographyService = biographyService;
 		this.photoService = photoService;
 		this.trackService = trackService;
+		this.videoService = videoService;
+		this.commentService = commentService;
 	}
 
 	@GetMapping("/")
 	public String home(Model model, Principal principal) {
-		model.addAttribute("concerts", concertService.findAllConcerts());
+		var concerts = concertService.findAllConcerts();
+		model.addAttribute("concerts", concerts);
+
+		// Ajouter les compteurs et commentaires pour chaque concert
+		concerts.forEach(concert -> {
+			Long commentCount = commentService.countApprovedComments(CommentType.CONCERT, concert.getId());
+			model.addAttribute("commentCount_" + concert.getId(), commentCount);
+
+			var comments = commentService.getApprovedComments(CommentType.CONCERT, concert.getId());
+			model.addAttribute("comments_" + concert.getId(), comments);
+		});
+
 		if (!model.containsAttribute("message")) {
 			model.addAttribute("message", new Message());
 		}
@@ -84,5 +103,11 @@ public class MainController {
 	public String showMusic(Model model) {
 		model.addAttribute("tracks", trackService.getAllTracks());
 		return "musique";
+	}
+
+	@GetMapping("/videos")
+	public String showVideos(Model model) {
+		model.addAttribute("videos", videoService.getAllVideos());
+		return "videos";
 	}
 }

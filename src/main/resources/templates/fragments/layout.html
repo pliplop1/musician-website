@@ -10,6 +10,7 @@
                 <a th:href="@{/biographie}" class="px-4" th:classappend="${currentUri == '/biographie'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Biographie</a>
                 <a th:href="@{/galerie}" class="px-4" th:classappend="${currentUri == '/galerie'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Galerie</a>
                 <a th:href="@{/musique}" class="px-4" th:classappend="${currentUri == '/musique'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Musique</a>
+                <a th:href="@{/videos}" class="px-4" th:classappend="${currentUri == '/videos'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Vidéos</a>
                 <a th:href="@{/actualites}" class="px-4" th:classappend="${currentUri == '/actualites'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Actualités</a>
                 
                 <div sec:authorize="!isAuthenticated()" class="inline">

@@ -39,9 +39,14 @@
             </div>
         </form>
         
-        <p class="text-center text-sm text-gray-600">
-            Pas encore de compte ? <a th:href="@{/register}" class="font-medium text-indigo-600 hover:text-indigo-500">Inscrivez-vous</a>
-        </p>
+        <div class="space-y-2">
+            <p class="text-center text-sm text-gray-600">
+                Pas encore de compte ? <a th:href="@{/register}" class="font-medium text-indigo-600 hover:text-indigo-500">Inscrivez-vous</a>
+            </p>
+            <p class="text-center text-sm text-gray-600">
+                <a th:href="@{/}" class="font-medium text-gray-700 hover:text-indigo-500">← Retour à l'accueil</a>
+            </p>
+        </div>
     </div>
 
     <script>

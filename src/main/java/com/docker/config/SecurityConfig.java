@@ -52,6 +52,7 @@ public class SecurityConfig {
 						"/biographie", // Page biographie
 						"/galerie", // Page galerie
 						"/musique", // Page musique
+						"/videos", // Page vidéos
 						"/actualites", // Page actualités
 						"/contact", // Formulaire de contact
 						"/register", // Page d'inscription
@@ -61,6 +62,7 @@ public class SecurityConfig {
 						"/images/**", // Images statiques
 						"/uploaded-photos/**", // Photos uploadées
 						"/uploaded-music/**", // Musique uploadée
+						"/uploaded-videos/**", // Vidéos uploadées
 						"/api/**" // API REST publique
 				).permitAll()
 

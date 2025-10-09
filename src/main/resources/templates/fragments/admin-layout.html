@@ -54,6 +54,12 @@
                 </a>
             </li>
             <li>
+                <a th:href="@{/admin/videos}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/videos')} ? 'bg-gray-900 font-semibold' : ''">
+                   🎬 Vidéos
+                </a>
+            </li>
+            <li>
                 <a th:href="@{/admin/biographie}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/biographie')} ? 'bg-gray-900 font-semibold' : ''">
                    📖 Biographie
@@ -69,6 +75,18 @@
                 <a th:href="@{/admin/users}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/users')} ? 'bg-gray-900 font-semibold' : ''">
                    👥 Utilisateurs
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/comments}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/comments')} ? 'bg-gray-900 font-semibold' : ''">
+                   💬 Commentaires
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/social-links}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/social-links')} ? 'bg-gray-900 font-semibold' : ''">
+                   🔗 Réseaux Sociaux
                 </a>
             </li>
             <li class="mt-8 border-t border-gray-600 pt-4">
