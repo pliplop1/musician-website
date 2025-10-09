@@ -1,5 +1,6 @@
 package com.docker.controller;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.docker.entity.Role;
 import com.docker.entity.User;
 import com.docker.repository.RoleRepository;
 import com.docker.service.UserService;
@@ -60,8 +62,17 @@ public class AdminUserController {
     @PostMapping("/users/update")
     public String updateUser(@ModelAttribute User user, @RequestParam(name = "roleId", required = false) Long roleId,
             RedirectAttributes redirectAttributes) {
-        userService.updateUserFromAdmin(user.getId(), user.getUsername(), user.getEmail(),
-                Set.of(roleRepository.findById(roleId).orElse(null)));
+        Set<Role> roles = new HashSet<>();
+        if (roleId != null) {
+            roleRepository.findById(roleId).ifPresent(roles::add);
+        }
+
+        if (roles.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Veuillez sélectionner au moins un rôle.");
+            return "redirect:/admin/users/edit/" + user.getId();
+        }
+
+        userService.updateUserFromAdmin(user.getId(), user.getUsername(), user.getEmail(), roles);
         redirectAttributes.addFlashAttribute("successMessage", "L'utilisateur a été mis à jour avec succès.");
         return "redirect:/admin/users";
     }

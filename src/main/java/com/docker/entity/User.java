@@ -43,7 +43,7 @@ public class User {
     
     private LocalDateTime createdAt; // Date d'inscription
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id"),
@@ -59,7 +59,7 @@ public class User {
     )
     private Set<Concert> favoriteConcerts = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserBadge> badges = new HashSet<>();
 
     // Définit automatiquement la date de création

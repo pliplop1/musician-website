@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Musique - MARC DUPONT</title>
+    <title>Vidéos - MARC DUPONT</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="bg-gray-900 text-white">
@@ -11,9 +11,9 @@
 <header th:replace="~{fragments/layout :: header}"></header>
 
 <main class="container mx-auto px-6 py-12">
-    <section id="music-content">
-        <h2 class="text-4xl font-bold text-center mb-10">Musique</h2>
-        <div id="tracks-container" class="max-w-4xl mx-auto space-y-8">
+    <section id="video-content">
+        <h2 class="text-4xl font-bold text-center mb-10">Vidéos</h2>
+        <div id="videos-container" class="max-w-4xl mx-auto space-y-8">
             <p id="loading-message" class="text-center text-gray-400">Chargement...</p>
         </div>
     </section>
@@ -40,44 +40,44 @@
 
 <script th:inline="javascript">
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('/api/tracks')
+    fetch('/api/videos')
         .then(response => {
             if (!response.ok) {
                 throw new Error('La réponse du réseau n\'était pas ok');
             }
             return response.json();
         })
-        .then(tracks => {
-            const container = document.getElementById('tracks-container');
+        .then(videos => {
+            const container = document.getElementById('videos-container');
             container.innerHTML = ''; // Vider le message de chargement
 
-            if (tracks.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-400">Aucune musique disponible.</p>';
+            if (videos.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400">Aucune vidéo disponible.</p>';
                 return;
             }
 
-            tracks.forEach(track => {
-                const trackDiv = document.createElement('div');
-                trackDiv.className = 'bg-gray-800 rounded-lg p-6 shadow-lg';
-                
-                let content = `<h3 class="text-2xl font-bold mb-4">${track.title}</h3>`;
-                
-                if (track.trackType === 'EMBED') {
-                    content += `<div>${track.embedCode}</div>`;
-                } else if (track.trackType === 'UPLOADED_FILE') {
+            videos.forEach(video => {
+                const videoDiv = document.createElement('div');
+                videoDiv.className = 'bg-gray-800 rounded-lg p-6 shadow-lg';
+
+                let content = `<h3 class="text-2xl font-bold mb-4">${video.title}</h3>`;
+
+                if (video.videoType === 'EMBED') {
+                    content += `<div>${video.embedCode}</div>`;
+                } else if (video.videoType === 'UPLOADED_FILE') {
                     // On construit l'URL vers notre nouvel endpoint de streaming
-                    const streamUrl = `/api/tracks/stream/${track.id}`;
-                    content += `<audio controls class="w-full" src="${streamUrl}"></audio>`;
+                    const streamUrl = `/api/videos/stream/${video.id}`;
+                    content += `<video controls class="w-full" src="${streamUrl}"></video>`;
                 }
-                
-                trackDiv.innerHTML = content;
-                container.appendChild(trackDiv);
+
+                videoDiv.innerHTML = content;
+                container.appendChild(videoDiv);
             });
         })
         .catch(error => {
-            console.error('Erreur lors de la récupération des pistes:', error);
-            const container = document.getElementById('tracks-container');
-            container.innerHTML = '<p class="text-center text-red-500">Impossible de charger la musique.</p>';
+            console.error('Erreur lors de la récupération des vidéos:', error);
+            const container = document.getElementById('videos-container');
+            container.innerHTML = '<p class="text-center text-red-500">Impossible de charger les vidéos.</p>';
         });
 });
 </script>

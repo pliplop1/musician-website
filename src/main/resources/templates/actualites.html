@@ -21,6 +21,63 @@
                 <p class="text-sm text-gray-400" th:text="${#temporals.format(article.datePublication, 'dd MMMM yyyy')}"></p>
                 <h3 class="text-2xl font-bold text-indigo-400 mt-2 mb-4" th:text="${article.titre}"></h3>
                 <p class="text-gray-300 whitespace-pre-wrap" th:text="${article.contenu}"></p>
+
+                <!-- Section des commentaires -->
+                <div class="mt-6 pt-6 border-t border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-semibold text-gray-300">
+                            💬 Commentaires (<span th:text="${#ctx.getVariable('commentCount_' + article.id) ?: 0}">0</span>)
+                        </h4>
+                    </div>
+
+                    <!-- Formulaire d'ajout de commentaire (si connecté) -->
+                    <div sec:authorize="isAuthenticated()" class="mb-4">
+                        <form th:action="@{/comments/article/{id}(id=${article.id})}" method="post" class="space-y-2">
+                            <textarea name="content" rows="3" maxlength="1000" required
+                                      placeholder="Ajouter un commentaire..."
+                                      class="w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white text-sm resize-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"></textarea>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-400">Max 1000 caractères</span>
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-md text-sm transition-colors">
+                                    Publier
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Message pour se connecter si non connecté -->
+                    <div sec:authorize="!isAuthenticated()" class="mb-4 text-center">
+                        <p class="text-sm text-gray-400">
+                            <a th:href="@{/login}" class="text-indigo-400 hover:text-indigo-300">Connectez-vous</a> pour laisser un commentaire
+                        </p>
+                    </div>
+
+                    <!-- Liste des commentaires approuvés -->
+                    <div class="space-y-3">
+                        <div th:each="comment : ${#ctx.getVariable('comments_' + article.id)}" class="bg-gray-800 rounded-md p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="flex-shrink-0">
+                                    <div th:if="${comment.user.avatarFilename != null}">
+                                        <img th:src="@{/uploaded-avatars/{filename}(filename=${comment.user.avatarFilename})}"
+                                             alt="Avatar"
+                                             class="w-8 h-8 rounded-full object-cover">
+                                    </div>
+                                    <div th:if="${comment.user.avatarFilename == null}"
+                                         class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                                        <span th:text="${comment.user.initials}"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-semibold text-sm text-indigo-400" th:text="${comment.user.username}">Utilisateur</span>
+                                        <span class="text-xs text-gray-500" th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}">Date</span>
+                                    </div>
+                                    <p class="text-gray-300 text-sm whitespace-pre-wrap" th:text="${comment.content}">Contenu du commentaire</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -28,9 +85,18 @@
 
 <footer class="bg-gray-800 mt-20 py-8">
     <div class="container mx-auto px-6 text-center text-gray-400">
-        <div class="flex justify-center space-x-6 mb-6">
-            <a href="https://facebook.com/VOTRE_PAGE" target="_blank" class="hover:text-white transition-colors">Facebook</a>
-            <a href="https://instagram.com/VOTRE_PROFIL" target="_blank" class="hover:text-white transition-colors">Instagram</a>
+        <div class="flex justify-center space-x-6 mb-6" th:if="${!#lists.isEmpty(enabledSocialLinks)}">
+            <a th:each="link : ${enabledSocialLinks}"
+               th:href="${link.url}"
+               target="_blank"
+               class="hover:text-white transition-colors flex items-center gap-2"
+               th:title="${link.name}">
+                <i th:class="${link.icon} + ' text-xl'"></i>
+                <span th:text="${link.name}"></span>
+            </a>
+        </div>
+        <div th:if="${#lists.isEmpty(enabledSocialLinks)}" class="mb-6 text-sm">
+            <p>Aucun réseau social configuré</p>
         </div>
         <p>© 2025 MARC DUPONT. Tous droits réservés.</p>
     </div>

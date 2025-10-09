@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modération des Commentaires - Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+<div class="flex min-h-screen">
+    <div th:replace="~{fragments/admin-layout :: sidebar}"></div>
+
+    <main class="flex-grow p-8">
+        <h1 class="text-3xl font-bold mb-6">Modération des Commentaires</h1>
+
+        <div th:if="${successMessage}" class="bg-green-500 text-white p-4 rounded-md mb-6">
+            <p th:text="${successMessage}"></p>
+        </div>
+
+        <!-- Commentaires en attente de modération -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                <span class="bg-yellow-600 text-white rounded-full px-3 py-1 text-sm" th:text="${#lists.size(pendingComments)}">0</span>
+                En attente de modération
+            </h2>
+
+            <div th:if="${#lists.isEmpty(pendingComments)}" class="bg-white rounded-lg shadow-md p-8 text-center">
+                <p class="text-gray-600">✅ Aucun commentaire en attente de modération</p>
+            </div>
+
+            <div class="space-y-4">
+                <div th:each="comment : ${pendingComments}" class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="font-semibold text-indigo-600" th:text="${comment.user.username}">Utilisateur</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100"
+                                      th:text="${comment.type}"
+                                      th:classappend="${comment.type == 'CONCERT' ? 'text-green-600' : (comment.type == 'ARTICLE' ? 'text-blue-600' : 'text-purple-600')}">
+                                    TYPE
+                                </span>
+                                <span class="text-xs text-gray-500"
+                                      th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                    Date
+                                </span>
+                            </div>
+                            <p class="text-gray-700 whitespace-pre-wrap" th:text="${comment.content}">Contenu du commentaire</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <form th:action="@{/admin/comments/approve/{id}(id=${comment.id})}" method="post" class="inline">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                                ✓ Approuver
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/comments/delete/{id}(id=${comment.id})}" method="post" class="inline">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')">
+                                🗑 Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tous les commentaires -->
+        <section>
+            <h2 class="text-2xl font-bold mb-6">Tous les commentaires</h2>
+
+            <div th:if="${#lists.isEmpty(allComments)}" class="bg-white rounded-lg shadow-md p-8 text-center">
+                <p class="text-gray-600">Aucun commentaire pour le moment</p>
+            </div>
+
+            <div class="space-y-4">
+                <div th:each="comment : ${allComments}" class="bg-white rounded-lg shadow-md p-6"
+                     th:classappend="${comment.approved ? 'border-l-4 border-green-500' : 'border-l-4 border-gray-400'}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="font-semibold text-indigo-600" th:text="${comment.user.username}">Utilisateur</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100"
+                                      th:text="${comment.type}"
+                                      th:classappend="${comment.type == 'CONCERT' ? 'text-green-600' : (comment.type == 'ARTICLE' ? 'text-blue-600' : 'text-purple-600')}">
+                                    TYPE
+                                </span>
+                                <span class="text-xs px-2 py-1 rounded-full"
+                                      th:classappend="${comment.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                                    <span th:if="${comment.approved}">✓ Approuvé</span>
+                                    <span th:if="${!comment.approved}">⏳ En attente</span>
+                                </span>
+                                <span class="text-xs text-gray-500"
+                                      th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                    Date
+                                </span>
+                            </div>
+                            <p class="text-gray-700 whitespace-pre-wrap" th:text="${comment.content}">Contenu du commentaire</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <form th:if="${!comment.approved}" th:action="@{/admin/comments/approve/{id}(id=${comment.id})}" method="post" class="inline">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors text-sm">
+                                ✓ Approuver
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/comments/delete/{id}(id=${comment.id})}" method="post" class="inline">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors text-sm"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')">
+                                🗑 Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+</body>
+</html>
