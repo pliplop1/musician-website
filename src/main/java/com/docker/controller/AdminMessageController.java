@@ -1,9 +1,12 @@
 package com.docker.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.ui.Model;
@@ -33,5 +36,25 @@ public class AdminMessageController {
 		redirectAttributes.addFlashAttribute("successMessage", "Le message a été supprimé avec succès !");
 		return "redirect:/admin/messages";
 
+	}
+
+	/**
+	 * Supprimer plusieurs messages en masse
+	 */
+	@PostMapping("/messages/bulk-delete")
+	public String bulkDeleteMessages(@RequestParam("messageIds") List<Long> messageIds, RedirectAttributes redirectAttributes) {
+		if (messageIds == null || messageIds.isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Aucun message sélectionné");
+			return "redirect:/admin/messages";
+		}
+
+		int count = 0;
+		for (Long id : messageIds) {
+			messageService.deleteMessage(id);
+			count++;
+		}
+
+		redirectAttributes.addFlashAttribute("successMessage", count + " message(s) supprimé(s) avec succès !");
+		return "redirect:/admin/messages";
 	}
 }

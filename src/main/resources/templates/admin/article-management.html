@@ -26,12 +26,16 @@
                 <div>
                     <label for="titre" class="block text-sm font-medium">Titre</label>
                     <input type="text" id="titre" th:field="*{titre}" required
+                           th:classappend="${#fields.hasErrors('titre')} ? 'border-red-500' : ''"
                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}" class="mt-1 text-sm text-red-500"></p>
                 </div>
                 <div>
                     <label for="contenu" class="block text-sm font-medium">Contenu</label>
                     <textarea id="contenu" th:field="*{contenu}" rows="5" required
+                              th:classappend="${#fields.hasErrors('contenu')} ? 'border-red-500' : ''"
                               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <p th:if="${#fields.hasErrors('contenu')}" th:errors="*{contenu}" class="mt-1 text-sm text-red-500"></p>
                 </div>
                 <div>
                     <button type="submit"

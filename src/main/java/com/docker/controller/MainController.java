@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ import com.docker.service.TrackService;
 import com.docker.service.VideoService;
 import com.docker.service.CommentService;
 import com.docker.entity.CommentType;
+import jakarta.validation.Valid;
 
 @Controller
 public class MainController {
@@ -87,7 +89,31 @@ public class MainController {
 	}
 
 	@PostMapping("/contact")
-	public String submitContactForm(@ModelAttribute Message message, RedirectAttributes redirectAttributes) {
+	public String submitContactForm(@Valid @ModelAttribute("message") Message message, BindingResult result, Model model, RedirectAttributes redirectAttributes, Principal principal) {
+		if (result.hasErrors()) {
+			// Recharger les données nécessaires pour afficher la page d'accueil
+			var concerts = concertService.findAllConcerts();
+			model.addAttribute("concerts", concerts);
+
+			concerts.forEach(concert -> {
+				Long commentCount = commentService.countApprovedComments(CommentType.CONCERT, concert.getId());
+				model.addAttribute("commentCount_" + concert.getId(), commentCount);
+				var comments = commentService.getApprovedComments(CommentType.CONCERT, concert.getId());
+				model.addAttribute("comments_" + concert.getId(), comments);
+			});
+
+			if (principal != null) {
+				User user = userService.findByUsername(principal.getName());
+				Set<Long> favoriteConcertIds = user.getFavoriteConcerts().stream().map(Concert::getId)
+						.collect(Collectors.toSet());
+				model.addAttribute("favoriteConcertIds", favoriteConcertIds);
+			} else {
+				model.addAttribute("favoriteConcertIds", Collections.emptySet());
+			}
+
+			return "index";
+		}
+
 		messageService.saveMessage(message);
 		redirectAttributes.addFlashAttribute("successMessage", "Votre message a bien été envoyé !");
 		return "redirect:/";
