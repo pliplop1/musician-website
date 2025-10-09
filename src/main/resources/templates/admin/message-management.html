@@ -41,7 +41,7 @@
 		<div th:replace="~{fragments/admin-layout :: sidebar}"></div>
 
 		<main class="flex-grow p-8">
-			<h1 class="text-3xl font-bold mb-6">Messages Reçus</h1>
+			<h1 class="text-3xl font-bold mb-6">Messages Reçus [VERSION AVEC CSRF TOKEN]</h1>
 
 			<div th:if="${successMessage}"
 				class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-8 shadow-sm">
@@ -56,6 +56,12 @@
 					<span class="text-sm font-medium">Tout sélectionner</span>
 				</label>
 				<div class="flex-1"></div>
+				<form th:action="@{/admin/messages/mark-all-read}" method="post" style="display: inline;">
+					<button type="submit"
+						class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+						✓ Marquer tout comme lu
+					</button>
+				</form>
 				<button type="button" onclick="handleBulkDelete()"
 					class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
 					🗑 Supprimer la sélection
@@ -105,13 +111,21 @@
 										th:data-name="${message.name}" th:data-email="${message.email}"
 										th:data-timestamp="${#temporals.format(message.timestamp, 'dd MMMM yy à HH:mm')}"
 										th:data-content="${message.content}">Voir</button>
-									<form
-										th:action="@{/admin/messages/delete/{id}(id=${message.id})}"
-										method="post" class="inline">
-										<button type="submit"
-											class="ml-4 text-red-600 hover:text-red-900 bg-transparent border-none p-0 cursor-pointer"
-											onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">Supprimer</button>
-									</form>
+									|
+									<button type="button"
+										class="toggle-read-btn"
+									th:data-id="${message.id}"
+									th:data-csrf-token="${_csrf.token}"
+									th:data-csrf-param="${_csrf.parameterName}"
+										th:class="${message.read} ? 'toggle-read-btn text-gray-600 hover:text-gray-900' : 'toggle-read-btn text-green-600 hover:text-green-900'"
+										th:text="${message.read} ? '✓ Lu' : '📭 Non lu'">
+									</button>
+									|
+									<button type="button"
+										class="delete-msg-btn ml-4 text-red-600 hover:text-red-900 bg-transparent border-none p-0 cursor-pointer"
+										th:data-id="${message.id}"
+										th:data-csrf-token="${_csrf.token}"
+										th:data-csrf-param="${_csrf.parameterName}">Supprimer</button>
 								</td>
 							</tr>
 						</tbody>
@@ -155,13 +169,89 @@
 	</div>
 
 	<script th:inline="javascript">
+    // Fonctions globales pour les boutons toggle/delete
+    function toggleRead(id, csrfToken, csrfParam) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/messages/toggle-read/' + id;
+
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = csrfParam;
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function deleteMessage(id, csrfToken, csrfParam) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/messages/delete/' + id;
+
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = csrfParam;
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOMContentLoaded - Script initialized');
+
         const messageModal = document.getElementById('messageModal');
+        console.log('Modal found:', messageModal);
+
         if (messageModal) {
             const closeMessageModalBtn = document.getElementById('closeMessageModalBtn');
+
+            // Attacher les événements directement aux boutons toggle et delete
+            const toggleButtons = document.querySelectorAll('.toggle-read-btn');
+            const deleteButtons = document.querySelectorAll('.delete-msg-btn');
+
+            console.log('Toggle buttons found:', toggleButtons.length);
+            console.log('Delete buttons found:', deleteButtons.length);
+
+            // Event listeners pour les boutons toggle
+            toggleButtons.forEach(function(toggleBtn) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Toggle button clicked!', toggleBtn);
+                    console.log('Dataset:', toggleBtn.dataset);
+
+                    const id = toggleBtn.dataset.id;
+                    const csrfToken = toggleBtn.dataset.csrfToken;
+                    const csrfParam = toggleBtn.dataset.csrfParam;
+
+                    console.log('Calling toggleRead with:', id, csrfToken, csrfParam);
+                    toggleRead(id, csrfToken, csrfParam);
+                });
+            });
+
+            // Event listeners pour les boutons delete
+            deleteButtons.forEach(function(deleteBtn) {
+                deleteBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Delete button clicked!', deleteBtn);
+
+                    if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
+                        const id = deleteBtn.dataset.id;
+                        const csrfToken = deleteBtn.dataset.csrfToken;
+                        const csrfParam = deleteBtn.dataset.csrfParam;
+                        deleteMessage(id, csrfToken, csrfParam);
+                    }
+                });
+            });
+
+            // Event listener pour les boutons "Voir"
             document.body.addEventListener('click', function (event) {
                 const viewBtn = event.target.closest('.view-message-btn');
                 if (viewBtn) {
+                    console.log('View button clicked');
                     document.getElementById('modal-name').textContent = viewBtn.dataset.name;
                     document.getElementById('modal-email').textContent = viewBtn.dataset.email;
                     document.getElementById('modal-timestamp').textContent = viewBtn.dataset.timestamp;
@@ -169,6 +259,7 @@
                     messageModal.style.display = 'block';
                 }
             });
+
             closeMessageModalBtn.addEventListener('click', () => {
                 messageModal.style.display = 'none';
             });
@@ -178,6 +269,7 @@
                 }
             });
         }
+
     });
 </script>
 

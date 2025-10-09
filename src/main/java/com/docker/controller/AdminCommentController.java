@@ -27,8 +27,19 @@ public class AdminCommentController {
      */
     @GetMapping
     public String showCommentsManagement(Model model) {
-        model.addAttribute("pendingComments", commentService.getPendingComments());
-        model.addAttribute("allComments", commentService.getAllComments());
+        var pendingComments = commentService.getPendingComments();
+        var allComments = commentService.getAllComments();
+
+        System.out.println("=== ADMIN COMMENTS PAGE ===");
+        System.out.println("Pending comments: " + pendingComments.size());
+        System.out.println("All comments: " + allComments.size());
+
+        pendingComments.forEach(c ->
+            System.out.println("  Pending: ID=" + c.getId() + ", user=" + c.getUser().getUsername() + ", type=" + c.getType() + ", targetId=" + c.getTargetId())
+        );
+
+        model.addAttribute("pendingComments", pendingComments);
+        model.addAttribute("allComments", allComments);
         return "admin/comments";
     }
 

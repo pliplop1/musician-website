@@ -13,7 +13,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
-@Data
 public class Message {
 
     @Id
@@ -34,6 +33,9 @@ public class Message {
     private String content;
 
     private LocalDateTime timestamp;
+
+    @Column(name = "is_read", nullable = false)
+    private boolean read = false;
 
     // Constructeurs
     public Message() {
@@ -78,6 +80,14 @@ public class Message {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }
 

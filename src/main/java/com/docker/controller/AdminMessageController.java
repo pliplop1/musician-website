@@ -57,4 +57,23 @@ public class AdminMessageController {
 		redirectAttributes.addFlashAttribute("successMessage", count + " message(s) supprimé(s) avec succès !");
 		return "redirect:/admin/messages";
 	}
+
+	/**
+	 * Basculer l'état lu/non lu d'un message
+	 */
+	@PostMapping("/messages/toggle-read/{id}")
+	public String toggleReadStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+		messageService.toggleReadStatus(id);
+		return "redirect:/admin/messages";
+	}
+
+	/**
+	 * Marquer tous les messages comme lus
+	 */
+	@PostMapping("/messages/mark-all-read")
+	public String markAllMessagesAsRead(RedirectAttributes redirectAttributes) {
+		messageService.markAllAsRead();
+		redirectAttributes.addFlashAttribute("successMessage", "Tous les messages ont été marqués comme lus !");
+		return "redirect:/admin/messages";
+	}
 }

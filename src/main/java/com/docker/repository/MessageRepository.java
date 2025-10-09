@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
+
+    // Compter les messages non lus
+    long countByReadFalse();
 }
