@@ -1,6 +1,7 @@
 package com.docker.controller;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -81,6 +82,26 @@ public class AdminUserController {
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.deleteUser(id);
         redirectAttributes.addFlashAttribute("successMessage", "L'utilisateur a été supprimé avec succès !");
+        return "redirect:/admin/users";
+    }
+
+    /**
+     * Supprimer plusieurs utilisateurs en masse
+     */
+    @PostMapping("/users/bulk-delete")
+    public String bulkDeleteUsers(@RequestParam("userIds") List<Long> userIds, RedirectAttributes redirectAttributes) {
+        if (userIds == null || userIds.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Aucun utilisateur sélectionné");
+            return "redirect:/admin/users";
+        }
+
+        int count = 0;
+        for (Long id : userIds) {
+            userService.deleteUser(id);
+            count++;
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", count + " utilisateur(s) supprimé(s) avec succès !");
         return "redirect:/admin/users";
     }
 }

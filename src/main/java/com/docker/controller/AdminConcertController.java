@@ -3,6 +3,7 @@ package com.docker.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.docker.entity.Concert;
 import com.docker.service.ConcertService;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/admin") // Toutes les routes ici commenceront par /admin
@@ -25,7 +27,11 @@ public class AdminConcertController {
     }
 
     @PostMapping("/concerts/add")
-    public String saveConcert(@ModelAttribute Concert concert, RedirectAttributes redirectAttributes) {
+    public String saveConcert(@Valid @ModelAttribute("concert") Concert concert, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            model.addAttribute("concerts", concertService.findAllConcerts());
+            return "admin/concert-management";
+        }
         concertService.saveConcert(concert);
         redirectAttributes.addFlashAttribute("successMessage", "Le concert a été ajouté avec succès !");
         return "redirect:/admin/dashboard";
@@ -47,8 +53,14 @@ public class AdminConcertController {
     }
 
     @PostMapping("/concerts/update/{id}")
-    public String updateConcert(@PathVariable Long id, @ModelAttribute Concert concert,
-            RedirectAttributes redirectAttributes) {
+    public String updateConcert(@PathVariable Long id, @Valid @ModelAttribute("concert") Concert concert, BindingResult result,
+            Model model, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            concert.setId(id);
+            model.addAttribute("concert", concert);
+            return "admin/edit-concert";
+        }
+
         Concert existingConcert = concertService.findConcertById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid concert Id:" + id));
         existingConcert.setLocation(concert.getLocation());

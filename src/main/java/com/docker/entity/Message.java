@@ -2,10 +2,14 @@ package com.docker.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
@@ -15,9 +19,20 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "Le nom est obligatoire")
+    @Size(min = 2, max = 100, message = "Le nom doit contenir entre 2 et 100 caractères")
     private String name;
+
+    @NotBlank(message = "L'email est obligatoire")
+    @Email(message = "L'email doit être valide")
     private String email;
+
+    @NotBlank(message = "Le message est obligatoire")
+    @Size(min = 10, max = 2000, message = "Le message doit contenir entre 10 et 2000 caractères")
+    @Column(length = 2000)
     private String content;
+
     private LocalDateTime timestamp;
 
     // Constructeurs
