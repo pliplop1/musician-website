@@ -4,8 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion de la Galerie</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script th:src="@{/js/admin-gallery-search.js}" defer></script>
+    <script th:src="@{/js/photo-sortable.js}" defer></script>
+    <style>
+        .sortable-ghost {
+            opacity: 0.4;
+        }
+        .sortable-chosen {
+            cursor: move;
+        }
+        .photo-card:hover {
+            cursor: grab;
+        }
+        .photo-card:active {
+            cursor: grabbing;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
@@ -49,7 +67,7 @@
                 <p>Aucune photo dans la galerie pour le moment.</p>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <div th:each="photo : ${photos}" class="relative group">
+                <div th:each="photo : ${photos}" class="relative group photo-card" th:data-photo-id="${photo.id}">
                     <img th:src="@{/uploaded-photos/{filename}(filename=${photo.filename})}"
                          alt="Photo de la galerie"
                          class="rounded-lg object-cover w-full h-48">

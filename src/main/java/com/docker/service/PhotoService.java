@@ -29,7 +29,7 @@ public class PhotoService {
 	}
 
 	public List<Photo> getAllPhotos() {
-		return photoRepository.findAll();
+		return photoRepository.findAllByOrderByDisplayOrderAsc();
 	}
 
 	public void savePhoto(MultipartFile file) throws IOException {
