@@ -31,6 +31,7 @@ public class MessageService {
 	 */
 	public Message saveMessage(Message message) {
 		message.setTimestamp(LocalDateTime.now());
+		message.setRead(false); // Marquer le message comme non lu par défaut
 		return messageRepository.save(message);
 	}
 
@@ -54,5 +55,28 @@ public class MessageService {
 
 	public long countMessages() {
 		return messageRepository.count();
+	}
+
+	/**
+	 * Marque tous les messages comme lus.
+	 */
+	public void markAllAsRead() {
+		List<Message> messages = messageRepository.findAll();
+		for (Message message : messages) {
+			if (!message.isRead()) {
+				message.setRead(true);
+			}
+		}
+		messageRepository.saveAll(messages);
+	}
+
+	/**
+	 * Bascule l'état lu/non lu d'un message.
+	 */
+	public void toggleReadStatus(Long id) {
+		Message message = messageRepository.findById(id)
+			.orElseThrow(() -> new RuntimeException("Message non trouvé"));
+		message.setRead(!message.isRead());
+		messageRepository.save(message);
 	}
 }

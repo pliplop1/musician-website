@@ -47,6 +47,9 @@ public class SecurityConfig {
 				// Routes USER (USER ou ADMIN)
 				.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
 
+				// Routes COMMENTS (utilisateurs authentifiés)
+				.requestMatchers("/comments/**").hasAnyRole("USER", "ADMIN")
+
 				// Routes PUBLIQUES - CORRECTION ICI
 				.requestMatchers("/", // Page d'accueil
 						"/biographie", // Page biographie
@@ -68,6 +71,8 @@ public class SecurityConfig {
 
 				// Tout le reste nécessite une authentification
 				.anyRequest().authenticated())
+				// Configuration CSRF : activé par défaut (pas de configuration supplémentaire nécessaire)
+				// Spring Security active automatiquement la protection CSRF pour toutes les requêtes POST/PUT/DELETE
 				.formLogin(formLogin -> formLogin.loginPage("/login")
 						.successHandler((request, response, authentication) -> {
 							System.out.println("--- Authentication Success Handler ---");

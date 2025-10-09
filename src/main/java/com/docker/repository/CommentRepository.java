@@ -32,4 +32,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Compter les commentaires approuvés pour un target
     Long countByTypeAndTargetIdAndApprovedTrue(CommentType type, Long targetId);
+
+    // Compter les commentaires en attente d'approbation
+    long countByApprovedFalse();
 }
