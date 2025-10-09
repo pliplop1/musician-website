@@ -36,8 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Ordre des liens sociaux mis à jour:', data);
-                // Optionnel : afficher un message de succès
                 showToast('✓ Ordre des liens enregistré', 'success');
             })
             .catch(error => {

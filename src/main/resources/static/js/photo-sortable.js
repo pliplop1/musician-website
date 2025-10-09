@@ -3,11 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const photoGrid = document.querySelector('.grid');
 
     if (!photoGrid) {
-        console.log('Grille de photos non trouvée');
         return;
     }
-
-    console.log('Initialisation de Sortable pour la galerie photo');
 
     // Initialiser Sortable
     new Sortable(photoGrid, {
@@ -40,8 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Ordre des photos mis à jour:', data);
-                // Optionnel : afficher un message de succès
                 showToast('✓ Ordre des photos enregistré', 'success');
             })
             .catch(error => {
