@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Modération des Commentaires - Admin</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/comment-actions.js}"></script>
+    <script th:src="@{/js/admin-comments-search.js}" defer></script>
     <script>
         function toggleAll(source, formId) {
             const checkboxes = document.querySelectorAll(`#${formId} input[name="commentIds"]`);
@@ -58,6 +62,7 @@
 
             <div th:if="${!#lists.isEmpty(pendingComments)}">
                 <form id="pendingForm" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <!-- Actions groupées -->
                     <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center gap-4">
                         <label class="flex items-center gap-2">
@@ -93,7 +98,21 @@
                                             Date
                                         </span>
                                     </div>
-                                    <p class="text-gray-700 whitespace-pre-wrap" th:text="${comment.content}">Contenu du commentaire</p>
+                                    <p class="text-gray-700 whitespace-pre-wrap mb-3" th:text="${comment.content}">Contenu du commentaire</p>
+
+                                    <!-- Actions individuelles AJAX pour commentaires en attente -->
+                                    <div class="flex gap-3 mt-3">
+                                        <button type="button"
+                                                class="approve-comment-btn bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded text-sm transition-colors"
+                                                th:data-comment-id="${comment.id}">
+                                            ✓ Approuver
+                                        </button>
+                                        <button type="button"
+                                                class="delete-comment-btn bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-4 rounded text-sm transition-colors"
+                                                th:data-comment-id="${comment.id}">
+                                            🗑 Supprimer
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -112,6 +131,7 @@
 
             <div th:if="${!#lists.isEmpty(allComments)}">
                 <form id="allForm" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <!-- Actions groupées -->
                     <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center gap-4">
                         <label class="flex items-center gap-2">
@@ -153,7 +173,22 @@
                                             Date
                                         </span>
                                     </div>
-                                    <p class="text-gray-700 whitespace-pre-wrap" th:text="${comment.content}">Contenu du commentaire</p>
+                                    <p class="text-gray-700 whitespace-pre-wrap mb-3" th:text="${comment.content}">Contenu du commentaire</p>
+
+                                    <!-- Actions individuelles AJAX pour tous les commentaires -->
+                                    <div class="flex gap-3 mt-3">
+                                        <button type="button"
+                                                class="approve-comment-btn bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded text-sm transition-colors"
+                                                th:data-comment-id="${comment.id}"
+                                                th:if="${!comment.approved}">
+                                            ✓ Approuver
+                                        </button>
+                                        <button type="button"
+                                                class="delete-comment-btn bg-red-600 hover:bg-red-700 text-white font-medium py-1.5 px-4 rounded text-sm transition-colors"
+                                                th:data-comment-id="${comment.id}">
+                                            🗑 Supprimer
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
