@@ -2,6 +2,7 @@
 
 package com.docker.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,4 +20,7 @@ public class Photo {
     private Long id;
 
     private String filename; // Le nom du fichier image (ex: concert_paris.jpg)
+
+    @Column(name = "display_order", nullable = false)
+    private Integer displayOrder = 0; // Ordre d'affichage
 }

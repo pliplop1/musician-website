@@ -15,6 +15,7 @@
     "tailwindcss": "^4.1.13"
   },
   "dependencies": {
-    "github-app": "^4.0.1"
+    "github-app": "^4.0.1",
+    "sortablejs": "^1.15.6"
   }
 }

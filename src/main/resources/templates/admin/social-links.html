@@ -4,8 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Réseaux Sociaux - Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script th:src="@{/js/social-link-sortable.js}" defer></script>
+    <style>
+        .sortable-ghost {
+            opacity: 0.4;
+        }
+        .sortable-chosen {
+            cursor: move;
+        }
+        .social-link-card:hover {
+            cursor: grab;
+        }
+        .social-link-card:active {
+            cursor: grabbing;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
@@ -45,7 +63,8 @@
                 <form th:each="link : ${socialLinks}"
                       th:action="@{/admin/social-links/update/{id}(id=${link.id})}"
                       method="post"
-                      class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                      class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow social-link-card"
+                      th:data-link-id="${link.id}">
 
                     <!-- Icône et Nom du réseau -->
                     <div class="flex items-center mb-4">
