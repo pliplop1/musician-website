@@ -45,6 +45,14 @@ dependency-reduced-pom.xml
 # AJOUT - Ignore le dossier de build du frontend
 /frontend/dist/
 
+### Vue.js Frontend ###
+/vue-frontend/node_modules/
+/vue-frontend/dist/
+/vue-frontend/.vite/
+/vue-frontend/.env
+/vue-frontend/.env.local
+/vue-frontend/.env.production
+
 ### Fichiers de log ###
 *.log
 # AJOUT - Ignore le répertoire de logs complet
