@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Tag(name = "API Publique", description = "Endpoints publics accessibles sans authentification pour le frontend Vue.js")
 @RestController
 @RequestMapping("/api/public")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8106"})
 public class PublicApiController {
 
     private final BiographyService biographyService;
