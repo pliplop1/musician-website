@@ -1,0 +1,133 @@
+version: '3.8'
+
+# =============================================================
+# Docker Compose - Duo Black & White Website
+# =============================================================
+# Services:
+# - database: MariaDB 10.11
+# - app: Application Spring Boot + Vue.js
+# - adminer: Interface web pour gérer la base de données (optionnel)
+# =============================================================
+
+services:
+  # =============================================================
+  # MariaDB Database
+  # =============================================================
+  database:
+    image: mariadb:10.11
+    container_name: musician-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password_change_me}
+      MYSQL_DATABASE: ${DB_NAME:-musician_db}
+      MYSQL_USER: ${DB_USER:-musician_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-musician_password}
+      TZ: Europe/Paris
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/mariadb/init:/docker-entrypoint-initdb.d
+    networks:
+      - musician-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================
+  # Application Spring Boot + Vue.js
+  # =============================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: musician-app
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      # Spring profiles
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+
+      # Database configuration
+      DATABASE_URL: jdbc:mariadb://database:3306/${DB_NAME:-musician_db}?useSSL=false&allowPublicKeyRetrieval=true
+      DATABASE_USERNAME: ${DB_USER:-musician_user}
+      DATABASE_PASSWORD: ${DB_PASSWORD:-musician_password}
+
+      # Server configuration
+      SERVER_PORT: 8080
+
+      # Email configuration (optionnel)
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-noreply@duoblackandwhite.com}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-dumoulin.marilyne@gmail.com}
+
+      # Upload directories
+      UPLOAD_PHOTOS_DIR: /app/uploads/photos
+      UPLOAD_MUSIC_DIR: /app/uploads/music
+      UPLOAD_VIDEOS_DIR: /app/uploads/videos
+
+      # Logs
+      LOG_FILE: /app/logs/application.log
+
+      # Java options
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx1024m}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    volumes:
+      - app-uploads:/app/uploads
+      - app-logs:/app/logs
+    networks:
+      - musician-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # =============================================================
+  # Adminer - Interface web pour la base de données (optionnel)
+  # Accès: http://localhost:8081
+  # =============================================================
+  adminer:
+    image: adminer:4.8.1
+    container_name: musician-adminer
+    restart: unless-stopped
+    depends_on:
+      - database
+    ports:
+      - "${ADMINER_PORT:-8081}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+      ADMINER_DESIGN: pepa-linha
+    networks:
+      - musician-network
+
+# =============================================================
+# Volumes
+# =============================================================
+volumes:
+  db-data:
+    driver: local
+    name: musician-db-data
+  app-uploads:
+    driver: local
+    name: musician-uploads
+  app-logs:
+    driver: local
+    name: musician-logs
+
+# =============================================================
+# Networks
+# =============================================================
+networks:
+  musician-network:
+    driver: bridge
+    name: musician-network

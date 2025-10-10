@@ -69,7 +69,9 @@ public class SecurityConfig {
 						"/api/**", // API REST publique
 						"/swagger-ui/**", // Documentation Swagger UI
 						"/v3/api-docs/**", // Documentation OpenAPI JSON
-						"/swagger-ui.html" // Page principale Swagger UI
+						"/swagger-ui.html", // Page principale Swagger UI
+						"/actuator/health", // Health check endpoint (public)
+						"/actuator/info" // Info endpoint (public)
 				).permitAll()
 
 				// Tout le reste nécessite une authentification

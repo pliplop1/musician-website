@@ -1,0 +1,70 @@
+# =============================================================
+# .dockerignore - Exclusions pour Docker build
+# =============================================================
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Maven
+target/
+.mvn/
+mvnw
+mvnw.cmd
+
+# Node / Frontend
+**/node_modules/
+**/dist/
+**/.vite/
+**/.env
+**/.env.local
+**/.env.production
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+.springBeans
+.sts4-cache
+
+# Claude Code
+.claude/
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Tests
+**/test/
+**/*Test.java
+**/*Tests.java
+
+# Logs
+*.log
+logs/
+
+# Uploads (ces fichiers seront gérés via volumes)
+src/main/resources/static/uploads/
+src/main/resources/static/uploaded-*/
+
+# Système
+.DS_Store
+Thumbs.db
+nul
+
+# Environnement
+.env
+.env.example
