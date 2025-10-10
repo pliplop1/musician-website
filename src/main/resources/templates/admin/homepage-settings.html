@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::body})}">
+<head>
+    <title>Gestion Page d'Accueil Vue.js</title>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <!-- En-tête principal -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4">
+                    <i class="fas fa-paint-brush"></i> Gestion de la Page d'Accueil Vue.js
+                </h1>
+                <p class="lead text-muted">
+                    Configurez l'apparence et le contenu de la vitrine publique Vue.js
+                </p>
+            </div>
+        </div>
+
+        <!-- Messages de feedback -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Formulaire principal -->
+        <form th:action="@{/admin/homepage/settings/save}" method="post" id="homepageSettingsForm">
+
+            <!-- Section Hero -->
+            <div th:replace="~{admin/homepage/hero-section :: heroSettings}"></div>
+
+            <!-- Section Vidéos Featured -->
+            <div th:replace="~{admin/homepage/videos-section :: videosSettings}"></div>
+
+            <!-- Section Tracks Featured -->
+            <div th:replace="~{admin/homepage/tracks-section :: tracksSettings}"></div>
+
+            <!-- Section Inscription -->
+            <div th:replace="~{admin/homepage/registration-section :: registrationSettings}"></div>
+
+            <!-- Boutons d'action -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-save"></i> Sauvegarder Tous les Paramètres
+                            </button>
+                            <a href="/admin/dashboard" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Script de validation -->
+    <script th:inline="javascript">
+        // Validation côté client
+        document.getElementById('homepageSettingsForm').addEventListener('submit', function(e) {
+            const videoCheckboxes = document.querySelectorAll('.video-checkbox:checked');
+            const trackCheckboxes = document.querySelectorAll('.track-checkbox:checked');
+
+            if (videoCheckboxes.length > 3) {
+                e.preventDefault();
+                alert('Maximum 3 vidéos featured autorisées');
+                return false;
+            }
+
+            if (trackCheckboxes.length > 3) {
+                e.preventDefault();
+                alert('Maximum 3 tracks featured autorisés');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

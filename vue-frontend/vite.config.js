@@ -17,7 +17,17 @@ export default defineConfig({
         changeOrigin: true,
         secure: false
       },
-      '/uploaded-tracks': {
+      '/uploaded-music': {
+        target: 'http://localhost:8106',
+        changeOrigin: true,
+        secure: false
+      },
+      '/uploaded-avatars': {
+        target: 'http://localhost:8106',
+        changeOrigin: true,
+        secure: false
+      },
+      '/uploaded-videos': {
         target: 'http://localhost:8106',
         changeOrigin: true,
         secure: false

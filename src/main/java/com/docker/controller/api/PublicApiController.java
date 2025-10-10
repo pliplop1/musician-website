@@ -4,6 +4,7 @@ import com.docker.dto.*;
 import com.docker.entity.*;
 import com.docker.exception.ResourceNotFoundException;
 import com.docker.service.*;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -35,13 +38,20 @@ public class PublicApiController {
     private final ConcertService concertService;
     private final PhotoService photoService;
     private final TrackService trackService;
+    private final VideoService videoService;
+    private final HomepageSettingsService homepageSettingsService;
+    private final UserService userService;
 
     public PublicApiController(BiographyService biographyService, ConcertService concertService,
-                               PhotoService photoService, TrackService trackService) {
+                               PhotoService photoService, TrackService trackService, VideoService videoService,
+                               HomepageSettingsService homepageSettingsService, UserService userService) {
         this.biographyService = biographyService;
         this.concertService = concertService;
         this.photoService = photoService;
         this.trackService = trackService;
+        this.videoService = videoService;
+        this.homepageSettingsService = homepageSettingsService;
+        this.userService = userService;
     }
 
     /**
@@ -135,12 +145,12 @@ public class PublicApiController {
                 String spotifyUrl = null;
 
                 // Construire l'URL selon le type de track
-                if ("EMBED".equals(track.getTrackType())) {
+                if (TrackType.EMBED.equals(track.getTrackType())) {
                     // Pour les embeds, utiliser le embedCode comme spotifyUrl
                     spotifyUrl = track.getEmbedCode();
-                } else if ("UPLOADED_FILE".equals(track.getTrackType())) {
+                } else if (TrackType.UPLOADED_FILE.equals(track.getTrackType()) && track.getFilename() != null) {
                     // Pour les fichiers uploadés, construire l'URL
-                    audioUrl = "/uploaded-tracks/" + track.getFilename();
+                    audioUrl = "/uploaded-music/" + track.getFilename();
                 }
 
                 return new TrackDTO(
@@ -276,6 +286,54 @@ public class PublicApiController {
         return ResponseEntity.ok(stats);
     }
 
+    /**
+     * Vérifier l'état d'authentification de l'utilisateur
+     * Utilisé par le frontend Vue.js pour afficher les boutons Login/Profil/Admin
+     */
+    @Operation(
+        summary = "Vérifier l'état d'authentification",
+        description = "Retourne l'état de connexion de l'utilisateur, son nom d'utilisateur et ses rôles (USER, ADMIN)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "État d'authentification récupéré avec succès",
+            content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping("/auth/status")
+    public ResponseEntity<Map<String, Object>> getAuthStatus(Authentication authentication) {
+        Map<String, Object> authStatus = new HashMap<>();
+
+        if (authentication != null && authentication.isAuthenticated()
+            && !authentication.getPrincipal().equals("anonymousUser")) {
+
+            // Utilisateur connecté
+            authStatus.put("authenticated", true);
+            authStatus.put("username", authentication.getName());
+
+            // Vérifier si l'utilisateur est admin
+            boolean isAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+            authStatus.put("isAdmin", isAdmin);
+
+            // Liste des rôles
+            List<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(role -> role.replace("ROLE_", ""))
+                .collect(Collectors.toList());
+
+            authStatus.put("roles", roles);
+        } else {
+            // Utilisateur non connecté
+            authStatus.put("authenticated", false);
+            authStatus.put("username", null);
+            authStatus.put("isAdmin", false);
+            authStatus.put("roles", new ArrayList<>());
+        }
+
+        return ResponseEntity.ok(authStatus);
+    }
+
     // Helper method pour mapper Concert → ConcertDTO
     private ConcertDTO mapToConcertDTO(Concert concert) {
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -300,5 +358,190 @@ public class PublicApiController {
             isPast,
             daysUntil
         );
+    }
+
+    // ========================================================================
+    // NOUVEAUX ENDPOINTS POUR GÉRER LA PAGE D'ACCUEIL VUE.JS
+    // ========================================================================
+
+    /**
+     * Récupérer les paramètres de la page d'accueil
+     */
+    @Operation(
+        summary = "Récupérer les paramètres de la page d'accueil",
+        description = "Retourne les paramètres généraux de la page d'accueil (titres, messages, état inscription)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Paramètres récupérés avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = HomepageSettingsDTO.class)))
+    })
+    @GetMapping("/homepage-settings")
+    public ResponseEntity<HomepageSettingsDTO> getHomepageSettings() {
+        HomepageSettings settings = homepageSettingsService.getSettings();
+
+        HomepageSettingsDTO dto = new HomepageSettingsDTO(
+            settings.getHeroTitle(),
+            settings.getHeroSubtitle(),
+            settings.getHeroBackgroundVideoUrl(),
+            settings.getWelcomeMessage(),
+            settings.getRegistrationEnabled(),
+            settings.getRegistrationMessage()
+        );
+
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Récupérer les vidéos featured (1-3)
+     */
+    @Operation(
+        summary = "Récupérer les vidéos featured",
+        description = "Retourne les vidéos mises en avant sur la page d'accueil (maximum 3)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Vidéos récupérées avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = VideoDTO.class)))
+    })
+    @GetMapping("/featured/videos")
+    public ResponseEntity<List<VideoDTO>> getFeaturedVideos() {
+        HomepageSettings settings = homepageSettingsService.getSettings();
+
+        List<VideoDTO> videos = settings.getFeaturedVideos().stream()
+            .map(video -> new VideoDTO(
+                video.getId(),
+                video.getTitle(),
+                video.getVideoType().toString(),
+                video.getEmbedCode(),
+                video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null
+            ))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(videos);
+    }
+
+    /**
+     * Récupérer toutes les vidéos (pour la galerie complète)
+     */
+    @Operation(
+        summary = "Récupérer toutes les vidéos",
+        description = "Retourne toutes les vidéos (YouTube embeds et fichiers uploadés) pour la galerie vidéo complète"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Vidéos récupérées avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = VideoDTO.class)))
+    })
+    @GetMapping("/videos")
+    public ResponseEntity<List<VideoDTO>> getAllVideos() {
+        List<Video> videos = videoService.getAllVideos();
+
+        List<VideoDTO> videoDTOs = videos.stream()
+            .map(video -> new VideoDTO(
+                video.getId(),
+                video.getTitle(),
+                video.getVideoType().toString(),
+                video.getEmbedCode(),
+                video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null
+            ))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(videoDTOs);
+    }
+
+    /**
+     * Récupérer les tracks featured (1-3)
+     */
+    @Operation(
+        summary = "Récupérer les sons featured",
+        description = "Retourne les morceaux/sons mis en avant sur la page d'accueil (maximum 3)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Tracks récupérés avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrackDTO.class)))
+    })
+    @GetMapping("/featured/tracks")
+    public ResponseEntity<List<TrackDTO>> getFeaturedTracks() {
+        HomepageSettings settings = homepageSettingsService.getSettings();
+
+        List<TrackDTO> tracks = settings.getFeaturedTracks().stream()
+            .map(track -> {
+                String audioUrl = null;
+                String spotifyUrl = null;
+
+                if (TrackType.EMBED.equals(track.getTrackType())) {
+                    spotifyUrl = track.getEmbedCode();
+                } else if (TrackType.UPLOADED_FILE.equals(track.getTrackType()) && track.getFilename() != null) {
+                    audioUrl = "/uploaded-music/" + track.getFilename();
+                }
+
+                return new TrackDTO(
+                    track.getId(),
+                    track.getTitle(),
+                    null, // trackNumber
+                    null, // duration
+                    audioUrl,
+                    spotifyUrl
+                );
+            })
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(tracks);
+    }
+
+    /**
+     * Inscription d'un utilisateur depuis Vue.js
+     */
+    @Operation(
+        summary = "Inscrire un nouvel utilisateur",
+        description = "Permet l'inscription d'un utilisateur depuis le frontend Vue.js"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Inscription réussie", content = @Content),
+        @ApiResponse(responseCode = "400", description = "Données invalides ou utilisateur déjà existant", content = @Content),
+        @ApiResponse(responseCode = "403", description = "Inscription désactivée", content = @Content)
+    })
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, Object>> registerUser(@Valid @RequestBody UserRegistrationDTO registrationDTO) {
+        try {
+            // Vérifier si l'inscription est activée
+            HomepageSettings settings = homepageSettingsService.getSettings();
+            if (!settings.getRegistrationEnabled()) {
+                return ResponseEntity.status(403)
+                    .body(Map.of("message", "L'inscription est actuellement désactivée"));
+            }
+
+            // Vérifier username unique
+            if (userService.findByUsername(registrationDTO.username()) != null) {
+                return ResponseEntity.status(400)
+                    .body(Map.of("message", "Ce nom d'utilisateur existe déjà"));
+            }
+
+            // Vérifier email unique
+            if (userService.findByEmail(registrationDTO.email()) != null) {
+                return ResponseEntity.status(400)
+                    .body(Map.of("message", "Cet email est déjà utilisé"));
+            }
+
+            // Créer un nouvel utilisateur
+            User user = new User();
+            user.setUsername(registrationDTO.username());
+            user.setEmail(registrationDTO.email());
+            user.setPassword(registrationDTO.password());
+
+            userService.saveUser(user);
+
+            return ResponseEntity.status(201)
+                .body(Map.of(
+                    "message", "Inscription réussie !",
+                    "username", user.getUsername(),
+                    "redirectUrl", "/login"
+                ));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400)
+                .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                .body(Map.of("message", "Erreur serveur lors de l'inscription"));
+        }
     }
 }

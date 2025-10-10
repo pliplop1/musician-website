@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Fragment: Section Tracks Featured -->
+    <div th:fragment="tracksSettings" class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-music"></i> Sons / Tracks Featured (Maximum 3)
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Sélectionnez jusqu'à <strong>3 morceaux/sons</strong> à mettre en avant sur la page d'accueil Vue.js.
+                        Ils seront affichés avec un lecteur audio ou embed Spotify.
+                    </p>
+
+                    <!-- Message si aucun track disponible -->
+                    <div th:if="${#lists.isEmpty(allTracks)}" class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Aucun morceau disponible. <a href="/admin/tracks/add" class="alert-link">Ajoutez un track</a> d'abord.
+                    </div>
+
+                    <!-- Liste des tracks disponibles -->
+                    <div th:unless="${#lists.isEmpty(allTracks)}" class="row">
+                        <div class="col-md-4 mb-3" th:each="track : ${allTracks}">
+                            <div class="card h-100 border-success">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input track-checkbox"
+                                               type="checkbox"
+                                               name="featuredTrackIds"
+                                               th:value="${track.id}"
+                                               th:checked="${#lists.contains(featuredTrackIds, track.id)}"
+                                               th:id="'track-' + ${track.id}">
+                                        <label class="form-check-label fw-bold"
+                                               th:for="'track-' + ${track.id}">
+                                            <i class="fas fa-headphones text-success"></i>
+                                            <span th:text="${track.title}">Titre Track</span>
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">
+                                        Type: <span th:text="${track.trackType}">EMBED</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compteur de sélection -->
+                    <div class="mt-3">
+                        <span class="badge bg-success" id="trackCount">0 track(s) sélectionné(s)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script pour compter les tracks sélectionnés -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const trackCheckboxes = document.querySelectorAll('.track-checkbox');
+            const trackCount = document.getElementById('trackCount');
+
+            function updateTrackCount() {
+                const checked = document.querySelectorAll('.track-checkbox:checked').length;
+                trackCount.textContent = checked + ' track(s) sélectionné(s)';
+                trackCount.className = checked > 3 ? 'badge bg-warning' : 'badge bg-success';
+            }
+
+            trackCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const checked = document.querySelectorAll('.track-checkbox:checked');
+                    if (checked.length > 3) {
+                        this.checked = false;
+                        alert('Maximum 3 tracks autorisés');
+                    }
+                    updateTrackCount();
+                });
+            });
+
+            updateTrackCount();
+        });
+    </script>
+</body>
+</html>

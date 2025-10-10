@@ -5,15 +5,28 @@ const heroData = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
-// Fetch hero data from API
+// Fetch hero data from homepage settings API
 const fetchHeroData = async () => {
   try {
-    const response = await fetch('/api/public/hero')
+    const response = await fetch('/api/public/homepage-settings')
     if (!response.ok) throw new Error('Failed to fetch hero data')
-    heroData.value = await response.json()
+    const settings = await response.json()
+
+    // Mapper les données de settings vers heroData
+    heroData.value = {
+      artistName: settings.heroTitle || 'DUO BLACK & WHITE',
+      tagline: settings.heroSubtitle || 'La musique qui vous transporte',
+      backgroundVideoUrl: settings.heroBackgroundVideoUrl,
+      welcomeMessage: settings.welcomeMessage
+    }
   } catch (err) {
     error.value = err.message
     console.error('Error fetching hero data:', err)
+    // Données par défaut en cas d'erreur
+    heroData.value = {
+      artistName: 'DUO BLACK & WHITE',
+      tagline: 'La musique qui vous transporte • France & Belgique'
+    }
   } finally {
     loading.value = false
   }
@@ -26,48 +39,51 @@ onMounted(() => {
 
 <template>
   <section class="hero-section">
-    <!-- Video Background (placeholder for now) -->
+    <!-- Video Background -->
     <div class="hero-background">
+      <!-- Vidéo de fond si définie par l'admin -->
+      <video
+        v-if="heroData && heroData.backgroundVideoUrl"
+        autoplay
+        muted
+        loop
+        playsinline
+        class="hero-video">
+        <source :src="heroData.backgroundVideoUrl" type="video/mp4">
+      </video>
+      <!-- Overlay pour améliorer la lisibilité -->
       <div class="hero-overlay"></div>
     </div>
 
     <!-- Hero Content -->
     <div class="hero-content">
       <div v-if="loading" class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
         <p>Chargement...</p>
       </div>
 
       <div v-else-if="error" class="error">
-        <p>Erreur: {{ error }}</p>
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>{{ error }}</p>
       </div>
 
       <div v-else-if="heroData" class="hero-text">
         <h1 class="hero-title">{{ heroData.artistName }}</h1>
         <p class="hero-tagline">{{ heroData.tagline }}</p>
 
-        <!-- Latest Release -->
-        <div v-if="heroData.latestRelease" class="latest-release">
-          <h3>Dernier Album</h3>
-          <div class="release-card">
-            <img :src="heroData.latestRelease.coverUrl" :alt="heroData.latestRelease.title" />
-            <div class="release-info">
-              <h4>{{ heroData.latestRelease.title }}</h4>
-              <div class="release-links">
-                <a v-if="heroData.latestRelease.spotifyUrl"
-                   :href="heroData.latestRelease.spotifyUrl"
-                   target="_blank"
-                   class="btn-stream">
-                  Écouter sur Spotify
-                </a>
-                <a v-if="heroData.latestRelease.appleMusicUrl"
-                   :href="heroData.latestRelease.appleMusicUrl"
-                   target="_blank"
-                   class="btn-stream">
-                  Apple Music
-                </a>
-              </div>
-            </div>
-          </div>
+        <!-- Message d'accueil personnalisé -->
+        <div v-if="heroData.welcomeMessage" class="welcome-message">
+          <p>{{ heroData.welcomeMessage }}</p>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="hero-actions">
+          <a href="#videos" class="btn btn-primary">
+            <i class="fas fa-play-circle"></i> Découvrir nos vidéos
+          </a>
+          <a href="#music" class="btn btn-secondary">
+            <i class="fas fa-music"></i> Écouter notre musique
+          </a>
         </div>
 
         <!-- Scroll Indicator -->
@@ -99,13 +115,24 @@ onMounted(() => {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 
 .hero-content {
@@ -115,6 +142,73 @@ onMounted(() => {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.welcome-message {
+  margin: 2rem auto;
+  max-width: 700px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome-message p {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.9rem 2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn i {
+  font-size: 1.1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
 }
 
 .hero-text {

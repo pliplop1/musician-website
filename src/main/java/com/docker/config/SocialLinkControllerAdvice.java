@@ -11,7 +11,7 @@ import com.docker.entity.SocialLink;
 /**
  * Injecte les liens sociaux actifs dans tous les modèles de templates.
  */
-@ControllerAdvice
+@ControllerAdvice(basePackages = "com.docker.controller")
 public class SocialLinkControllerAdvice {
 
     @Autowired

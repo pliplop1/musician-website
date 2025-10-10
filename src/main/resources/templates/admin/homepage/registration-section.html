@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Fragment: Section Inscription -->
+    <div th:fragment="registrationSettings" class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-plus"></i> Paramètres d'Inscription Publique
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Contrôlez si les visiteurs peuvent créer un compte depuis la page Vue.js.
+                    </p>
+
+                    <div class="row">
+                        <!-- Activer/Désactiver l'inscription -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       role="switch"
+                                       id="registrationEnabled"
+                                       name="registrationEnabled"
+                                       th:checked="${settings.registrationEnabled}"
+                                       value="true">
+                                <label class="form-check-label fw-bold" for="registrationEnabled">
+                                    <i class="fas fa-toggle-on text-success"></i>
+                                    Activer l'inscription publique
+                                </label>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">
+                                Si désactivé, le formulaire d'inscription sera masqué sur Vue.js
+                            </small>
+
+                            <!-- Badge statut -->
+                            <div class="mt-3">
+                                <span th:if="${settings.registrationEnabled}" class="badge bg-success">
+                                    <i class="fas fa-check-circle"></i> Inscription Active
+                                </span>
+                                <span th:unless="${settings.registrationEnabled}" class="badge bg-danger">
+                                    <i class="fas fa-times-circle"></i> Inscription Désactivée
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Message personnalisé pour le formulaire d'inscription -->
+                        <div class="col-md-6 mb-3">
+                            <label for="registrationMessage" class="form-label fw-bold">
+                                <i class="fas fa-comment-alt"></i> Message d'Inscription (Optionnel)
+                            </label>
+                            <textarea class="form-control"
+                                      id="registrationMessage"
+                                      name="registrationMessage"
+                                      rows="3"
+                                      th:text="${settings.registrationMessage}"
+                                      placeholder="Ex: Rejoignez notre communauté de fans !"></textarea>
+                            <small class="form-text text-muted">
+                                Message affiché au-dessus du formulaire d'inscription
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Informations complémentaires -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="alert alert-light border">
+                                <h5 class="alert-heading">
+                                    <i class="fas fa-shield-alt"></i> Sécurité
+                                </h5>
+                                <ul class="mb-0">
+                                    <li>Les mots de passe sont automatiquement hashés avec BCrypt</li>
+                                    <li>Validation email et username côté serveur</li>
+                                    <li>Les nouveaux utilisateurs ont le rôle USER par défaut</li>
+                                    <li>Protection CSRF activée sur le formulaire</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script pour toggle visuel -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const registrationToggle = document.getElementById('registrationEnabled');
+            const registrationMessageInput = document.getElementById('registrationMessage');
+
+            // Désactiver le message si inscription désactivée
+            function toggleRegistrationFields() {
+                if (registrationToggle && registrationMessageInput) {
+                    registrationMessageInput.disabled = !registrationToggle.checked;
+                }
+            }
+
+            if (registrationToggle) {
+                registrationToggle.addEventListener('change', toggleRegistrationFields);
+                toggleRegistrationFields(); // Appel initial
+            }
+        });
+    </script>
+</body>
+</html>

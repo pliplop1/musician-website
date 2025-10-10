@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Fragment: Section Hero -->
+    <div th:fragment="heroSettings" class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-star"></i> Section Hero (Bannière Principale)
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Titre Principal -->
+                        <div class="col-md-6 mb-3">
+                            <label for="heroTitle" class="form-label fw-bold">
+                                <i class="fas fa-heading"></i> Titre Principal *
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-lg"
+                                   id="heroTitle"
+                                   name="heroTitle"
+                                   th:value="${settings.heroTitle}"
+                                   required
+                                   maxlength="200"
+                                   placeholder="Ex: DUO BLACK & WHITE">
+                            <small class="form-text text-muted">
+                                Affiché en grand sur la bannière d'accueil
+                            </small>
+                        </div>
+
+                        <!-- Sous-titre -->
+                        <div class="col-md-6 mb-3">
+                            <label for="heroSubtitle" class="form-label fw-bold">
+                                <i class="fas fa-quote-right"></i> Sous-titre / Tagline *
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-lg"
+                                   id="heroSubtitle"
+                                   name="heroSubtitle"
+                                   th:value="${settings.heroSubtitle}"
+                                   required
+                                   maxlength="500"
+                                   placeholder="Ex: La musique qui vous transporte">
+                            <small class="form-text text-muted">
+                                Courte description affichée sous le titre
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- URL Vidéo de fond (optionnel) -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="heroBackgroundVideoUrl" class="form-label fw-bold">
+                                <i class="fas fa-video"></i> URL Vidéo de Fond (Optionnel)
+                            </label>
+                            <input type="url"
+                                   class="form-control"
+                                   id="heroBackgroundVideoUrl"
+                                   name="heroBackgroundVideoUrl"
+                                   th:value="${settings.heroBackgroundVideoUrl}"
+                                   placeholder="/uploaded-videos/background.mp4">
+                            <small class="form-text text-muted">
+                                URL d'une vidéo locale ou externe pour le fond de la section Hero
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Message d'accueil -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="welcomeMessage" class="form-label fw-bold">
+                                <i class="fas fa-comment-dots"></i> Message d'Accueil (Optionnel)
+                            </label>
+                            <textarea class="form-control"
+                                      id="welcomeMessage"
+                                      name="welcomeMessage"
+                                      rows="3"
+                                      th:text="${settings.welcomeMessage}"
+                                      placeholder="Ex: Bienvenue sur notre site officiel !"></textarea>
+                            <small class="form-text text-muted">
+                                Message personnalisé affiché sur la page d'accueil (Markdown supporté)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

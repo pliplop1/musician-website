@@ -1,5 +1,6 @@
 package com.docker.config;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +28,23 @@ public class SecurityConfig {
 
 	public SecurityConfig(UserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
+	}
+
+	/**
+	 * NOTE: Utilisation de web.ignoring() pour les fichiers statiques
+	 * car .permitAll() cause des problèmes avec CORS
+	 */
+	@Bean
+	public WebSecurityCustomizer webSecurityCustomizer() {
+		return (web) -> web.ignoring()
+			.requestMatchers("/uploaded-avatars/**")
+			.requestMatchers("/uploaded-photos/**")
+			.requestMatchers("/uploaded-music/**")
+			.requestMatchers("/uploaded-videos/**")
+			.requestMatchers("/css/**")
+			.requestMatchers("/js/**")
+			.requestMatchers("/images/**")
+			.requestMatchers("/favicon.ico");
 	}
 
 	@Bean
@@ -36,9 +60,53 @@ public class SecurityConfig {
 		return authProvider;
 	}
 
+	/**
+	 * Configuration CORS pour permettre les requêtes depuis le frontend Vue.js
+	 */
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+
+		// Origines autorisées
+		configuration.setAllowedOrigins(Arrays.asList(
+			"http://localhost:5173",  // Vue.js dev server
+			"http://localhost:8106"   // Backend
+		));
+
+		// Méthodes HTTP autorisées
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+		// En-têtes autorisés
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+
+		// Permettre les credentials (cookies, authorization headers)
+		configuration.setAllowCredentials(true);
+
+		// Durée de cache de la réponse preflight (OPTIONS)
+		configuration.setMaxAge(3600L);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authenticationProvider(authenticationProvider());
+
+		// Activer CORS avec la configuration définie dans corsConfigurationSource()
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+		// Désactiver CSRF pour les fichiers statiques et l'API publique
+		http.csrf(csrf -> csrf
+			.ignoringRequestMatchers(
+				"/uploaded-music/**",
+				"/uploaded-photos/**",
+				"/uploaded-videos/**",
+				"/uploaded-avatars/**",
+				"/api/**"
+			)
+		);
 
 		http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
 				// Routes ADMIN
@@ -66,6 +134,7 @@ public class SecurityConfig {
 						"/uploaded-photos/**", // Photos uploadées
 						"/uploaded-music/**", // Musique uploadée
 						"/uploaded-videos/**", // Vidéos uploadées
+						"/uploaded-avatars/**", // Avatars utilisateurs - IMPORTANT !
 						"/api/**", // API REST publique
 						"/swagger-ui/**", // Documentation Swagger UI
 						"/v3/api-docs/**", // Documentation OpenAPI JSON

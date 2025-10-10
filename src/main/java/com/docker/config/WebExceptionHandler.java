@@ -10,11 +10,12 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.servlet.http.HttpServletRequest; 
 
-@ControllerAdvice
+// DÉSACTIVÉ TEMPORAIREMENT POUR RÉSOUDRE LE STACKOVERFLOW
+// @ControllerAdvice(basePackages = "com.docker.controller")
 public class WebExceptionHandler {
 
-    
-    @ExceptionHandler(NoResourceFoundException.class)
+
+    // @ExceptionHandler(NoResourceFoundException.class)
     public ModelAndView handleNotFound(HttpServletRequest req, Exception ex) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("exception", ex);
@@ -23,7 +24,7 @@ public class WebExceptionHandler {
         return mav;
     }
 
-    @ExceptionHandler(Exception.class)
+    // @ExceptionHandler(Exception.class)
     public ModelAndView handleGenericException(HttpServletRequest req, Exception ex) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("exception", ex);
