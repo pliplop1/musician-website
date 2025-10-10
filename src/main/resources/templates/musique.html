@@ -3,20 +3,568 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Musique - Duo Black & White</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Styles pour la page musique */
+        .music-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f23 100%);
+            padding: 6rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .music-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .music-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+        }
+
+        .page-title i {
+            margin-right: 1rem;
+            color: #22c55e;
+            -webkit-text-fill-color: #22c55e;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Barre de recherche */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #22c55e;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #22c55e;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        /* Compteur de résultats */
+        .results-count {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .results-count strong {
+            color: #22c55e;
+        }
+
+        /* Grille de musiques */
+        .tracks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 1024px) {
+            .tracks-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .track-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .track-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(34, 197, 94, 0.3);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .track-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #22c55e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .music-icon-overlay {
+            font-size: 5rem;
+            color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            z-index: 1;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            color: #22c55e;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+
+        .track-card:hover .play-overlay {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .track-card-footer {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .track-card-footer h3 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: #fff;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .track-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 15px;
+            color: #4ade80;
+            font-size: 0.8rem;
+            width: fit-content;
+        }
+
+        /* Modal */
+        .track-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .track-modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -3rem;
+            right: 0;
+            background: rgba(34, 197, 94, 0.2);
+            border: 2px solid #22c55e;
+            color: #fff;
+            font-size: 1.5rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        }
+
+        .modal-close:hover {
+            background: #22c55e;
+            transform: rotate(90deg);
+        }
+
+        .modal-player-wrapper {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .modal-player-wrapper .spotify-container,
+        .modal-player-wrapper .embed-container {
+            position: relative;
+            min-height: 352px;
+        }
+
+        .modal-player-wrapper iframe {
+            width: 100%;
+            height: 352px;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .modal-player-wrapper audio {
+            width: 100%;
+            display: block;
+            padding: 2rem;
+        }
+
+        .modal-title {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-title h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        /* Bouton Ouvrir dans le service */
+        .modal-actions {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .btn-open-external {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-open-external:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+
+        .btn-open-external i:first-child {
+            font-size: 1.3rem;
+        }
+
+        .btn-open-external i:last-child {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .help-text {
+            margin-top: 0.75rem;
+            color: #9ca3af;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* Message vide */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #22c55e;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(34, 197, 94, 0.2);
+            border-top-color: #22c55e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Bouton Charger Plus */
+        .load-more-container {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .btn-load-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 3rem;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-load-more::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-load-more:hover::before {
+            left: 100%;
+        }
+
+        .btn-load-more:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(34, 197, 94, 0.6);
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+
+        .btn-load-more i {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-load-more:hover i {
+            transform: translateY(3px);
+        }
+
+        .btn-load-more:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .music-page {
+                padding: 4rem 1rem;
+            }
+
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .page-subtitle {
+                font-size: 1rem;
+            }
+
+            .tracks-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .search-input {
+                font-size: 1rem;
+                padding: 0.875rem 2.5rem 0.875rem 1.25rem;
+            }
+
+            .btn-load-more {
+                font-size: 1rem;
+                padding: 1rem 2rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body>
 
 <header th:replace="~{fragments/layout :: header}"></header>
 
-<main class="container mx-auto px-6 py-12">
-    <section id="music-content">
-        <h2 class="text-4xl font-bold text-center mb-10">Musique</h2>
-        <div id="tracks-container" class="max-w-4xl mx-auto space-y-8">
-            <p id="loading-message" class="text-center text-gray-400">Chargement...</p>
+<main class="music-page">
+    <div class="music-container">
+        <h1 class="page-title">
+            <i class="fas fa-music"></i> Toute notre Musique
+        </h1>
+        <p class="page-subtitle">Découvrez l'intégralité de nos morceaux</p>
+
+        <!-- Barre de recherche -->
+        <div class="search-container">
+            <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Rechercher un morceau...">
+            <i class="fas fa-search search-icon"></i>
         </div>
-    </section>
+
+        <!-- Compteur de résultats -->
+        <div class="results-count" id="resultsCount"></div>
+
+        <!-- Loading -->
+        <div class="loading" id="loadingMessage">
+            <div class="spinner"></div>
+            <p>Chargement de la musique...</p>
+        </div>
+
+        <!-- Grille de morceaux -->
+        <div class="tracks-grid" id="tracksGrid" style="display: none;"></div>
+
+        <!-- Message aucun résultat -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h3>Aucun morceau trouvé</h3>
+            <p>Essayez avec d'autres mots-clés</p>
+        </div>
+
+        <!-- Bouton Charger Plus -->
+        <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+            <button class="btn-load-more" id="btnLoadMore">
+                <i class="fas fa-plus-circle"></i>
+                <span>Charger plus de morceaux</span>
+                <i class="fas fa-arrow-down"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal lecteur -->
+    <div class="track-modal" id="trackModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-player-wrapper" id="modalPlayerWrapper">
+                <!-- Le contenu audio sera injecté ici -->
+            </div>
+            <div class="modal-title">
+                <h2 id="modalTitle"></h2>
+            </div>
+            <div class="modal-actions" id="modalActions" style="display: none;">
+                <!-- Bouton "Ouvrir dans Spotify/SoundCloud" sera ajouté ici -->
+            </div>
+        </div>
+    </div>
 </main>
 
 <footer class="bg-gray-800 mt-20 py-8">
@@ -38,46 +586,284 @@
     </div>
 </footer>
 
-<script th:inline="javascript">
+<script>
+let allTracks = [];
+let filteredTracks = [];
+let currentPage = 1;
+const tracksPerPage = 9;
+
+// Déterminer le type de lecteur et l'icône
+function getPlayerType(track) {
+    if (track.audioUrl) {
+        return { icon: 'fas fa-file-audio', label: 'Audio Local' };
+    }
+    if (track.spotifyUrl) {
+        if (track.spotifyUrl.includes('soundcloud.com')) {
+            return { icon: 'fab fa-soundcloud', label: 'SoundCloud' };
+        }
+        return { icon: 'fab fa-spotify', label: 'Spotify' };
+    }
+    return { icon: 'fas fa-music', label: 'Audio' };
+}
+
+// Obtenir le lien externe
+function getExternalLink(track) {
+    if (!track.spotifyUrl) return null;
+
+    // Spotify
+    if (track.spotifyUrl.includes('spotify.com/embed/track/')) {
+        return track.spotifyUrl.replace('/embed/track/', '/track/');
+    }
+
+    // SoundCloud
+    if (track.spotifyUrl.includes('soundcloud.com')) {
+        const match = track.spotifyUrl.match(/url=([^&]+)/);
+        if (match) {
+            return decodeURIComponent(match[1]);
+        }
+    }
+
+    return track.spotifyUrl;
+}
+
+// Afficher les morceaux avec pagination
+function displayTracks(tracks) {
+    const grid = document.getElementById('tracksGrid');
+    const noResults = document.getElementById('noResults');
+    const resultsCount = document.getElementById('resultsCount');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+
+    if (tracks.length === 0) {
+        grid.style.display = 'none';
+        noResults.style.display = 'block';
+        loadMoreContainer.style.display = 'none';
+        resultsCount.textContent = '';
+        return;
+    }
+
+    noResults.style.display = 'none';
+    grid.style.display = 'grid';
+
+    // Calculer la pagination
+    const totalPages = Math.ceil(tracks.length / tracksPerPage);
+    const startIndex = (currentPage - 1) * tracksPerPage;
+    const endIndex = startIndex + tracksPerPage;
+    const tracksToShow = tracks.slice(startIndex, endIndex);
+
+    // Mettre à jour le compteur
+    resultsCount.innerHTML = `Page <strong>${currentPage}</strong> sur <strong>${totalPages}</strong> - <strong>${tracks.length}</strong> morceau${tracks.length > 1 ? 'x' : ''} au total`;
+
+    grid.innerHTML = tracksToShow.map(track => {
+        const playerType = getPlayerType(track);
+        return `
+            <div class="track-card" data-track-id="${track.id}">
+                <div class="track-thumbnail">
+                    <div class="music-icon-overlay">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="play-overlay">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                </div>
+                <div class="track-card-footer">
+                    <h3>${track.title}</h3>
+                    <span class="track-type-badge">
+                        <i class="${playerType.icon}"></i>
+                        ${playerType.label}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Ajouter les événements de clic
+    document.querySelectorAll('.track-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const trackId = parseInt(this.dataset.trackId);
+            const track = allTracks.find(t => t.id === trackId);
+            if (track) {
+                openTrackModal(track);
+            }
+        });
+    });
+
+    // Afficher/masquer le bouton de pagination
+    updatePaginationButton(totalPages);
+
+    // Scroll vers le haut
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Mettre à jour le bouton de pagination
+function updatePaginationButton(totalPages) {
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const btnLoadMore = document.getElementById('btnLoadMore');
+
+    if (totalPages <= 1) {
+        loadMoreContainer.style.display = 'none';
+        return;
+    }
+
+    loadMoreContainer.style.display = 'block';
+
+    if (currentPage < totalPages) {
+        btnLoadMore.innerHTML = `
+            <i class="fas fa-chevron-right"></i>
+            <span>Page suivante (${currentPage + 1}/${totalPages})</span>
+            <i class="fas fa-arrow-right"></i>
+        `;
+        btnLoadMore.disabled = false;
+    } else {
+        btnLoadMore.innerHTML = `
+            <i class="fas fa-redo"></i>
+            <span>Retour à la page 1</span>
+            <i class="fas fa-arrow-left"></i>
+        `;
+        btnLoadMore.disabled = false;
+    }
+}
+
+// Charger la page suivante
+function loadNextPage() {
+    const totalPages = Math.ceil(filteredTracks.length / tracksPerPage);
+
+    if (currentPage < totalPages) {
+        currentPage++;
+    } else {
+        currentPage = 1;
+    }
+
+    displayTracks(filteredTracks);
+}
+
+// Ouvrir le modal
+function openTrackModal(track) {
+    const modal = document.getElementById('trackModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalPlayerWrapper = document.getElementById('modalPlayerWrapper');
+    const modalActions = document.getElementById('modalActions');
+
+    modalTitle.textContent = track.title;
+
+    // Construire le contenu audio
+    let playerContent = '';
+    const playerType = getPlayerType(track);
+
+    if (track.spotifyUrl) {
+        const embedCode = track.spotifyUrl.trim();
+
+        if (embedCode.startsWith('<iframe') || embedCode.startsWith('<')) {
+            // HTML complet (SoundCloud)
+            playerContent = `<div class="embed-container">${embedCode}</div>`;
+        } else if (embedCode.includes('spotify.com')) {
+            // URL Spotify
+            playerContent = `<iframe src="${embedCode}" width="100%" height="352" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+        } else {
+            playerContent = `<div class="embed-container">${embedCode}</div>`;
+        }
+    } else if (track.audioUrl) {
+        playerContent = `<audio controls autoplay><source src="${track.audioUrl}" type="audio/mpeg">Votre navigateur ne supporte pas la lecture audio.</audio>`;
+    }
+
+    modalPlayerWrapper.innerHTML = playerContent;
+
+    // Ajouter le bouton "Ouvrir dans [Service]"
+    const externalLink = getExternalLink(track);
+    if (externalLink) {
+        modalActions.style.display = 'block';
+        modalActions.innerHTML = `
+            <a href="${externalLink}" target="_blank" rel="noopener noreferrer" class="btn-open-external">
+                <i class="${playerType.icon}"></i>
+                <span>Ouvrir dans ${playerType.label}</span>
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+            <p class="help-text">Pour contrôler le volume et la navigation complète</p>
+        `;
+    } else {
+        modalActions.style.display = 'none';
+    }
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Fermer le modal
+function closeTrackModal() {
+    const modal = document.getElementById('trackModal');
+    const modalPlayerWrapper = document.getElementById('modalPlayerWrapper');
+
+    modal.classList.remove('active');
+    modalPlayerWrapper.innerHTML = '';
+    document.body.style.overflow = '';
+}
+
+// Recherche
+function searchTracks(query) {
+    const searchTerm = query.toLowerCase().trim();
+
+    if (searchTerm === '') {
+        filteredTracks = allTracks;
+    } else {
+        filteredTracks = allTracks.filter(track =>
+            track.title.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    currentPage = 1;
+    displayTracks(filteredTracks);
+}
+
+// Charger les morceaux
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('/api/tracks')
+    const loadingMessage = document.getElementById('loadingMessage');
+    const searchInput = document.getElementById('searchInput');
+    const modalClose = document.getElementById('modalClose');
+    const modal = document.getElementById('trackModal');
+    const btnLoadMore = document.getElementById('btnLoadMore');
+
+    // Événement de recherche
+    searchInput.addEventListener('input', function() {
+        searchTracks(this.value);
+    });
+
+    // Événement du bouton Charger Plus
+    btnLoadMore.addEventListener('click', loadNextPage);
+
+    // Fermer le modal
+    modalClose.addEventListener('click', closeTrackModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeTrackModal();
+        }
+    });
+
+    // Échapper pour fermer le modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeTrackModal();
+        }
+    });
+
+    // Charger les morceaux depuis l'API
+    fetch('/api/public/tracks')
         .then(response => {
             if (!response.ok) {
-                throw new Error('La réponse du réseau n\'était pas ok');
+                throw new Error('Erreur lors du chargement de la musique');
             }
             return response.json();
         })
         .then(tracks => {
-            const container = document.getElementById('tracks-container');
-            container.innerHTML = ''; // Vider le message de chargement
-
-            if (tracks.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-400">Aucune musique disponible.</p>';
-                return;
-            }
-
-            tracks.forEach(track => {
-                const trackDiv = document.createElement('div');
-                trackDiv.className = 'bg-gray-800 rounded-lg p-6 shadow-lg';
-                
-                let content = `<h3 class="text-2xl font-bold mb-4">${track.title}</h3>`;
-                
-                if (track.trackType === 'EMBED') {
-                    content += `<div>${track.embedCode}</div>`;
-                } else if (track.trackType === 'UPLOADED_FILE') {
-                    // On construit l'URL vers notre nouvel endpoint de streaming
-                    const streamUrl = `/api/tracks/stream/${track.id}`;
-                    content += `<audio controls class="w-full" src="${streamUrl}"></audio>`;
-                }
-                
-                trackDiv.innerHTML = content;
-                container.appendChild(trackDiv);
-            });
+            allTracks = tracks;
+            filteredTracks = tracks;
+            loadingMessage.style.display = 'none';
+            displayTracks(tracks);
         })
         .catch(error => {
-            console.error('Erreur lors de la récupération des pistes:', error);
-            const container = document.getElementById('tracks-container');
-            container.innerHTML = '<p class="text-center text-red-500">Impossible de charger la musique.</p>';
+            console.error('Erreur:', error);
+            loadingMessage.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: #22c55e; font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p style="color: #4ade80;">Impossible de charger la musique</p>
+            `;
         });
 });
 </script>
