@@ -1,17 +1,52 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 const tracks = ref([])
 const loading = ref(true)
 const error = ref(null)
+const selectedTrack = ref(null)
+const showModal = ref(false)
 
 const fetchTracks = async () => {
   try {
-    const response = await fetch('/api/public/featured/tracks')
+    const CACHE_KEY = 'featuredTracks_v2'
+    const CACHE_TIMESTAMP_KEY = 'featuredTracksTimestamp_v2'
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000 // 24 heures en millisecondes
+
+    // Vérifier le cache localStorage
+    const cachedTracks = localStorage.getItem(CACHE_KEY)
+    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
+
+    if (cachedTracks && cachedTimestamp) {
+      const now = Date.now()
+      const timeDiff = now - parseInt(cachedTimestamp)
+
+      // Si moins de 24h se sont écoulées, utiliser le cache
+      if (timeDiff < TWENTY_FOUR_HOURS) {
+        console.log('Utilisation des morceaux en cache (valides pour encore', Math.round((TWENTY_FOUR_HOURS - timeDiff) / (60 * 60 * 1000)), 'heures)')
+        tracks.value = JSON.parse(cachedTracks)
+        loading.value = false
+        return
+      }
+    }
+
+    // Sinon, récupérer de nouveaux morceaux depuis l'API
+    console.log('Récupération de nouveaux morceaux aléatoires depuis l\'API')
+    const response = await fetch('/api/public/tracks')
     if (!response.ok) {
       throw new Error('Erreur lors du chargement des morceaux')
     }
-    tracks.value = await response.json()
+    const allTracks = await response.json()
+
+    // Sélectionner 3 morceaux aléatoires
+    const shuffled = [...allTracks].sort(() => 0.5 - Math.random())
+    const selectedTracks = shuffled.slice(0, 3)
+
+    // Stocker dans le cache avec le timestamp actuel
+    localStorage.setItem(CACHE_KEY, JSON.stringify(selectedTracks))
+    localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString())
+
+    tracks.value = selectedTracks
   } catch (err) {
     error.value = err.message
     console.error('Error fetching tracks:', err)
@@ -20,18 +55,94 @@ const fetchTracks = async () => {
   }
 }
 
+// Détecter si c'est du HTML ou une URL
+const isHtmlEmbed = (embedCode) => {
+  if (!embedCode) return false
+  return embedCode.trim().startsWith('<iframe') || embedCode.trim().startsWith('<')
+}
+
+// Extraire l'ID Spotify depuis l'URL embed
+const getSpotifyId = (embedCode) => {
+  if (!embedCode) return null
+  const match = embedCode.match(/spotify\.com\/embed\/track\/([a-zA-Z0-9]+)/)
+  return match ? match[1] : null
+}
+
+// Déterminer le type de lecteur
+const getPlayerType = (track) => {
+  if (track.audioUrl) return { icon: 'fas fa-file-audio', label: 'Audio Local' }
+  if (track.spotifyUrl) {
+    if (track.spotifyUrl.includes('soundcloud.com')) {
+      return { icon: 'fab fa-soundcloud', label: 'SoundCloud' }
+    }
+    return { icon: 'fab fa-spotify', label: 'Spotify' }
+  }
+  return { icon: 'fas fa-music', label: 'Audio' }
+}
+
+// Obtenir le lien externe pour ouvrir dans le service
+const getExternalLink = (track) => {
+  if (!track.spotifyUrl) return null
+
+  // Spotify: convertir embed en lien normal
+  if (track.spotifyUrl.includes('spotify.com/embed/track/')) {
+    return track.spotifyUrl.replace('/embed/track/', '/track/')
+  }
+
+  // SoundCloud: extraire l'URL du track depuis l'iframe
+  if (track.spotifyUrl.includes('soundcloud.com')) {
+    const match = track.spotifyUrl.match(/url=([^&]+)/)
+    if (match) {
+      return decodeURIComponent(match[1])
+    }
+  }
+
+  // Autres cas: retourner l'URL telle quelle
+  return track.spotifyUrl
+}
+
+// Générer l'URL de la miniature (utiliser une image par défaut musicale)
+const getThumbnailUrl = (track) => {
+  // Pour Spotify, on utilise une vignette musicale stylisée
+  return '/images/music-placeholder.jpg'
+}
+
+// Ouvrir le morceau dans un modal
+const openTrack = (track) => {
+  console.log('=== DEBUG openTrack ===')
+  console.log('Track data:', track)
+  console.log('Has spotifyUrl?', !!track.spotifyUrl)
+  console.log('spotifyUrl value:', track.spotifyUrl)
+  console.log('Has audioUrl?', !!track.audioUrl)
+  console.log('audioUrl value:', track.audioUrl)
+  console.log('======================')
+
+  selectedTrack.value = track
+  showModal.value = true
+  // Empêcher le scroll du body
+  document.body.style.overflow = 'hidden'
+}
+
+// Fermer le modal
+const closeModal = () => {
+  showModal.value = false
+  selectedTrack.value = null
+  // Réactiver le scroll du body
+  document.body.style.overflow = ''
+}
+
 onMounted(() => {
   fetchTracks()
 })
 </script>
 
 <template>
-  <section class="tracks-section" id="featured-tracks">
+  <section v-if="tracks.length > 0" class="tracks-section" id="music">
     <div class="container">
       <h2 class="section-title">
-        <i class="fas fa-headphones-alt"></i> Notre Musique
+        <i class="fas fa-music"></i> Notre Musique
       </h2>
-      <p class="section-subtitle">Découvrez notre univers musical</p>
+      <p class="section-subtitle">Découvrez quelques-uns de nos meilleurs morceaux</p>
 
       <div v-if="loading" class="loading">
         <div class="spinner"></div>
@@ -43,65 +154,99 @@ onMounted(() => {
         {{ error }}
       </div>
 
-      <div v-else-if="tracks.length > 0" class="tracks-grid">
+      <div v-else class="tracks-grid">
         <div
           v-for="track in tracks"
           :key="track.id"
-          class="track-card">
-          <div class="track-card-header">
-            <div class="track-icon">
+          class="track-card"
+          @click="openTrack(track)">
+          <div class="track-thumbnail">
+            <div class="music-icon-overlay">
               <i class="fas fa-music"></i>
             </div>
-            <div class="track-info">
-              <h3>{{ track.title }}</h3>
-              <span class="track-type-badge">
-                <i :class="track.spotifyUrl ? 'fab fa-spotify' : 'fas fa-file-audio'"></i>
-                {{ track.spotifyUrl ? 'Spotify' : 'Audio Local' }}
-              </span>
+            <div class="play-overlay">
+              <i class="fas fa-play-circle"></i>
             </div>
           </div>
-
-          <div class="track-player">
-            <!-- Spotify Embed -->
-            <div
-              v-if="track.spotifyUrl"
-              v-html="track.spotifyUrl"
-              class="spotify-container">
-            </div>
-
-            <!-- Fichier audio uploadé -->
-            <div v-else-if="track.audioUrl" class="audio-player-wrapper">
-              <audio controls class="audio-player">
-                <source :src="track.audioUrl" type="audio/mpeg">
-                Votre navigateur ne supporte pas la lecture audio.
-              </audio>
-              <div class="audio-visualizer">
-                <div class="wave-bar" v-for="i in 20" :key="i"></div>
-              </div>
-            </div>
-
-            <!-- Fallback si pas de source audio -->
-            <div v-else class="audio-unavailable">
-              <i class="fas fa-music"></i>
-              <p>Audio temporairement indisponible</p>
-            </div>
+          <div class="track-card-footer">
+            <h3>{{ track.title }}</h3>
+            <span class="track-type-badge">
+              <i :class="getPlayerType(track).icon"></i>
+              {{ getPlayerType(track).label }}
+            </span>
           </div>
         </div>
       </div>
 
-      <div v-else class="no-tracks-message">
-        <i class="fas fa-music"></i>
-        <p>Aucun morceau en vedette pour le moment</p>
-      </div>
-
       <!-- Bouton pour voir toutes les musiques -->
-      <div class="view-all-container">
+      <div class="view-all-tracks">
         <a href="http://localhost:8106/musique" class="btn-view-all">
           <i class="fas fa-compact-disc"></i>
-          Découvrir toute notre musique
+          <span>Voir toute notre musique</span>
+          <i class="fas fa-arrow-right"></i>
         </a>
       </div>
     </div>
+
+    <!-- Modal pour afficher le lecteur -->
+    <Teleport to="body">
+      <div v-if="showModal" class="track-modal" @click.self="closeModal">
+        <div class="modal-content">
+          <button class="modal-close" @click="closeModal">
+            <i class="fas fa-times"></i>
+          </button>
+          <div class="modal-player-wrapper">
+            <!-- Embed avec HTML complet (SoundCloud, etc.) -->
+            <div
+              v-if="selectedTrack && selectedTrack.spotifyUrl && isHtmlEmbed(selectedTrack.spotifyUrl)"
+              v-html="selectedTrack.spotifyUrl"
+              class="embed-html-container">
+            </div>
+
+            <!-- Embed avec URL simple (Spotify) -->
+            <div
+              v-else-if="selectedTrack && selectedTrack.spotifyUrl"
+              class="spotify-container">
+              <iframe
+                :src="selectedTrack.spotifyUrl"
+                width="100%"
+                height="352"
+                frameborder="0"
+                allowtransparency="true"
+                allow="encrypted-media">
+              </iframe>
+            </div>
+
+            <!-- Fichier audio uploadé -->
+            <audio
+              v-else-if="selectedTrack && selectedTrack.audioUrl"
+              controls
+              autoplay
+              class="audio-player">
+              <source :src="selectedTrack.audioUrl" type="audio/mpeg">
+              Votre navigateur ne supporte pas la lecture audio.
+            </audio>
+          </div>
+          <div class="modal-title">
+            <h2>{{ selectedTrack?.title }}</h2>
+          </div>
+
+          <!-- Bouton pour ouvrir dans le service -->
+          <div v-if="selectedTrack && getExternalLink(selectedTrack)" class="modal-actions">
+            <a
+              :href="getExternalLink(selectedTrack)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-open-external">
+              <i :class="getPlayerType(selectedTrack).icon"></i>
+              <span>Ouvrir dans {{ getPlayerType(selectedTrack).label }}</span>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+            <p class="help-text">Pour contrôler le volume et la navigation complète</p>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </section>
 </template>
 
@@ -159,7 +304,7 @@ onMounted(() => {
 
 .tracks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
 }
 
@@ -171,48 +316,65 @@ onMounted(() => {
   transition: all 0.4s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
 .track-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-10px) scale(1.05);
   box-shadow: 0 12px 40px rgba(34, 197, 94, 0.3);
   border-color: rgba(34, 197, 94, 0.3);
 }
 
-.track-card-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.track-card:hover .play-overlay {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
 }
 
-.track-icon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  border-radius: 12px;
+.track-thumbnail {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a2e 0%, #22c55e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  color: white;
-  flex-shrink: 0;
 }
 
-.track-info {
-  flex: 1;
-  min-width: 0;
+.music-icon-overlay {
+  font-size: 5rem;
+  color: rgba(255, 255, 255, 0.1);
+  position: absolute;
+  z-index: 1;
 }
 
-.track-info h3 {
-  font-size: 1.25rem;
-  margin: 0 0 0.5rem 0;
+.play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  color: #22c55e;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.track-card-footer {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.track-card-footer h3 {
+  font-size: 1.1rem;
+  margin: 0;
   color: #fff;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.4;
 }
 
 .track-type-badge {
@@ -222,93 +384,229 @@ onMounted(() => {
   padding: 0.4rem 0.8rem;
   background: rgba(34, 197, 94, 0.15);
   border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 20px;
+  border-radius: 15px;
   color: #4ade80;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  width: fit-content;
 }
 
-.track-player {
+/* Bouton Voir toute la musique */
+.view-all-tracks {
+  margin-top: 4rem;
+  text-align: center;
+  padding-top: 3rem;
+  border-top: 2px solid rgba(34, 197, 94, 0.2);
+}
+
+.btn-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 3rem;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
   position: relative;
-  background: #000;
+  overflow: hidden;
 }
 
-/* Spotify container */
-.spotify-container {
-  position: relative;
+.btn-view-all::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
   width: 100%;
-  min-height: 152px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
 }
 
-.spotify-container :deep(iframe) {
-  width: 100%;
-  border: none;
-  border-radius: 0;
+.btn-view-all:hover::before {
+  left: 100%;
 }
 
-/* Audio player local */
-.audio-player-wrapper {
-  padding: 2rem;
-  position: relative;
+.btn-view-all:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(34, 197, 94, 0.6);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 }
 
-.audio-player {
-  width: 100%;
-  height: 40px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
+.btn-view-all i:first-child {
+  font-size: 1.5rem;
 }
 
-.audio-player::-webkit-media-controls-panel {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%);
+.btn-view-all i:last-child {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
 }
 
-.audio-visualizer {
+.btn-view-all:hover i:last-child {
+  transform: translateX(5px);
+}
+
+/* Modal lecteur */
+.track-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 3px;
-  height: 60px;
-  margin-top: 1.5rem;
-}
-
-.wave-bar {
-  width: 4px;
-  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
-  border-radius: 2px;
-  animation: wave 1.2s ease-in-out infinite;
-  opacity: 0.6;
-}
-
-.wave-bar:nth-child(odd) {
-  animation-delay: 0.1s;
-}
-
-.wave-bar:nth-child(even) {
-  animation-delay: 0.2s;
-}
-
-@keyframes wave {
-  0%, 100% {
-    height: 10px;
-  }
-  50% {
-    height: 40px;
-  }
-}
-
-.audio-unavailable {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
-  color: #6b7280;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease;
 }
 
-.audio-unavailable i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: -3rem;
+  right: 0;
+  background: rgba(34, 197, 94, 0.2);
+  border: 2px solid #22c55e;
+  color: #fff;
+  font-size: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.modal-close:hover {
+  background: #22c55e;
+  transform: rotate(90deg);
+}
+
+.modal-player-wrapper {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.modal-player-wrapper .embed-html-container {
+  width: 100%;
+  min-height: 166px;
+}
+
+.modal-player-wrapper .embed-html-container :deep(iframe) {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+}
+
+.modal-player-wrapper .spotify-container {
+  width: 100%;
+  min-height: 352px;
+}
+
+.modal-player-wrapper .spotify-container iframe {
+  width: 100%;
+  height: 352px;
+  border: none;
+  border-radius: 10px;
+}
+
+.modal-player-wrapper .audio-player {
+  width: 100%;
+  display: block;
+  padding: 2rem;
+}
+
+.modal-title {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.modal-title h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+/* Bouton ouvrir dans le service */
+.modal-actions {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.btn-open-external {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.btn-open-external:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+
+.btn-open-external i:first-child {
+  font-size: 1.3rem;
+}
+
+.btn-open-external i:last-child {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.help-text {
+  margin-top: 0.75rem;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  font-style: italic;
 }
 
 /* Loading */
@@ -382,61 +680,6 @@ onMounted(() => {
   animation-delay: 0.3s;
 }
 
-/* No tracks message */
-.no-tracks-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  color: #9ca3af;
-}
-
-.no-tracks-message i {
-  font-size: 4rem;
-  margin-bottom: 1.5rem;
-  opacity: 0.4;
-  color: #22c55e;
-}
-
-.no-tracks-message p {
-  font-size: 1.2rem;
-}
-
-/* View All Button */
-.view-all-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 3rem;
-  padding-top: 3rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-view-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  color: #fff;
-  text-decoration: none;
-  border-radius: 30px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
-}
-
-.btn-view-all:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-}
-
-.btn-view-all i {
-  font-size: 1.3rem;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .tracks-section {
@@ -456,40 +699,9 @@ onMounted(() => {
     gap: 1.5rem;
   }
 
-  .track-card-header {
-    padding: 1rem;
-  }
-
-  .track-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
-  }
-
-  .track-info h3 {
-    font-size: 1.1rem;
-  }
-
   .track-type-badge {
     font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
-  }
-
-  .audio-player-wrapper {
-    padding: 1.5rem;
-  }
-
-  .btn-view-all {
-    padding: 0.875rem 2rem;
-    font-size: 1rem;
-  }
-
-  .no-tracks-message i {
-    font-size: 3rem;
-  }
-
-  .no-tracks-message p {
-    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
   }
 }
 </style>

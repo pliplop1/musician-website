@@ -488,6 +488,46 @@ public class PublicApiController {
     }
 
     /**
+     * Récupérer tous les tracks (pour la galerie complète)
+     */
+    @Operation(
+        summary = "Récupérer tous les morceaux",
+        description = "Retourne tous les morceaux (Spotify embeds et fichiers uploadés) pour la galerie musicale complète"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Morceaux récupérés avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrackDTO.class)))
+    })
+    @GetMapping("/tracks")
+    public ResponseEntity<List<TrackDTO>> getAllTracks() {
+        List<Track> tracks = trackService.getAllTracks();
+
+        List<TrackDTO> trackDTOs = tracks.stream()
+            .map(track -> {
+                String audioUrl = null;
+                String spotifyUrl = null;
+
+                if (TrackType.EMBED.equals(track.getTrackType())) {
+                    spotifyUrl = track.getEmbedCode();
+                } else if (TrackType.UPLOADED_FILE.equals(track.getTrackType()) && track.getFilename() != null) {
+                    audioUrl = "/uploaded-music/" + track.getFilename();
+                }
+
+                return new TrackDTO(
+                    track.getId(),
+                    track.getTitle(),
+                    null, // trackNumber
+                    null, // duration
+                    audioUrl,
+                    spotifyUrl
+                );
+            })
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(trackDTOs);
+    }
+
+    /**
      * Inscription d'un utilisateur depuis Vue.js
      */
     @Operation(
