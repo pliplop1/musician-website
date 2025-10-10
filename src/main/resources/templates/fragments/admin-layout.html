@@ -119,6 +119,12 @@
                    🔗 Réseaux Sociaux
                 </a>
             </li>
+            <li>
+                <a th:href="@{/admin/homepage/settings}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/homepage')} ? 'bg-gray-900 font-semibold' : ''">
+                   🎨 Page d'Accueil Vue.js
+                </a>
+            </li>
             <li class="mt-8 border-t border-gray-600 pt-4">
                 <a th:href="@{/}" class="block py-2 px-3 rounded hover:bg-gray-700">
                    🏠 Retour au site

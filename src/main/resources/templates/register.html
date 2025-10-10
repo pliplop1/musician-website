@@ -1,88 +1,312 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inscription</title>
-<link rel="stylesheet" th:href="@{/css/style.css}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
-	rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Duo Black & White</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem 0;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .register-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 500px;
+            padding: 3rem 2.5rem;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        0 0 100px rgba(74, 144, 226, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 1rem;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #fff;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: #888;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-error p {
+            color: #ef4444;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ddd;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #4a90e2;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #666;
+        }
+
+        input.error {
+            border-color: #ef4444 !important;
+        }
+
+        .field-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .password-hint {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            color: #bbb;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #357abd 0%, #2868a8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .links {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .links p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .links a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .links a:hover {
+            color: #357abd;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo h1 {
+                font-size: 1.4rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
-<body
-	class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+<body>
 
-	<div
-		class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-lg shadow-lg">
-		<h2 class="text-3xl font-bold text-center">Créer un compte</h2>
+    <div class="register-container">
+        <div class="logo">
+            <h1>DUO BLACK & WHITE</h1>
+            <p>Créer votre compte</p>
+        </div>
 
-        <div id="client-error-message" class="hidden bg-red-500 text-white p-3 rounded-md text-center"></div>
+        <h2>Inscription</h2>
 
-		<div th:if="${errorMessage}"
-			class="bg-red-500 text-white p-3 rounded-md text-center">
-			<p class="whitespace-pre-wrap" th:text="${errorMessage}"></p>
-		</div>
+        <div id="client-error-message" class="alert-error" style="display: none;">
+            <p id="client-error-text"></p>
+        </div>
 
-		<form id="registerForm" th:action="@{/register}" th:object="${user}" method="post" class="space-y-6">
+        <div th:if="${errorMessage}" class="alert-error">
+            <p th:text="${errorMessage}"></p>
+        </div>
 
-			<div>
-				<label for="username"
-					class="block text-sm font-medium text-gray-300">Nom
-					d'utilisateur</label>
-				<div class="mt-1">
-					<input id="username" th:field="*{username}" type="text" required
-						th:classappend="${#fields.hasErrors('username')} ? 'border-red-500' : ''"
-						class="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-				</div>
-				<p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="mt-1 text-sm text-red-500"></p>
-			</div>
+        <form id="registerForm" th:action="@{/register}" th:object="${user}" method="post">
 
-			<div>
-				<label for="email" class="block text-sm font-medium text-gray-300">Email</label>
-				<div class="mt-1">
-					<input id="email" th:field="*{email}" type="email" required
-						th:classappend="${#fields.hasErrors('email')} ? 'border-red-500' : ''"
-						class="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-				</div>
-				<p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="mt-1 text-sm text-red-500"></p>
-			</div>
-
-			<div>
-				<label for="password"
-					class="block text-sm font-medium text-gray-300">Mot de
-					passe</label>
-				<div class="mt-1">
-					<input id="password" th:field="*{password}" type="password"
-						required
-						th:classappend="${#fields.hasErrors('password')} ? 'border-red-500' : ''"
-						class="w-full px-3 py-2 border border-gray-600 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-				</div>
-				<p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="mt-1 text-sm text-red-500"></p>
-                <div class="mt-2 text-xs text-gray-400">
-                    Doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&).
-                </div>
-			</div>
-            
-            <div class="flex items-center">
-                <input id="showPassword" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                <label for="showPassword" class="ml-2 block text-sm text-gray-400">Afficher le mot de passe</label>
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input id="username"
+                       th:field="*{username}"
+                       type="text"
+                       required
+                       th:classappend="${#fields.hasErrors('username')} ? 'error' : ''"
+                       placeholder="Choisissez un nom d'utilisateur">
+                <p th:if="${#fields.hasErrors('username')}"
+                   th:errors="*{username}"
+                   class="field-error"></p>
             </div>
 
-			<div>
-				<button type="submit"
-					class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-					S'inscrire</button>
-			</div>
-		</form>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email"
+                       th:field="*{email}"
+                       type="email"
+                       required
+                       th:classappend="${#fields.hasErrors('email')} ? 'error' : ''"
+                       placeholder="votre@email.com">
+                <p th:if="${#fields.hasErrors('email')}"
+                   th:errors="*{email}"
+                   class="field-error"></p>
+            </div>
 
-		<div class="text-center text-sm text-gray-400">
-			Déjà un compte ? <a th:href="@{/login}"
-				class="font-medium text-indigo-400 hover:text-indigo-300">Se
-				connecter</a>
-		</div>
-	</div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input id="password"
+                       th:field="*{password}"
+                       type="password"
+                       required
+                       th:classappend="${#fields.hasErrors('password')} ? 'error' : ''"
+                       placeholder="Choisissez un mot de passe sécurisé">
+                <p th:if="${#fields.hasErrors('password')}"
+                   th:errors="*{password}"
+                   class="field-error"></p>
+                <div class="password-hint">
+                    Doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&).
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input id="showPassword" type="checkbox">
+                <label for="showPassword">Afficher le mot de passe</label>
+            </div>
+
+            <button type="submit" class="btn-submit">S'inscrire</button>
+        </form>
+
+        <div class="links">
+            <p>
+                Déjà un compte ? <a th:href="@{/login}">Se connecter</a>
+            </p>
+        </div>
+    </div>
 
     <script>
         document.getElementById('showPassword').addEventListener('change', function(event) {
@@ -97,22 +321,26 @@
         const registerForm = document.getElementById('registerForm');
         const passwordInput = document.getElementById('password');
         const clientErrorDiv = document.getElementById('client-error-message');
+        const clientErrorText = document.getElementById('client-error-text');
 
         registerForm.addEventListener('submit', function(event) {
             const password = passwordInput.value;
-            // La même regex que dans votre `UserService`
+            // La même regex que dans votre UserService
             const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
             if (!passwordPattern.test(password)) {
                 // Empêche l'envoi du formulaire
                 event.preventDefault();
-                
+
                 // Affiche le message d'erreur
-                clientErrorDiv.textContent = 'Le mot de passe ne respecte pas les critères de sécurité.';
-                clientErrorDiv.classList.remove('hidden');
+                clientErrorText.textContent = 'Le mot de passe ne respecte pas les critères de sécurité.';
+                clientErrorDiv.style.display = 'block';
+
+                // Scroll vers le haut pour voir l'erreur
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 // Cache le message d'erreur s'il était affiché
-                clientErrorDiv.classList.add('hidden');
+                clientErrorDiv.style.display = 'none';
             }
         });
     </script>

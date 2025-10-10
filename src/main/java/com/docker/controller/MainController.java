@@ -116,7 +116,7 @@ public class MainController {
 
 		messageService.saveMessage(message);
 		redirectAttributes.addFlashAttribute("successMessage", "Votre message a bien été envoyé ! Il sera vérifié par un administrateur.");
-		return "redirect:/";
+		return "redirect:/#contact";
 	}
 
 	@GetMapping("/galerie")

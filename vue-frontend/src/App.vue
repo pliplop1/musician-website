@@ -1,15 +1,39 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import HeroSection from './components/HeroSection.vue'
+import FeaturedVideosSection from './components/FeaturedVideosSection.vue'
+import FeaturedTracksSection from './components/FeaturedTracksSection.vue'
 import BiographySection from './components/BiographySection.vue'
 import DiscographySection from './components/DiscographySection.vue'
 import GallerySection from './components/GallerySection.vue'
 import ConcertsSection from './components/ConcertsSection.vue'
-import ContactSection from './components/ContactSection.vue'
 
 // Navigation state
 const isScrolled = ref(false)
 const mobileMenuOpen = ref(false)
+
+// Authentication state
+const authState = ref({
+  authenticated: false,
+  username: null,
+  isAdmin: false,
+  roles: []
+})
+
+// Check authentication status
+const checkAuthStatus = async () => {
+  try {
+    const response = await fetch('/api/public/auth/status', {
+      credentials: 'include' // Important pour envoyer les cookies de session
+    })
+    if (response.ok) {
+      const data = await response.json()
+      authState.value = data
+    }
+  } catch (error) {
+    console.error('Error checking auth status:', error)
+  }
+}
 
 // Handle scroll for navbar styling
 const handleScroll = () => {
@@ -32,6 +56,7 @@ const scrollToSection = (sectionId) => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  checkAuthStatus() // Vérifier l'authentification au chargement
 })
 </script>
 
@@ -45,11 +70,25 @@ onMounted(() => {
         <!-- Desktop Menu -->
         <ul class="nav-menu desktop-only">
           <li><a @click="scrollToSection('hero')">Accueil</a></li>
+          <li><a @click="scrollToSection('videos')">Vidéos</a></li>
+          <li><a href="http://localhost:8106/musique">Musique</a></li>
           <li><a @click="scrollToSection('biography')">Le Duo</a></li>
-          <li><a @click="scrollToSection('discography')">Répertoire</a></li>
           <li><a @click="scrollToSection('gallery')">Galerie</a></li>
           <li><a @click="scrollToSection('concerts')">Événements</a></li>
-          <li><a @click="scrollToSection('contact')">Contact</a></li>
+          <li><a href="http://localhost:8106/login">Contact</a></li>
+
+          <!-- Auth Buttons -->
+          <li v-if="!authState.authenticated">
+            <a href="http://localhost:8106/login" class="auth-btn login-btn">Connexion</a>
+          </li>
+          <li v-if="authState.authenticated">
+            <a href="http://localhost:8106/user/profile" class="auth-btn profile-btn">
+              <span class="user-icon">👤</span> {{ authState.username }}
+            </a>
+          </li>
+          <li v-if="authState.isAdmin">
+            <a href="http://localhost:8106/admin/dashboard" class="auth-btn admin-btn">Admin</a>
+          </li>
         </ul>
 
         <!-- Mobile Menu Button -->
@@ -63,11 +102,25 @@ onMounted(() => {
         <div v-if="mobileMenuOpen" class="mobile-menu">
           <ul>
             <li><a @click="scrollToSection('hero')">Accueil</a></li>
+            <li><a @click="scrollToSection('videos')">Vidéos</a></li>
+            <li><a href="http://localhost:8106/musique">Musique</a></li>
             <li><a @click="scrollToSection('biography')">Le Duo</a></li>
-            <li><a @click="scrollToSection('discography')">Répertoire</a></li>
             <li><a @click="scrollToSection('gallery')">Galerie</a></li>
             <li><a @click="scrollToSection('concerts')">Événements</a></li>
-            <li><a @click="scrollToSection('contact')">Contact</a></li>
+            <li><a href="http://localhost:8106/login">Contact</a></li>
+
+            <!-- Auth Buttons Mobile -->
+            <li v-if="!authState.authenticated" class="mobile-auth">
+              <a href="http://localhost:8106/login">Connexion</a>
+            </li>
+            <li v-if="authState.authenticated" class="mobile-auth">
+              <a href="http://localhost:8106/user/profile">
+                <span class="user-icon">👤</span> {{ authState.username }}
+              </a>
+            </li>
+            <li v-if="authState.isAdmin" class="mobile-auth">
+              <a href="http://localhost:8106/admin/dashboard">Admin</a>
+            </li>
           </ul>
         </div>
       </transition>
@@ -76,11 +129,12 @@ onMounted(() => {
     <!-- Sections -->
     <main>
       <HeroSection id="hero" />
+      <FeaturedVideosSection id="videos" />
+      <FeaturedTracksSection id="music" />
       <BiographySection id="biography" />
       <DiscographySection id="discography" />
       <GallerySection id="gallery" />
       <ConcertsSection id="concerts" />
-      <ContactSection id="contact" />
     </main>
 
     <!-- Footer -->
@@ -369,5 +423,74 @@ main {
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+}
+
+/* Auth Buttons Styling */
+.auth-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: #fff !important;
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #357abd 0%, #2868a8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+.profile-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff !important;
+}
+
+.profile-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.admin-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #fff !important;
+  font-weight: bold;
+}
+
+.admin-btn:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.user-icon {
+  font-size: 1rem;
+}
+
+/* Mobile auth buttons */
+.mobile-auth {
+  border-top: 2px solid rgba(74, 144, 226, 0.3);
+  margin-top: 1rem;
+  padding-top: 1rem !important;
+}
+
+.mobile-auth a {
+  background: rgba(74, 144, 226, 0.1);
+  padding: 0.75rem 2rem !important;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobile-auth a:hover {
+  background: rgba(74, 144, 226, 0.2);
 }
 </style>

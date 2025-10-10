@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Fragment: Section Vidéos Featured -->
+    <div th:fragment="videosSettings" class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-film"></i> Vidéos Featured (Maximum 3)
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Sélectionnez jusqu'à <strong>3 vidéos</strong> à mettre en avant sur la page d'accueil Vue.js.
+                        Ces vidéos seront affichées dans une section dédiée.
+                    </p>
+
+                    <!-- Message si aucune vidéo disponible -->
+                    <div th:if="${#lists.isEmpty(allVideos)}" class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Aucune vidéo disponible. <a href="/admin/videos/add" class="alert-link">Ajoutez une vidéo</a> d'abord.
+                    </div>
+
+                    <!-- Liste des vidéos disponibles -->
+                    <div th:unless="${#lists.isEmpty(allVideos)}" class="row">
+                        <div class="col-md-4 mb-3" th:each="video : ${allVideos}">
+                            <div class="card h-100 border-secondary">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input video-checkbox"
+                                               type="checkbox"
+                                               name="featuredVideoIds"
+                                               th:value="${video.id}"
+                                               th:checked="${#lists.contains(featuredVideoIds, video.id)}"
+                                               th:id="'video-' + ${video.id}">
+                                        <label class="form-check-label fw-bold"
+                                               th:for="'video-' + ${video.id}">
+                                            <i class="fas fa-video text-danger"></i>
+                                            <span th:text="${video.title}">Titre Vidéo</span>
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">
+                                        Type: <span th:text="${video.videoType}">EMBED</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compteur de sélection -->
+                    <div class="mt-3">
+                        <span class="badge bg-danger" id="videoCount">0 vidéo(s) sélectionnée(s)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script pour compter les vidéos sélectionnées -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoCheckboxes = document.querySelectorAll('.video-checkbox');
+            const videoCount = document.getElementById('videoCount');
+
+            function updateVideoCount() {
+                const checked = document.querySelectorAll('.video-checkbox:checked').length;
+                videoCount.textContent = checked + ' vidéo(s) sélectionnée(s)';
+                videoCount.className = checked > 3 ? 'badge bg-warning' : 'badge bg-danger';
+            }
+
+            videoCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const checked = document.querySelectorAll('.video-checkbox:checked');
+                    if (checked.length > 3) {
+                        this.checked = false;
+                        alert('Maximum 3 vidéos autorisées');
+                    }
+                    updateVideoCount();
+                });
+            });
+
+            updateVideoCount();
+        });
+    </script>
+</body>
+</html>
