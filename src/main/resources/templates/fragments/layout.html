@@ -4,7 +4,7 @@
 
     <header th:fragment="header" class="bg-gray-800 shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a th:href="@{/}" class="text-3xl font-bold tracking-wider hover:text-indigo-400 transition-colors">MARC DUPONT</a>
+            <a th:href="@{/}" class="text-3xl font-bold tracking-wider hover:text-indigo-400 transition-colors">Duo Black & White</a>
             <nav class="flex items-center">
                 <a th:href="@{/}" class="px-4" th:classappend="${currentUri == '/'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Accueil</a>
                 <a th:href="@{/biographie}" class="px-4" th:classappend="${currentUri == '/biographie'} ? 'text-indigo-400 font-bold' : 'hover:text-indigo-400'">Biographie</a>
