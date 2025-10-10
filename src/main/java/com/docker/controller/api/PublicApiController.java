@@ -4,6 +4,12 @@ import com.docker.dto.*;
 import com.docker.entity.*;
 import com.docker.exception.ResourceNotFoundException;
 import com.docker.service.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +25,7 @@ import java.util.stream.Collectors;
  * API REST publique pour le frontend Vue.js
  * Tous ces endpoints sont accessibles sans authentification
  */
+@Tag(name = "API Publique", description = "Endpoints publics accessibles sans authentification pour le frontend Vue.js")
 @RestController
 @RequestMapping("/api/public")
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
@@ -40,6 +47,14 @@ public class PublicApiController {
     /**
      * Données pour la Hero Section
      */
+    @Operation(
+        summary = "Récupérer les données de la section Hero",
+        description = "Retourne les données pour la section principale de la page d'accueil (Hero), incluant le titre, la dernière sortie musicale et la vidéo de fond"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Données récupérées avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = HeroDataDTO.class)))
+    })
     @GetMapping("/hero")
     public ResponseEntity<HeroDataDTO> getHeroData() {
         // Pour l'instant données en dur, à adapter selon ta DB
@@ -64,6 +79,15 @@ public class PublicApiController {
     /**
      * Biographie complète
      */
+    @Operation(
+        summary = "Récupérer la biographie du duo",
+        description = "Retourne la biographie complète du Duo Black & White avec la timeline des événements marquants et les photos associées"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Biographie récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BiographyDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Biographie introuvable ou vide", content = @Content)
+    })
     @GetMapping("/biography")
     public ResponseEntity<BiographyDTO> getBiography() {
         Biography bio = biographyService.getBiography();
@@ -91,6 +115,14 @@ public class PublicApiController {
     /**
      * Discographie complète (tous les albums et morceaux)
      */
+    @Operation(
+        summary = "Récupérer la discographie complète",
+        description = "Retourne tous les albums du duo avec leurs morceaux, incluant les liens Spotify et les fichiers audio uploadés"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Discographie récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AlbumDTO.class)))
+    })
     @GetMapping("/discography")
     public ResponseEntity<List<AlbumDTO>> getDiscography() {
         List<Track> tracks = trackService.getAllTracks();
@@ -139,6 +171,14 @@ public class PublicApiController {
     /**
      * Galerie photos complète
      */
+    @Operation(
+        summary = "Récupérer la galerie photos",
+        description = "Retourne toutes les photos du duo avec leurs métadonnées (catégories, légendes, ordre d'affichage)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Galerie récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PhotoDTO.class)))
+    })
     @GetMapping("/gallery")
     public ResponseEntity<List<PhotoDTO>> getGallery() {
         List<Photo> photos = photoService.getAllPhotos();
@@ -160,6 +200,14 @@ public class PublicApiController {
     /**
      * Prochains concerts (à venir uniquement)
      */
+    @Operation(
+        summary = "Récupérer les concerts à venir",
+        description = "Retourne tous les concerts programmés dans le futur, triés par date croissante avec le nombre de jours restants"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Liste des concerts à venir récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConcertDTO.class)))
+    })
     @GetMapping("/concerts/upcoming")
     public ResponseEntity<List<ConcertDTO>> getUpcomingConcerts() {
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -178,6 +226,14 @@ public class PublicApiController {
     /**
      * Concerts passés
      */
+    @Operation(
+        summary = "Récupérer les concerts passés",
+        description = "Retourne tous les concerts déjà réalisés, triés par date décroissante (du plus récent au plus ancien)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Liste des concerts passés récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConcertDTO.class)))
+    })
     @GetMapping("/concerts/past")
     public ResponseEntity<List<ConcertDTO>> getPastConcerts() {
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -196,6 +252,14 @@ public class PublicApiController {
     /**
      * Données stats pour le dashboard (optionnel)
      */
+    @Operation(
+        summary = "Récupérer les statistiques du site",
+        description = "Retourne des statistiques globales : nombre total de concerts, photos, morceaux, et concerts à venir"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Statistiques récupérées avec succès",
+            content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStats() {
         java.time.LocalDate today = java.time.LocalDate.now();
