@@ -66,7 +66,10 @@ public class SecurityConfig {
 						"/uploaded-photos/**", // Photos uploadées
 						"/uploaded-music/**", // Musique uploadée
 						"/uploaded-videos/**", // Vidéos uploadées
-						"/api/**" // API REST publique
+						"/api/**", // API REST publique
+						"/swagger-ui/**", // Documentation Swagger UI
+						"/v3/api-docs/**", // Documentation OpenAPI JSON
+						"/swagger-ui.html" // Page principale Swagger UI
 				).permitAll()
 
 				// Tout le reste nécessite une authentification
