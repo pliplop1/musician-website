@@ -10,6 +10,9 @@ public record HomepageSettingsDTO(
     String heroBackgroundVideoUrl,
     String welcomeMessage,
     Boolean registrationEnabled,
-    String registrationMessage
+    String registrationMessage,
+    Boolean autoRotationEnabledVideos,
+    Boolean autoRotationEnabledTracks,
+    Boolean autoRotationEnabledGallery
 ) {
 }

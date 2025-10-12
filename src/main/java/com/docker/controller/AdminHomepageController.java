@@ -1,9 +1,11 @@
 package com.docker.controller;
 
 import com.docker.entity.HomepageSettings;
+import com.docker.entity.Photo;
 import com.docker.entity.Track;
 import com.docker.entity.Video;
 import com.docker.service.HomepageSettingsService;
+import com.docker.service.PhotoService;
 import com.docker.service.TrackService;
 import com.docker.service.VideoService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,14 +28,17 @@ public class AdminHomepageController {
     private final HomepageSettingsService homepageSettingsService;
     private final VideoService videoService;
     private final TrackService trackService;
+    private final PhotoService photoService;
 
     public AdminHomepageController(
             HomepageSettingsService homepageSettingsService,
             VideoService videoService,
-            TrackService trackService) {
+            TrackService trackService,
+            PhotoService photoService) {
         this.homepageSettingsService = homepageSettingsService;
         this.videoService = videoService;
         this.trackService = trackService;
+        this.photoService = photoService;
     }
 
     /**
@@ -49,6 +54,9 @@ public class AdminHomepageController {
         // Tous les tracks disponibles
         List<Track> allTracks = trackService.getAllTracks();
 
+        // Toutes les photos disponibles
+        List<Photo> allPhotos = photoService.getAllPhotos();
+
         // Récupérer les IDs des vidéos featured actuelles
         List<Long> featuredVideoIds = settings.getFeaturedVideos().stream()
                 .map(Video::getId)
@@ -59,11 +67,18 @@ public class AdminHomepageController {
                 .map(Track::getId)
                 .toList();
 
+        // Récupérer les IDs des photos featured actuelles
+        List<Long> featuredPhotoIds = settings.getFeaturedPhotos().stream()
+                .map(Photo::getId)
+                .toList();
+
         model.addAttribute("settings", settings);
         model.addAttribute("allVideos", allVideos);
         model.addAttribute("allTracks", allTracks);
+        model.addAttribute("allPhotos", allPhotos);
         model.addAttribute("featuredVideoIds", featuredVideoIds);
         model.addAttribute("featuredTrackIds", featuredTrackIds);
+        model.addAttribute("featuredPhotoIds", featuredPhotoIds);
 
         return "admin/homepage-settings";
     }
@@ -79,17 +94,22 @@ public class AdminHomepageController {
             @RequestParam(value = "welcomeMessage", required = false) String welcomeMessage,
             @RequestParam(value = "registrationEnabled", defaultValue = "false") Boolean registrationEnabled,
             @RequestParam(value = "registrationMessage", required = false) String registrationMessage,
+            @RequestParam(value = "autoRotationEnabledVideos", defaultValue = "false") Boolean autoRotationEnabledVideos,
+            @RequestParam(value = "autoRotationEnabledTracks", defaultValue = "false") Boolean autoRotationEnabledTracks,
+            @RequestParam(value = "autoRotationEnabledGallery", defaultValue = "false") Boolean autoRotationEnabledGallery,
             @RequestParam(value = "featuredVideoIds", required = false) List<Long> videoIds,
             @RequestParam(value = "featuredTrackIds", required = false) List<Long> trackIds,
+            @RequestParam(value = "featuredPhotoIds", required = false) List<Long> photoIds,
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Mise à jour des paramètres principaux
+            // Mise à jour des paramètres principaux et featured videos/tracks/photos
             HomepageSettings settings = homepageSettingsService.updateAllSettings(
                     heroTitle,
                     heroSubtitle,
                     videoIds != null ? videoIds : new ArrayList<>(),
-                    trackIds != null ? trackIds : new ArrayList<>()
+                    trackIds != null ? trackIds : new ArrayList<>(),
+                    photoIds != null ? photoIds : new ArrayList<>()
             );
 
             // Mise à jour des autres paramètres
@@ -97,6 +117,12 @@ public class AdminHomepageController {
             settings.setWelcomeMessage(welcomeMessage);
             settings.setRegistrationEnabled(registrationEnabled);
             settings.setRegistrationMessage(registrationMessage);
+            settings.setAutoRotationEnabledVideos(autoRotationEnabledVideos);
+            settings.setAutoRotationEnabledTracks(autoRotationEnabledTracks);
+            settings.setAutoRotationEnabledGallery(autoRotationEnabledGallery);
+
+            // Sauvegarde finale de toutes les modifications
+            homepageSettingsService.save(settings);
 
             redirectAttributes.addFlashAttribute("successMessage",
                     "✅ Paramètres de la page d'accueil sauvegardés avec succès !");

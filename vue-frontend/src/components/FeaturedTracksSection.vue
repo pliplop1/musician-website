@@ -1,71 +1,28 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useFeaturedContent } from '../composables/useFeaturedContent'
 
-const tracks = ref([])
-const loading = ref(true)
-const error = ref(null)
+// Utilisation du composable pour la logique auto/manuel + cache 24h
+const {
+  items: tracks,
+  loading,
+  error,
+  loadFeaturedContent
+} = useFeaturedContent({
+  contentType: 'tracks',
+  allItemsEndpoint: '/api/public/tracks',
+  featuredEndpoint: '/api/public/featured/tracks',
+  cacheKey: 'featuredTracks',
+  autoRotationFieldName: 'autoRotationEnabledTracks'
+})
+
 const selectedTrack = ref(null)
 const showModal = ref(false)
-
-const fetchTracks = async () => {
-  try {
-    const CACHE_KEY = 'featuredTracks_v2'
-    const CACHE_TIMESTAMP_KEY = 'featuredTracksTimestamp_v2'
-    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000 // 24 heures en millisecondes
-
-    // Vérifier le cache localStorage
-    const cachedTracks = localStorage.getItem(CACHE_KEY)
-    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
-
-    if (cachedTracks && cachedTimestamp) {
-      const now = Date.now()
-      const timeDiff = now - parseInt(cachedTimestamp)
-
-      // Si moins de 24h se sont écoulées, utiliser le cache
-      if (timeDiff < TWENTY_FOUR_HOURS) {
-        console.log('Utilisation des morceaux en cache (valides pour encore', Math.round((TWENTY_FOUR_HOURS - timeDiff) / (60 * 60 * 1000)), 'heures)')
-        tracks.value = JSON.parse(cachedTracks)
-        loading.value = false
-        return
-      }
-    }
-
-    // Sinon, récupérer de nouveaux morceaux depuis l'API
-    console.log('Récupération de nouveaux morceaux aléatoires depuis l\'API')
-    const response = await fetch('/api/public/tracks')
-    if (!response.ok) {
-      throw new Error('Erreur lors du chargement des morceaux')
-    }
-    const allTracks = await response.json()
-
-    // Sélectionner 3 morceaux aléatoires
-    const shuffled = [...allTracks].sort(() => 0.5 - Math.random())
-    const selectedTracks = shuffled.slice(0, 3)
-
-    // Stocker dans le cache avec le timestamp actuel
-    localStorage.setItem(CACHE_KEY, JSON.stringify(selectedTracks))
-    localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString())
-
-    tracks.value = selectedTracks
-  } catch (err) {
-    error.value = err.message
-    console.error('Error fetching tracks:', err)
-  } finally {
-    loading.value = false
-  }
-}
 
 // Détecter si c'est du HTML ou une URL
 const isHtmlEmbed = (embedCode) => {
   if (!embedCode) return false
   return embedCode.trim().startsWith('<iframe') || embedCode.trim().startsWith('<')
-}
-
-// Extraire l'ID Spotify depuis l'URL embed
-const getSpotifyId = (embedCode) => {
-  if (!embedCode) return null
-  const match = embedCode.match(/spotify\.com\/embed\/track\/([a-zA-Z0-9]+)/)
-  return match ? match[1] : null
 }
 
 // Déterminer le type de lecteur
@@ -80,46 +37,40 @@ const getPlayerType = (track) => {
   return { icon: 'fas fa-music', label: 'Audio' }
 }
 
-// Obtenir le lien externe pour ouvrir dans le service
+// Extraire le lien externe (Spotify, SoundCloud)
 const getExternalLink = (track) => {
   if (!track.spotifyUrl) return null
 
-  // Spotify: convertir embed en lien normal
-  if (track.spotifyUrl.includes('spotify.com/embed/track/')) {
-    return track.spotifyUrl.replace('/embed/track/', '/track/')
-  }
-
-  // SoundCloud: extraire l'URL du track depuis l'iframe
-  if (track.spotifyUrl.includes('soundcloud.com')) {
-    const match = track.spotifyUrl.match(/url=([^&]+)/)
+  // Si c'est du HTML embed, extraire l'URL
+  if (isHtmlEmbed(track.spotifyUrl)) {
+    const match = track.spotifyUrl.match(/src="([^"]+)"/)
     if (match) {
-      return decodeURIComponent(match[1])
+      const embedUrl = match[1]
+      // Convertir l'URL embed en URL normale
+      if (embedUrl.includes('spotify.com/embed')) {
+        return embedUrl.replace('/embed/', '/')
+      }
+      if (embedUrl.includes('soundcloud.com')) {
+        return embedUrl.split('&')[0].replace('/embed/', '/')
+      }
     }
   }
 
-  // Autres cas: retourner l'URL telle quelle
-  return track.spotifyUrl
+  // Si c'est déjà une URL
+  if (track.spotifyUrl.startsWith('http')) {
+    if (track.spotifyUrl.includes('spotify.com/embed')) {
+      return track.spotifyUrl.replace('/embed/', '/')
+    }
+    return track.spotifyUrl
+  }
+
+  return null
 }
 
-// Générer l'URL de la miniature (utiliser une image par défaut musicale)
-const getThumbnailUrl = (track) => {
-  // Pour Spotify, on utilise une vignette musicale stylisée
-  return '/images/music-placeholder.jpg'
-}
-
-// Ouvrir le morceau dans un modal
+// Ouvrir le lecteur dans un modal
 const openTrack = (track) => {
-  console.log('=== DEBUG openTrack ===')
-  console.log('Track data:', track)
-  console.log('Has spotifyUrl?', !!track.spotifyUrl)
-  console.log('spotifyUrl value:', track.spotifyUrl)
-  console.log('Has audioUrl?', !!track.audioUrl)
-  console.log('audioUrl value:', track.audioUrl)
-  console.log('======================')
-
   selectedTrack.value = track
   showModal.value = true
-  // Empêcher le scroll du body
   document.body.style.overflow = 'hidden'
 }
 
@@ -127,12 +78,11 @@ const openTrack = (track) => {
 const closeModal = () => {
   showModal.value = false
   selectedTrack.value = null
-  // Réactiver le scroll du body
   document.body.style.overflow = ''
 }
 
 onMounted(() => {
-  fetchTracks()
+  loadFeaturedContent()
 })
 </script>
 
@@ -258,7 +208,6 @@ onMounted(() => {
   overflow: hidden;
 }
 
-/* Effet de fond animé */
 .tracks-section::before {
   content: '';
   position: absolute;
@@ -390,7 +339,6 @@ onMounted(() => {
   width: fit-content;
 }
 
-/* Bouton Voir toute la musique */
 .view-all-tracks {
   margin-top: 4rem;
   text-align: center;
@@ -451,7 +399,6 @@ onMounted(() => {
   transform: translateX(5px);
 }
 
-/* Modal lecteur */
 .track-modal {
   position: fixed;
   top: 0;
@@ -566,7 +513,6 @@ onMounted(() => {
   margin: 0;
 }
 
-/* Bouton ouvrir dans le service */
 .modal-actions {
   margin-top: 2rem;
   text-align: center;
@@ -609,7 +555,6 @@ onMounted(() => {
   font-style: italic;
 }
 
-/* Loading */
 .loading {
   display: flex;
   flex-direction: column;
@@ -635,7 +580,6 @@ onMounted(() => {
   }
 }
 
-/* Error */
 .error-message {
   text-align: center;
   padding: 2rem;
@@ -651,7 +595,6 @@ onMounted(() => {
   display: block;
 }
 
-/* Animations */
 .track-card {
   animation: fadeInUp 0.6s ease-out;
 }
@@ -667,7 +610,6 @@ onMounted(() => {
   }
 }
 
-/* Animation en cascade pour les cartes */
 .track-card:nth-child(1) {
   animation-delay: 0.1s;
 }
@@ -680,7 +622,6 @@ onMounted(() => {
   animation-delay: 0.3s;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .tracks-section {
     padding: 4rem 1rem;

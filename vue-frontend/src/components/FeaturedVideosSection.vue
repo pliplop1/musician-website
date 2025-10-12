@@ -1,59 +1,23 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useFeaturedContent } from '../composables/useFeaturedContent'
 
-const videos = ref([])
-const loading = ref(true)
-const error = ref(null)
+// Utilisation du composable pour la logique auto/manuel + cache 24h
+const {
+  items: videos,
+  loading,
+  error,
+  loadFeaturedContent
+} = useFeaturedContent({
+  contentType: 'videos',
+  allItemsEndpoint: '/api/public/videos',
+  featuredEndpoint: '/api/public/featured/videos',
+  cacheKey: 'featuredVideos',
+  autoRotationFieldName: 'autoRotationEnabledVideos'
+})
+
 const selectedVideo = ref(null)
 const showModal = ref(false)
-
-const fetchVideos = async () => {
-  try {
-    const CACHE_KEY = 'featuredVideos'
-    const CACHE_TIMESTAMP_KEY = 'featuredVideosTimestamp'
-    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000 // 24 heures en millisecondes
-
-    // Vérifier le cache localStorage
-    const cachedVideos = localStorage.getItem(CACHE_KEY)
-    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
-
-    if (cachedVideos && cachedTimestamp) {
-      const now = Date.now()
-      const timeDiff = now - parseInt(cachedTimestamp)
-
-      // Si moins de 24h se sont écoulées, utiliser le cache
-      if (timeDiff < TWENTY_FOUR_HOURS) {
-        console.log('Utilisation des vidéos en cache (valides pour encore', Math.round((TWENTY_FOUR_HOURS - timeDiff) / (60 * 60 * 1000)), 'heures)')
-        videos.value = JSON.parse(cachedVideos)
-        loading.value = false
-        return
-      }
-    }
-
-    // Sinon, récupérer de nouvelles vidéos depuis l'API
-    console.log('Récupération de nouvelles vidéos aléatoires depuis l\'API')
-    const response = await fetch('/api/public/videos')
-    if (!response.ok) {
-      throw new Error('Erreur lors du chargement des vidéos')
-    }
-    const allVideos = await response.json()
-
-    // Sélectionner 3 vidéos aléatoires
-    const shuffled = [...allVideos].sort(() => 0.5 - Math.random())
-    const selectedVideos = shuffled.slice(0, 3)
-
-    // Stocker dans le cache avec le timestamp actuel
-    localStorage.setItem(CACHE_KEY, JSON.stringify(selectedVideos))
-    localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString())
-
-    videos.value = selectedVideos
-  } catch (err) {
-    error.value = err.message
-    console.error('Error fetching videos:', err)
-  } finally {
-    loading.value = false
-  }
-}
 
 // Extraire l'ID YouTube depuis l'URL embed
 const getYouTubeId = (embedCode) => {
@@ -77,7 +41,6 @@ const getThumbnailUrl = (video) => {
 const openVideo = (video) => {
   selectedVideo.value = video
   showModal.value = true
-  // Empêcher le scroll du body
   document.body.style.overflow = 'hidden'
 }
 
@@ -85,12 +48,11 @@ const openVideo = (video) => {
 const closeModal = () => {
   showModal.value = false
   selectedVideo.value = null
-  // Réactiver le scroll du body
   document.body.style.overflow = ''
 }
 
 onMounted(() => {
-  fetchVideos()
+  loadFeaturedContent()
 })
 </script>
 

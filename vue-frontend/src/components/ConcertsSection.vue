@@ -6,10 +6,14 @@ const loading = ref(true)
 
 const fetchConcerts = async () => {
   try {
-    const response = await fetch('/api/public/concerts/upcoming')
+    const response = await fetch('http://localhost:8106/api/public/concerts/upcoming')
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
     concerts.value = await response.json()
   } catch (err) {
     console.error('Error fetching concerts:', err)
+    concerts.value = []
   } finally {
     loading.value = false
   }

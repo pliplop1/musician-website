@@ -385,7 +385,10 @@ public class PublicApiController {
             settings.getHeroBackgroundVideoUrl(),
             settings.getWelcomeMessage(),
             settings.getRegistrationEnabled(),
-            settings.getRegistrationMessage()
+            settings.getRegistrationMessage(),
+            settings.getAutoRotationEnabledVideos(),
+            settings.getAutoRotationEnabledTracks(),
+            settings.getAutoRotationEnabledGallery()
         );
 
         return ResponseEntity.ok(dto);

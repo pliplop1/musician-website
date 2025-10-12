@@ -1,9 +1,11 @@
 package com.docker.service;
 
 import com.docker.entity.HomepageSettings;
+import com.docker.entity.Photo;
 import com.docker.entity.Track;
 import com.docker.entity.Video;
 import com.docker.repository.HomepageSettingsRepository;
+import com.docker.repository.PhotoRepository;
 import com.docker.repository.TrackRepository;
 import com.docker.repository.VideoRepository;
 import org.springframework.stereotype.Service;
@@ -22,14 +24,17 @@ public class HomepageSettingsService {
     private final HomepageSettingsRepository homepageSettingsRepository;
     private final VideoRepository videoRepository;
     private final TrackRepository trackRepository;
+    private final PhotoRepository photoRepository;
 
     public HomepageSettingsService(
             HomepageSettingsRepository homepageSettingsRepository,
             VideoRepository videoRepository,
-            TrackRepository trackRepository) {
+            TrackRepository trackRepository,
+            PhotoRepository photoRepository) {
         this.homepageSettingsRepository = homepageSettingsRepository;
         this.videoRepository = videoRepository;
         this.trackRepository = trackRepository;
+        this.photoRepository = photoRepository;
     }
 
     /**
@@ -138,7 +143,8 @@ public class HomepageSettingsService {
             String heroTitle,
             String heroSubtitle,
             List<Long> videoIds,
-            List<Long> trackIds) {
+            List<Long> trackIds,
+            List<Long> photoIds) {
 
         HomepageSettings settings = getSettings();
 
@@ -178,6 +184,22 @@ public class HomepageSettingsService {
             settings.setFeaturedTracks(new ArrayList<>());
         }
 
+        // Mise à jour des photos featured
+        if (photoIds != null && !photoIds.isEmpty()) {
+            if (photoIds.size() > 3) {
+                throw new IllegalArgumentException("Maximum 3 photos featured autorisées");
+            }
+            List<Photo> photos = new ArrayList<>();
+            for (Long photoId : photoIds) {
+                Photo photo = photoRepository.findById(photoId)
+                        .orElseThrow(() -> new IllegalArgumentException("Photo introuvable : " + photoId));
+                photos.add(photo);
+            }
+            settings.setFeaturedPhotos(photos);
+        } else {
+            settings.setFeaturedPhotos(new ArrayList<>());
+        }
+
         return homepageSettingsRepository.save(settings);
     }
 
@@ -211,6 +233,15 @@ public class HomepageSettingsService {
     public HomepageSettings updateHeroBackgroundVideo(String videoUrl) {
         HomepageSettings settings = getSettings();
         settings.setHeroBackgroundVideoUrl(videoUrl);
+        return homepageSettingsRepository.save(settings);
+    }
+
+    /**
+     * Sauvegarde un objet HomepageSettings
+     * @param settings L'objet à sauvegarder
+     * @return Les paramètres sauvegardés
+     */
+    public HomepageSettings save(HomepageSettings settings) {
         return homepageSettingsRepository.save(settings);
     }
 }
