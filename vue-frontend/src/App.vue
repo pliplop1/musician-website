@@ -4,7 +4,6 @@ import HeroSection from './components/HeroSection.vue'
 import FeaturedVideosSection from './components/FeaturedVideosSection.vue'
 import FeaturedTracksSection from './components/FeaturedTracksSection.vue'
 import BiographySection from './components/BiographySection.vue'
-import DiscographySection from './components/DiscographySection.vue'
 import GallerySection from './components/GallerySection.vue'
 import ConcertsSection from './components/ConcertsSection.vue'
 
@@ -132,7 +131,6 @@ onMounted(() => {
       <FeaturedVideosSection id="videos" />
       <FeaturedTracksSection id="music" />
       <BiographySection id="biography" />
-      <DiscographySection id="discography" />
       <GallerySection id="gallery" />
       <ConcertsSection id="concerts" />
     </main>

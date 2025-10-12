@@ -1,86 +1,706 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: layout(~{::title}, ~{::body})}">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion Page d'Accueil Vue.js</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Interface compacte et efficace */
+        .homepage-container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header-bar {
+            background: #1f2937;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-bar h1 {
+            font-size: 1.25rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-compact {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+
+        /* Layout en colonnes */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .section-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f9fafb;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-content {
+            padding: 1rem;
+        }
+
+        /* Formulaires compacts */
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* Listes compactes pour vidéos/tracks */
+        .media-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+        }
+
+        .media-item {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: background 0.15s;
+        }
+
+        .media-item:hover {
+            background: #f9fafb;
+        }
+
+        .media-item:last-child {
+            border-bottom: none;
+        }
+
+        .media-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .media-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .media-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-type {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .selection-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .selection-counter.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .selection-counter.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Section d'inscription compacte */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #cbd5e1;
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .toggle-slider {
+            background: #10b981;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Alerts compacts */
+        .alert-compact {
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        /* Modal preview */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .preview-modal.active {
+            display: flex;
+        }
+
+        .preview-content {
+            width: 100%;
+            height: 100%;
+            max-width: 1600px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            background: #1f2937;
+            color: white;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-close {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .preview-body {
+            flex: 1;
+            position: relative;
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-bar {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: stretch;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-compact {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
-<body>
-    <div class="container-fluid mt-4">
-        <!-- En-tête principal -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h1 class="display-4">
-                    <i class="fas fa-paint-brush"></i> Gestion de la Page d'Accueil Vue.js
-                </h1>
-                <p class="lead text-muted">
-                    Configurez l'apparence et le contenu de la vitrine publique Vue.js
-                </p>
+<body class="bg-gray-100 text-gray-800">
+
+<div class="flex min-h-screen">
+    <div th:replace="~{fragments/admin-layout :: sidebar}"></div>
+
+    <main class="flex-grow p-4">
+        <div class="homepage-container">
+            <!-- En-tête -->
+            <div class="header-bar">
+                <h1><i class="fas fa-cog"></i> Paramètres Page d'Accueil Vue.js</h1>
+                <div class="btn-group">
+                    <button type="button" class="btn-compact btn-primary" onclick="openPreview()">
+                        <i class="fas fa-eye"></i> Aperçu
+                    </button>
+                    <button type="submit" form="settingsForm" class="btn-compact btn-success">
+                        <i class="fas fa-save"></i> Sauvegarder
+                    </button>
+                    <a href="/admin/dashboard" class="btn-compact btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <!-- Messages de feedback -->
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <span th:text="${successMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+            <!-- Messages -->
+            <div th:if="${successMessage}" class="alert-compact alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
 
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="${errorMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+            <div th:if="${errorMessage}" class="alert-compact alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
 
-        <!-- Formulaire principal -->
-        <form th:action="@{/admin/homepage/settings/save}" method="post" id="homepageSettingsForm">
+            <!-- Formulaire -->
+            <form th:action="@{/admin/homepage/settings/save}" method="post" id="settingsForm">
+                <div class="settings-grid">
+                    <!-- Section Hero -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-star"></i> Section Hero</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="form-group">
+                                <label class="form-label">Titre principal *</label>
+                                <input type="text" name="heroTitle" class="form-input"
+                                       th:value="${settings.heroTitle}" required
+                                       placeholder="DUO BLACK & WHITE">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sous-titre *</label>
+                                <input type="text" name="heroSubtitle" class="form-input"
+                                       th:value="${settings.heroSubtitle}" required
+                                       placeholder="La musique qui vous transporte">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">URL Vidéo de fond (optionnel)</label>
+                                <input type="url" name="heroBackgroundVideoUrl" class="form-input"
+                                       th:value="${settings.heroBackgroundVideoUrl}"
+                                       placeholder="/uploaded-videos/background.mp4">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Message d'accueil (optionnel)</label>
+                                <textarea name="welcomeMessage" class="form-input"
+                                          th:text="${settings.welcomeMessage}"
+                                          placeholder="Bienvenue sur notre site !"></textarea>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Section Hero -->
-            <div th:replace="~{admin/homepage/hero-section :: heroSettings}"></div>
+                    <!-- Section Inscription -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-user-plus"></i> Inscription Publique</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="form-group">
+                                <label class="form-label">Activer l'inscription</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="registrationEnabled"
+                                           th:checked="${settings.registrationEnabled}" value="true">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Message d'inscription (optionnel)</label>
+                                <textarea name="registrationMessage" class="form-input"
+                                          th:text="${settings.registrationMessage}"
+                                          placeholder="Rejoignez notre communauté !"></textarea>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Section Vidéos Featured -->
-            <div th:replace="~{admin/homepage/videos-section :: videosSettings}"></div>
+                    <!-- Rotation Auto VIDÉOS -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-film"></i> Rotation Auto Vidéos</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="autoRotationEnabledVideos"
+                                           th:checked="${settings.autoRotationEnabledVideos}" value="true">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="form-label" style="display: inline; margin-left: 0.5rem;">
+                                    3 vidéos aléatoires /24h
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Section Tracks Featured -->
-            <div th:replace="~{admin/homepage/tracks-section :: tracksSettings}"></div>
+                    <!-- Rotation Auto MUSIQUES -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-music"></i> Rotation Auto Musiques</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="autoRotationEnabledTracks"
+                                           th:checked="${settings.autoRotationEnabledTracks}" value="true">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="form-label" style="display: inline; margin-left: 0.5rem;">
+                                    3 musiques aléatoires /24h
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Section Inscription -->
-            <div th:replace="~{admin/homepage/registration-section :: registrationSettings}"></div>
+                    <!-- Rotation Auto GALERIE -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-images"></i> Rotation Auto Galerie</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="autoRotationEnabledGallery"
+                                           th:checked="${settings.autoRotationEnabledGallery}" value="true">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="form-label" style="display: inline; margin-left: 0.5rem;">
+                                    3 photos aléatoires /24h
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Boutons d'action -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <button type="submit" class="btn btn-primary btn-lg me-3">
-                                <i class="fas fa-save"></i> Sauvegarder Tous les Paramètres
-                            </button>
-                            <a href="/admin/dashboard" class="btn btn-secondary btn-lg">
-                                <i class="fas fa-times"></i> Annuler
-                            </a>
+                    <!-- Vidéos Featured -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-film"></i> Vidéos Featured (Max 3)</span>
+                            <span class="selection-counter" id="videoCounter">0 / 3</span>
+                        </div>
+                        <div class="section-content" style="padding: 0;">
+                            <div th:if="${#lists.isEmpty(allVideos)}" class="alert-compact alert-info" style="margin: 1rem;">
+                                <i class="fas fa-info-circle"></i>
+                                Aucune vidéo disponible. <a href="/admin/videos/add">Ajoutez-en une</a>.
+                            </div>
+                            <div th:unless="${#lists.isEmpty(allVideos)}" class="media-list">
+                                <div class="media-item" th:each="video : ${allVideos}">
+                                    <input type="checkbox" class="media-checkbox video-check"
+                                           name="featuredVideoIds" th:value="${video.id}"
+                                           th:checked="${#lists.contains(featuredVideoIds, video.id)}">
+                                    <div class="media-info">
+                                        <div class="media-title" th:text="${video.title}">Titre</div>
+                                        <div class="media-type" th:text="${video.videoType}">EMBED</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tracks Featured -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-music"></i> Musiques Featured (Max 3)</span>
+                            <span class="selection-counter" id="trackCounter">0 / 3</span>
+                        </div>
+                        <div class="section-content" style="padding: 0;">
+                            <div th:if="${#lists.isEmpty(allTracks)}" class="alert-compact alert-info" style="margin: 1rem;">
+                                <i class="fas fa-info-circle"></i>
+                                Aucune musique disponible. <a href="/admin/tracks/add">Ajoutez-en une</a>.
+                            </div>
+                            <div th:unless="${#lists.isEmpty(allTracks)}" class="media-list">
+                                <div class="media-item" th:each="track : ${allTracks}">
+                                    <input type="checkbox" class="media-checkbox track-check"
+                                           name="featuredTrackIds" th:value="${track.id}"
+                                           th:checked="${#lists.contains(featuredTrackIds, track.id)}">
+                                    <div class="media-info">
+                                        <div class="media-title" th:text="${track.title}">Titre</div>
+                                        <div class="media-type" th:text="${track.trackType}">EMBED</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Photos Featured -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span><i class="fas fa-images"></i> Photos Featured (Max 3)</span>
+                            <span class="selection-counter" id="photoCounter">0 / 3</span>
+                        </div>
+                        <div class="section-content" style="padding: 0;">
+                            <div th:if="${#lists.isEmpty(allPhotos)}" class="alert-compact alert-info" style="margin: 1rem;">
+                                <i class="fas fa-info-circle"></i>
+                                Aucune photo disponible. <a href="/admin/photos">Ajoutez-en une</a>.
+                            </div>
+                            <div th:unless="${#lists.isEmpty(allPhotos)}" class="media-list">
+                                <div class="media-item" th:each="photo : ${allPhotos}">
+                                    <input type="checkbox" class="media-checkbox photo-check"
+                                           name="featuredPhotoIds" th:value="${photo.id}"
+                                           th:checked="${#lists.contains(featuredPhotoIds, photo.id)}">
+                                    <div class="media-info">
+                                        <div class="media-title" th:text="${photo.filename}">Photo</div>
+                                        <div class="media-type">Photo ID: <span th:text="${photo.id}"></span></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </form>
+        </div>
+
+        <!-- Modal Preview -->
+        <div class="preview-modal" id="previewModal" onclick="if(event.target===this) closePreview()">
+            <div class="preview-content">
+                <div class="preview-header">
+                    <span><i class="fas fa-eye"></i> Aperçu Page Publique</span>
+                    <button class="preview-close" onclick="closePreview()">×</button>
+                </div>
+                <div class="preview-body">
+                    <iframe id="previewFrame" class="preview-iframe"></iframe>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
 
-    <!-- Script de validation -->
-    <script th:inline="javascript">
-        // Validation côté client
-        document.getElementById('homepageSettingsForm').addEventListener('submit', function(e) {
-            const videoCheckboxes = document.querySelectorAll('.video-checkbox:checked');
-            const trackCheckboxes = document.querySelectorAll('.track-checkbox:checked');
+        <!-- Scripts -->
+        <script>
+            // Compteurs de sélection
+            function updateCounters() {
+                const videoChecks = document.querySelectorAll('.video-check:checked');
+                const trackChecks = document.querySelectorAll('.track-check:checked');
+                const photoChecks = document.querySelectorAll('.photo-check:checked');
 
-            if (videoCheckboxes.length > 3) {
-                e.preventDefault();
-                alert('Maximum 3 vidéos featured autorisées');
-                return false;
+                const videoCounter = document.getElementById('videoCounter');
+                const trackCounter = document.getElementById('trackCounter');
+                const photoCounter = document.getElementById('photoCounter');
+
+                if (videoCounter) {
+                    videoCounter.textContent = videoChecks.length + ' / 3';
+                    videoCounter.className = 'selection-counter ' +
+                        (videoChecks.length > 3 ? 'warning' : videoChecks.length > 0 ? 'success' : '');
+                }
+
+                if (trackCounter) {
+                    trackCounter.textContent = trackChecks.length + ' / 3';
+                    trackCounter.className = 'selection-counter ' +
+                        (trackChecks.length > 3 ? 'warning' : trackChecks.length > 0 ? 'success' : '');
+                }
+
+                if (photoCounter) {
+                    photoCounter.textContent = photoChecks.length + ' / 3';
+                    photoCounter.className = 'selection-counter ' +
+                        (photoChecks.length > 3 ? 'warning' : photoChecks.length > 0 ? 'success' : '');
+                }
             }
 
-            if (trackCheckboxes.length > 3) {
-                e.preventDefault();
-                alert('Maximum 3 tracks featured autorisés');
-                return false;
+            // Limitation de sélection
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('video-check')) {
+                    const checked = document.querySelectorAll('.video-check:checked');
+                    if (checked.length > 3) {
+                        e.target.checked = false;
+                        alert('Maximum 3 vidéos autorisées');
+                    }
+                    updateCounters();
+                }
+
+                if (e.target.classList.contains('track-check')) {
+                    const checked = document.querySelectorAll('.track-check:checked');
+                    if (checked.length > 3) {
+                        e.target.checked = false;
+                        alert('Maximum 3 musiques autorisées');
+                    }
+                    updateCounters();
+                }
+
+                if (e.target.classList.contains('photo-check')) {
+                    const checked = document.querySelectorAll('.photo-check:checked');
+                    if (checked.length > 3) {
+                        e.target.checked = false;
+                        alert('Maximum 3 photos autorisées');
+                    }
+                    updateCounters();
+                }
+            });
+
+            // Validation formulaire
+            document.getElementById('settingsForm').addEventListener('submit', function(e) {
+                const videoCount = document.querySelectorAll('.video-check:checked').length;
+                const trackCount = document.querySelectorAll('.track-check:checked').length;
+                const photoCount = document.querySelectorAll('.photo-check:checked').length;
+
+                if (videoCount > 3) {
+                    e.preventDefault();
+                    alert('Maximum 3 vidéos autorisées');
+                    return false;
+                }
+
+                if (trackCount > 3) {
+                    e.preventDefault();
+                    alert('Maximum 3 musiques autorisées');
+                    return false;
+                }
+
+                if (photoCount > 3) {
+                    e.preventDefault();
+                    alert('Maximum 3 photos autorisées');
+                    return false;
+                }
+            });
+
+            // Preview modal
+            function openPreview() {
+                const modal = document.getElementById('previewModal');
+                const frame = document.getElementById('previewFrame');
+                modal.classList.add('active');
+                if (!frame.src) frame.src = 'http://localhost:5173';
+                document.body.style.overflow = 'hidden';
             }
-        });
-    </script>
+
+            function closePreview() {
+                document.getElementById('previewModal').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closePreview();
+            });
+
+            // Init
+            updateCounters();
+        </script>
+    </main>
+</div>
+
 </body>
 </html>

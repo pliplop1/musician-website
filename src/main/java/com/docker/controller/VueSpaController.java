@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 /**
  * Contrôleur pour servir le SPA Vue.js en production
  * Redirige toutes les routes non-API vers index.html du Vue.js
+ *
+ * ⚠️ DÉSACTIVÉ TEMPORAIREMENT - Cause une boucle infinie de redirections
+ * En mode développement, utilisez Vue.js sur localhost:5173 séparément
  */
-@Controller
+// @Controller - COMMENTÉ POUR ÉVITER LA BOUCLE INFINIE
 public class VueSpaController {
 
     /**

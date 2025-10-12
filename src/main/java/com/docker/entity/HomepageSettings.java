@@ -76,6 +76,21 @@ public class HomepageSettings {
     @OrderColumn(name = "display_order")
     private List<Track> featuredTracks = new ArrayList<>();
 
+    // ====== PHOTOS FEATURED (1-3) ======
+
+    /**
+     * Liste des photos mises en avant sur la page d'accueil
+     * Maximum 3 photos pour ne pas surcharger la page
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "homepage_featured_photos",
+        joinColumns = @JoinColumn(name = "homepage_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "photo_id")
+    )
+    @OrderColumn(name = "display_order")
+    private List<Photo> featuredPhotos = new ArrayList<>();
+
     // ====== MESSAGE D'ACCUEIL ======
 
     /**
@@ -101,6 +116,35 @@ public class HomepageSettings {
     @Column(length = 500)
     private String registrationMessage;
 
+    // ====== ROTATION AUTOMATIQUE PAR TYPE DE CONTENU ======
+
+    /**
+     * Active/Désactive la rotation automatique des VIDÉOS toutes les 24h
+     * Si true : sélection aléatoire de 3 vidéos toutes les 24h (côté frontend)
+     * Si false : utilise les vidéos sélectionnées manuellement (featuredVideos)
+     * Par défaut : true (rotation automatique activée)
+     */
+    @Column(nullable = false)
+    private Boolean autoRotationEnabledVideos = true;
+
+    /**
+     * Active/Désactive la rotation automatique des MUSIQUES toutes les 24h
+     * Si true : sélection aléatoire de 3 musiques toutes les 24h (côté frontend)
+     * Si false : utilise les musiques sélectionnées manuellement (featuredTracks)
+     * Par défaut : true (rotation automatique activée)
+     */
+    @Column(nullable = false)
+    private Boolean autoRotationEnabledTracks = true;
+
+    /**
+     * Active/Désactive la rotation automatique de la GALERIE toutes les 24h
+     * Si true : sélection aléatoire de 3 photos toutes les 24h (côté frontend)
+     * Si false : utilise les photos sélectionnées manuellement (featuredPhotos)
+     * Par défaut : true (rotation automatique activée)
+     */
+    @Column(nullable = false)
+    private Boolean autoRotationEnabledGallery = true;
+
     // ====== CONSTRUCTEUR AVEC VALEURS PAR DÉFAUT ======
 
     /**
@@ -110,8 +154,12 @@ public class HomepageSettings {
         this.heroTitle = heroTitle;
         this.heroSubtitle = heroSubtitle;
         this.registrationEnabled = true;
+        this.autoRotationEnabledVideos = true; // Rotation automatique vidéos activée par défaut
+        this.autoRotationEnabledTracks = true; // Rotation automatique musiques activée par défaut
+        this.autoRotationEnabledGallery = true; // Rotation automatique galerie activée par défaut
         this.featuredVideos = new ArrayList<>();
         this.featuredTracks = new ArrayList<>();
+        this.featuredPhotos = new ArrayList<>();
     }
 
     // ====== MÉTHODES UTILITAIRES ======
@@ -182,5 +230,39 @@ public class HomepageSettings {
             throw new IllegalArgumentException("Maximum 3 tracks featured autorisés");
         }
         this.featuredTracks = new ArrayList<>(tracks);
+    }
+
+    /**
+     * Ajoute une photo à la liste des featured (max 3)
+     * @param photo La photo à ajouter
+     * @throws IllegalStateException si déjà 3 photos
+     */
+    public void addFeaturedPhoto(Photo photo) {
+        if (featuredPhotos.size() >= 3) {
+            throw new IllegalStateException("Maximum 3 photos featured autorisées");
+        }
+        if (!featuredPhotos.contains(photo)) {
+            featuredPhotos.add(photo);
+        }
+    }
+
+    /**
+     * Retire une photo de la liste des featured
+     * @param photo La photo à retirer
+     */
+    public void removeFeaturedPhoto(Photo photo) {
+        featuredPhotos.remove(photo);
+    }
+
+    /**
+     * Remplace complètement la liste des photos featured
+     * @param photos Nouvelle liste de photos (max 3)
+     * @throws IllegalArgumentException si plus de 3 photos
+     */
+    public void setFeaturedPhotos(List<Photo> photos) {
+        if (photos.size() > 3) {
+            throw new IllegalArgumentException("Maximum 3 photos featured autorisées");
+        }
+        this.featuredPhotos = new ArrayList<>(photos);
     }
 }
