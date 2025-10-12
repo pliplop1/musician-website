@@ -67,3 +67,6 @@ Thumbs.db
 *.sql
 # AJOUT - Ignore les fichiers de configuration locaux
 application-local.properties
+
+### Claude Code configuration (local only) ###
+.claude/
