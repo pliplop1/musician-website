@@ -23,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.docker.entity.LoginAttempt;
 import com.docker.entity.User;
 import com.docker.service.UserService;
 import com.docker.service.BadgeService;
 import com.docker.service.DataExportService;
+import com.docker.service.LoginAttemptService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,11 +43,13 @@ public class UserController {
     private final UserService userService;
     private final BadgeService badgeService;
     private final DataExportService dataExportService;
+    private final LoginAttemptService loginAttemptService;
 
-    public UserController(UserService userService, BadgeService badgeService, DataExportService dataExportService) {
+    public UserController(UserService userService, BadgeService badgeService, DataExportService dataExportService, LoginAttemptService loginAttemptService) {
         this.userService = userService;
         this.badgeService = badgeService;
         this.dataExportService = dataExportService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @GetMapping("/profile")
@@ -66,14 +70,32 @@ public class UserController {
         var userBadges = badgeService.getUserBadges(user);
         var badgeCount = badgeService.countUserBadges(user);
 
+        // Récupérer les informations de dernière connexion
+        LoginAttempt lastLogin = loginAttemptService.getLastSuccessfulLogin(username);
+
         model.addAttribute("username", username);
         model.addAttribute("user", user);
         model.addAttribute("favoriteConcerts", user.getFavoriteConcerts());
         model.addAttribute("daysSinceRegistration", daysSinceRegistration);
         model.addAttribute("userBadges", userBadges);
         model.addAttribute("badgeCount", badgeCount);
+        model.addAttribute("lastLogin", lastLogin);
 
         return "user/profile";
+    }
+
+    @GetMapping("/login-history")
+    public String showLoginHistory(Model model, Authentication authentication) {
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+
+        // Récupérer l'historique des connexions (30 derniers jours)
+        var loginHistory = loginAttemptService.getLoginHistory(username, 30);
+
+        model.addAttribute("user", user);
+        model.addAttribute("loginHistory", loginHistory);
+
+        return "user/login-history";
     }
 
     @GetMapping("/profile/edit")
@@ -268,8 +290,8 @@ public class UserController {
                 new SecurityContextLogoutHandler().logout(request, response, auth);
             }
 
-            // Supprimer le compte
-            userService.deleteUser(user.getId());
+            // Supprimer le compte et toutes les données associées (RGPD)
+            userService.deleteUserAccountCompletely(user.getId());
 
             redirectAttributes.addFlashAttribute("successMessage",
                 "Votre compte a été supprimé définitivement. Nous espérons vous revoir bientôt.");

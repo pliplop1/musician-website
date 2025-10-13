@@ -298,6 +298,13 @@
                 <label for="showPassword">Afficher le mot de passe</label>
             </div>
 
+            <div class="checkbox-group">
+                <input id="privacyConsent" name="privacyConsent" type="checkbox" required>
+                <label for="privacyConsent">
+                    J'accepte la <a th:href="@{/privacy-policy}" target="_blank" style="color: #4a90e2;">Politique de Confidentialité</a> et le traitement de mes données personnelles *
+                </label>
+            </div>
+
             <button type="submit" class="btn-submit">S'inscrire</button>
         </form>
 

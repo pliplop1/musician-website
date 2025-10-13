@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique de Confidentialité - Duo Black & White</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .privacy-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .privacy-container h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .privacy-container h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .privacy-container h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .privacy-container p {
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .privacy-container ul {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        .privacy-container ul li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .rgpd-highlight {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="privacy-container">
+    <h1>Politique de Confidentialité</h1>
+
+    <p><strong>Date de dernière mise à jour :</strong> <span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy')}"></span></p>
+
+    <div class="rgpd-highlight">
+        <p><strong>Conformité RGPD :</strong> Cette politique de confidentialité est conforme au Règlement Général sur la Protection des Données (RGPD) de l'Union Européenne.</p>
+    </div>
+
+    <h2>1. Responsable du traitement des données</h2>
+    <p>Le site <strong>Duo Black &amp; White</strong> est responsable du traitement de vos données personnelles.</p>
+    <p>Pour toute question concernant vos données, vous pouvez nous contacter via le formulaire de contact du site.</p>
+
+    <h2>2. Données collectées</h2>
+    <p>Nous collectons et traitons les données personnelles suivantes :</p>
+
+    <h3>2.1 Données d'inscription</h3>
+    <ul>
+        <li><strong>Nom d'utilisateur</strong> : pour identifier votre compte</li>
+        <li><strong>Adresse e-mail</strong> : pour communiquer avec vous et récupérer votre mot de passe</li>
+        <li><strong>Mot de passe</strong> : stocké de manière sécurisée (chiffré avec BCrypt)</li>
+        <li><strong>Date de création du compte</strong> : pour calculer votre ancienneté</li>
+    </ul>
+
+    <h3>2.2 Données de profil (optionnelles)</h3>
+    <ul>
+        <li><strong>Prénom et nom</strong> : pour personnaliser votre profil</li>
+        <li><strong>Photo de profil</strong> : image stockée de manière sécurisée</li>
+        <li><strong>Biographie</strong> : pour vous présenter (max 500 caractères)</li>
+    </ul>
+
+    <h3>2.3 Données d'activité</h3>
+    <ul>
+        <li><strong>Concerts favoris</strong> : pour personnaliser votre expérience</li>
+        <li><strong>Commentaires</strong> : vos contributions sur les concerts</li>
+        <li><strong>Badges obtenus</strong> : récompenses liées à votre activité</li>
+    </ul>
+
+    <h3>2.4 Données de sécurité</h3>
+    <ul>
+        <li><strong>Historique de connexion</strong> : date, heure, adresse IP, navigateur (conservé 30 jours)</li>
+        <li><strong>Tentatives de connexion échouées</strong> : pour protéger votre compte contre les attaques</li>
+        <li><strong>Tokens de réinitialisation de mot de passe</strong> : valables 1 heure uniquement</li>
+    </ul>
+
+    <h2>3. Finalités du traitement</h2>
+    <p>Vos données sont utilisées pour :</p>
+    <ul>
+        <li>Gérer votre compte utilisateur et votre authentification</li>
+        <li>Vous permettre d'utiliser les fonctionnalités du site (favoris, commentaires, badges)</li>
+        <li>Vous envoyer des e-mails de réinitialisation de mot de passe</li>
+        <li>Assurer la sécurité de votre compte (détection d'attaques par force brute)</li>
+        <li>Améliorer nos services et l'expérience utilisateur</li>
+    </ul>
+
+    <h2>4. Base légale du traitement</h2>
+    <p>Le traitement de vos données repose sur :</p>
+    <ul>
+        <li><strong>Votre consentement</strong> : lors de votre inscription</li>
+        <li><strong>L'exécution du contrat</strong> : nécessaire pour fournir nos services</li>
+        <li><strong>Nos intérêts légitimes</strong> : sécurité et amélioration des services</li>
+    </ul>
+
+    <h2>5. Durée de conservation</h2>
+    <div class="rgpd-highlight">
+        <p><strong>Conservation des données :</strong></p>
+        <ul>
+            <li><strong>Compte actif</strong> : tant que votre compte existe</li>
+            <li><strong>Historique de connexion</strong> : 30 jours maximum</li>
+            <li><strong>Tokens de réinitialisation</strong> : 1 heure (suppression automatique après expiration)</li>
+            <li><strong>Après suppression de compte</strong> : toutes vos données sont définitivement supprimées</li>
+        </ul>
+    </div>
+
+    <h2>6. Vos droits (RGPD - Articles 15 à 22)</h2>
+    <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+
+    <h3>6.1 Droit d'accès (Article 15)</h3>
+    <p>Vous pouvez accéder à toutes vos données personnelles depuis votre profil utilisateur.</p>
+
+    <h3>6.2 Droit de rectification (Article 16)</h3>
+    <p>Vous pouvez modifier vos informations personnelles à tout moment depuis :</p>
+    <ul>
+        <li><a th:href="@{/user/profile/edit}">Modifier mon profil</a></li>
+        <li><a th:href="@{/user/profile/details}">Modifier mes informations détaillées</a></li>
+    </ul>
+
+    <h3>6.3 Droit à la portabilité (Article 20)</h3>
+    <p>Vous pouvez télécharger toutes vos données dans un format JSON structuré :</p>
+    <ul>
+        <li><a th:href="@{/user/export-data}">Exporter mes données (JSON)</a></li>
+    </ul>
+
+    <h3>6.4 Droit à l'effacement - "Droit à l'oubli" (Article 17)</h3>
+    <p>Vous pouvez supprimer définitivement votre compte et toutes vos données associées :</p>
+    <ul>
+        <li><a th:href="@{/user/delete-account}">Supprimer mon compte définitivement</a></li>
+    </ul>
+    <div class="rgpd-highlight">
+        <p><strong>⚠️ Attention :</strong> La suppression est irréversible. Toutes vos données (profil, favoris, commentaires, badges, historique) seront définitivement supprimées.</p>
+    </div>
+
+    <h3>6.5 Droit d'opposition (Article 21)</h3>
+    <p>Vous pouvez vous opposer au traitement de vos données à des fins de marketing direct (actuellement non applicable sur ce site).</p>
+
+    <h3>6.6 Droit de limitation (Article 18)</h3>
+    <p>Vous pouvez demander la limitation du traitement de vos données dans certaines circonstances.</p>
+
+    <h2>7. Sécurité des données</h2>
+    <p>Nous mettons en œuvre des mesures de sécurité robustes pour protéger vos données :</p>
+    <ul>
+        <li><strong>Chiffrement des mots de passe</strong> : BCrypt avec salt aléatoire</li>
+        <li><strong>Protection anti-brute force</strong> : blocage après 5 tentatives échouées (15 minutes)</li>
+        <li><strong>Validation stricte des mots de passe</strong> : 8 caractères minimum, majuscules, minuscules, chiffres, caractères spéciaux</li>
+        <li><strong>Protection CSRF</strong> : tokens anti-contrefaçon sur tous les formulaires</li>
+        <li><strong>En-têtes de sécurité HTTP</strong> : CSP, X-Frame-Options, HSTS, Referrer-Policy</li>
+        <li><strong>Tokens de réinitialisation sécurisés</strong> : UUID uniques, expiration 1 heure, usage unique</li>
+        <li><strong>HTTPS</strong> : toutes les communications sont chiffrées (recommandé en production)</li>
+    </ul>
+
+    <h2>8. Partage des données</h2>
+    <p><strong>Nous ne vendons ni ne partageons vos données personnelles avec des tiers.</strong></p>
+    <p>Vos données restent exclusivement sur nos serveurs et ne sont utilisées que pour les finalités décrites dans cette politique.</p>
+
+    <h2>9. Cookies</h2>
+    <p>Notre site utilise les cookies suivants :</p>
+    <ul>
+        <li><strong>Cookie de session (JSESSIONID)</strong> : nécessaire pour votre authentification (supprimé à la déconnexion)</li>
+        <li><strong>Cookie CSRF</strong> : protection contre les attaques par contrefaçon de requêtes</li>
+    </ul>
+    <p>Ces cookies sont essentiels au fonctionnement du site et ne nécessitent pas de consentement préalable (cookies strictement nécessaires).</p>
+
+    <h2>10. Modifications de la politique</h2>
+    <p>Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment. Les modifications seront publiées sur cette page avec une nouvelle date de mise à jour.</p>
+
+    <h2>11. Contact</h2>
+    <p>Pour toute question concernant cette politique ou l'exercice de vos droits RGPD, vous pouvez :</p>
+    <ul>
+        <li>Utiliser le formulaire de contact du site</li>
+        <li>Gérer directement vos données depuis votre profil utilisateur</li>
+    </ul>
+
+    <div class="rgpd-highlight">
+        <p><strong>📋 Récapitulatif de vos droits RGPD :</strong></p>
+        <ul>
+            <li>✅ Accéder à vos données : <a th:href="@{/user/profile}">Mon profil</a></li>
+            <li>✅ Modifier vos données : <a th:href="@{/user/profile/edit}">Modifier mon profil</a></li>
+            <li>✅ Exporter vos données : <a th:href="@{/user/export-data}">Télécharger (JSON)</a></li>
+            <li>✅ Supprimer vos données : <a th:href="@{/user/delete-account}">Supprimer mon compte</a></li>
+        </ul>
+    </div>
+
+    <a th:href="@{/}" class="back-link">← Retour à l'accueil</a>
+</div>
+
+</body>
+</html>
