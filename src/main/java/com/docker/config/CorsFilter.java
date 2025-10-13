@@ -13,7 +13,7 @@ import java.io.IOException;
  * Filtre CORS global qui s'exécute AVANT Spring Security
  * pour gérer les requêtes cross-origin sur les fichiers statiques
  */
-@Component
+@Component("customCorsFilter")
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter {
 
