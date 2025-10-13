@@ -38,6 +38,20 @@ public class VideoService {
         return videoRepository.findAll();
     }
 
+	/**
+	 * Récupère une vidéo par son ID
+	 */
+	public Video findById(Long id) {
+		return videoRepository.findById(id).orElse(null);
+	}
+
+	/**
+	 * Sauvegarde une vidéo
+	 */
+	public Video save(Video video) {
+		return videoRepository.save(video);
+	}
+
 	// Méthode pour sauvegarder une vidéo de type EMBED
 	public void saveEmbedVideo(String title, String embedCode) {
 		Video video = new Video();

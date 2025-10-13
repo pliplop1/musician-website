@@ -32,6 +32,20 @@ public class PhotoService {
 		return photoRepository.findAllByOrderByDisplayOrderAsc();
 	}
 
+	/**
+	 * Récupère une photo par son ID
+	 */
+	public Photo findById(Long id) {
+		return photoRepository.findById(id).orElse(null);
+	}
+
+	/**
+	 * Sauvegarde une photo
+	 */
+	public Photo save(Photo photo) {
+		return photoRepository.save(photo);
+	}
+
 	public void savePhoto(MultipartFile file) throws IOException {
 		if (file.isEmpty()) {
 			throw new IOException("Impossible de sauvegarder un fichier vide.");
