@@ -9,6 +9,7 @@ public record VideoDTO(
     String title,
     String videoType,      // "EMBED" ou "UPLOADED_FILE"
     String embedCode,      // Code embed YouTube/Vimeo si type = EMBED
-    String videoUrl        // URL du fichier uploadé si type = UPLOADED_FILE
+    String videoUrl,       // URL du fichier uploadé si type = UPLOADED_FILE
+    int likeCount          // Nombre de likes
 ) {
 }

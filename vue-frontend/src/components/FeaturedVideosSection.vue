@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useFeaturedContent } from '../composables/useFeaturedContent'
+import { useRotationCache } from '../composables/useRotationCache'
 import axios from 'axios'
 
 // Utilisation du composable pour la logique auto/manuel + cache 24h
@@ -16,6 +17,9 @@ const {
   cacheKey: 'featuredVideos',
   autoRotationFieldName: 'autoRotationEnabledVideos'
 })
+
+// Gestion du cache pour mettre à jour après un like/unlike
+const { getCachedData, setCachedData } = useRotationCache('featuredVideos')
 
 const selectedVideo = ref(null)
 const showModal = ref(false)
@@ -69,11 +73,23 @@ const toggleLike = async (video, event) => {
     if (isLiked) {
       await axios.delete(`/api/videos/${video.id}/like`)
       likedVideos.value.delete(video.id)
-      video.likeCount = Math.max(0, (video.likeCount || 0) - 1)
     } else {
       await axios.post(`/api/videos/${video.id}/like`)
       likedVideos.value.add(video.id)
-      video.likeCount = (video.likeCount || 0) + 1
+    }
+
+    // Recharger les données depuis le serveur pour avoir le compteur à jour
+    const response = await axios.get(`/api/public/videos/${video.id}`)
+    video.likeCount = response.data.likeCount
+
+    // Mettre à jour le cache avec le nouveau likeCount (sans supprimer le cache)
+    const cachedData = getCachedData()
+    if (cachedData && Array.isArray(cachedData)) {
+      const updatedCache = cachedData.map(v =>
+        v.id === video.id ? { ...v, likeCount: response.data.likeCount } : v
+      )
+      setCachedData(updatedCache)
+      console.log('💾 Cache mis à jour avec le nouveau likeCount')
     }
   } catch (error) {
     console.error('Erreur lors du like:', error)

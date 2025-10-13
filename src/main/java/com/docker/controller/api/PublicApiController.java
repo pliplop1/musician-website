@@ -411,6 +411,30 @@ public class PublicApiController {
     }
 
     /**
+     * Récupérer une vidéo par ID
+     */
+    @Operation(
+        summary = "Récupérer une vidéo par ID",
+        description = "Retourne une vidéo spécifique avec ses détails (compteur de likes inclus)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Vidéo récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = VideoDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Vidéo introuvable", content = @Content)
+    })
+    @GetMapping("/videos/{id}")
+    public ResponseEntity<VideoDTO> getVideoById(@PathVariable Long id) {
+        Video video = videoService.findById(id);
+
+        if (video == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        VideoDTO videoDTO = mapToVideoDTO(video);
+        return ResponseEntity.ok(videoDTO);
+    }
+
+    /**
      * Récupérer les tracks featured (1-3)
      */
     @Operation(
@@ -618,7 +642,8 @@ public class PublicApiController {
             video.getTitle(),
             video.getVideoType().toString(),
             video.getEmbedCode(),
-            video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null
+            video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null,
+            video.getLikeCount() != null ? video.getLikeCount() : 0
         );
     }
 }
