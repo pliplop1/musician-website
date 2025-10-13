@@ -185,6 +185,7 @@ public class SecurityConfig {
 						"/login", // Page de connexion
 						"/forgot-password", // Demande de réinitialisation de mot de passe
 						"/reset-password", // Réinitialisation de mot de passe avec token
+						"/privacy-policy", // Politique de confidentialité RGPD
 						"/css/**", // Fichiers CSS
 						"/js/**", // Fichiers JavaScript
 						"/images/**", // Images statiques
