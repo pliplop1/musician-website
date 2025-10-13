@@ -6,6 +6,8 @@ import java.util.Set;
 import com.docker.security.CustomAuthenticationFailureHandler;
 import com.docker.security.CustomAuthenticationSuccessHandler;
 import com.docker.security.LoginAttemptFilter;
+import com.docker.security.CsrfTokenLogger;
+import com.docker.security.ContentSecurityPolicyFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,15 +34,21 @@ public class SecurityConfig {
 	private final CustomAuthenticationSuccessHandler successHandler;
 	private final CustomAuthenticationFailureHandler failureHandler;
 	private final LoginAttemptFilter loginAttemptFilter;
+	private final CsrfTokenLogger csrfTokenLogger;
+	private final ContentSecurityPolicyFilter cspFilter;
 
 	public SecurityConfig(UserDetailsService userDetailsService,
 	                      CustomAuthenticationSuccessHandler successHandler,
 	                      CustomAuthenticationFailureHandler failureHandler,
-	                      LoginAttemptFilter loginAttemptFilter) {
+	                      LoginAttemptFilter loginAttemptFilter,
+	                      CsrfTokenLogger csrfTokenLogger,
+	                      ContentSecurityPolicyFilter cspFilter) {
 		this.userDetailsService = userDetailsService;
 		this.successHandler = successHandler;
 		this.failureHandler = failureHandler;
 		this.loginAttemptFilter = loginAttemptFilter;
+		this.csrfTokenLogger = csrfTokenLogger;
+		this.cspFilter = cspFilter;
 	}
 
 	/**
@@ -110,6 +118,40 @@ public class SecurityConfig {
 		// Activer CORS avec la configuration définie dans corsConfigurationSource()
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
+		// ========================================
+		// EN-TÊTES DE SÉCURITÉ HTTP
+		// ========================================
+		http.headers(headers -> headers
+			// X-Frame-Options: Protège contre les attaques de clickjacking
+			.frameOptions(frameOptions -> frameOptions.deny())
+
+			// X-Content-Type-Options: Empêche le navigateur de deviner le type MIME
+			.contentTypeOptions(contentTypeOptions -> contentTypeOptions.disable())
+
+			// X-XSS-Protection: Protection XSS (obsolète mais garde la compatibilité)
+			.xssProtection(xssProtection -> xssProtection
+				.headerValue(org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
+			)
+
+			// Strict-Transport-Security (HSTS): Force HTTPS (à activer en production)
+			// NOTE: Commenté pour le développement local
+			// .httpStrictTransportSecurity(hsts -> hsts
+			//     .maxAgeInSeconds(31536000)
+			//     .includeSubDomains(true)
+			//     .preload(true)
+			// )
+
+			// Referrer-Policy: Contrôle les informations envoyées dans l'en-tête Referer
+			.referrerPolicy(referrerPolicy -> referrerPolicy
+				.policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+			)
+
+			// Permissions-Policy: Contrôle les fonctionnalités du navigateur
+			.permissionsPolicy(permissionsPolicy -> permissionsPolicy
+				.policy("camera=(), microphone=(), geolocation=()")
+			)
+		);
+
 		// Désactiver CSRF pour les fichiers statiques et l'API publique
 		http.csrf(csrf -> csrf
 			.ignoringRequestMatchers(
@@ -141,6 +183,8 @@ public class SecurityConfig {
 						"/contact", // Formulaire de contact
 						"/register", // Page d'inscription
 						"/login", // Page de connexion
+						"/forgot-password", // Demande de réinitialisation de mot de passe
+						"/reset-password", // Réinitialisation de mot de passe avec token
 						"/css/**", // Fichiers CSS
 						"/js/**", // Fichiers JavaScript
 						"/images/**", // Images statiques
@@ -169,6 +213,12 @@ public class SecurityConfig {
 
 		// Ajouter le filtre anti-brute force AVANT le filtre d'authentification
 		http.addFilterBefore(loginAttemptFilter, UsernamePasswordAuthenticationFilter.class);
+
+		// Ajouter le filtre de logging CSRF pour le debugging (en développement)
+		http.addFilterAfter(csrfTokenLogger, UsernamePasswordAuthenticationFilter.class);
+
+		// Ajouter le filtre Content Security Policy
+		http.addFilterAfter(cspFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
