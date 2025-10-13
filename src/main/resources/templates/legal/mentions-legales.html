@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentions Légales - Duo Black & White</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            background: #fff;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .legal-container h1 {
+            color: #000;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #4a90e2;
+            padding-bottom: 0.5rem;
+        }
+
+        .legal-container h2 {
+            color: #000;
+            font-size: 1.75rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-container h3 {
+            color: #333;
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .legal-container p {
+            margin-bottom: 1rem;
+        }
+
+        .legal-container ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-container li {
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box {
+            background: #f0f8ff;
+            border-left: 4px solid #4a90e2;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: #4a90e2;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #357abd;
+        }
+
+        .update-date {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        .company-info {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/layout :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="legal-container">
+        <h1>Mentions Légales</h1>
+        <p class="update-date">Dernière mise à jour : 13 octobre 2025</p>
+
+        <p>Conformément aux dispositions des articles 6-III et 19 de la Loi n° 2004-575 du 21 juin 2004 pour la Confiance dans l'économie numérique, dite L.C.E.N., nous portons à la connaissance des utilisateurs et visiteurs du site <strong>duoblackandwhite.fr</strong> les informations suivantes :</p>
+
+        <h2>1. Éditeur du site</h2>
+        <div class="company-info">
+            <p><strong>Raison sociale :</strong> Duo Black & White SARL<br>
+            <strong>Forme juridique :</strong> Société à Responsabilité Limitée (SARL)<br>
+            <strong>Capital social :</strong> 10 000 euros<br>
+            <strong>Siège social :</strong> 123 rue de la Musique, 75000 Paris, France<br>
+            <strong>SIRET :</strong> 123 456 789 00012<br>
+            <strong>RCS :</strong> Paris B 123 456 789<br>
+            <strong>Code APE :</strong> 9001Z (Arts du spectacle vivant)<br>
+            <strong>TVA intracommunautaire :</strong> FR 12 123456789</p>
+
+            <p><strong>Téléphone :</strong> +33 1 23 45 67 89<br>
+            <strong>Email :</strong> <a href="mailto:contact@duoblackandwhite.fr">contact@duoblackandwhite.fr</a></p>
+
+            <p><strong>Directeur de la publication :</strong> Duo Black & White<br>
+            <strong>Email du directeur :</strong> <a href="mailto:direction@duoblackandwhite.fr">direction@duoblackandwhite.fr</a></p>
+        </div>
+
+        <h2>2. Hébergement du site</h2>
+        <div class="company-info">
+            <p><strong>Hébergeur :</strong> OVH SAS<br>
+            <strong>Siège social :</strong> 2 rue Kellermann, 59100 Roubaix, France<br>
+            <strong>Téléphone :</strong> 1007 (depuis la France)<br>
+            <strong>Site web :</strong> <a href="https://www.ovh.com" target="_blank" rel="noopener noreferrer">www.ovh.com</a></p>
+        </div>
+
+        <h2>3. Données personnelles (RGPD)</h2>
+        <p>Le site <strong>duoblackandwhite.fr</strong> collecte et traite des données personnelles conformément au Règlement Général sur la Protection des Données (RGPD - UE 2016/679).</p>
+
+        <div class="info-box">
+            <p><strong>Déclaration CNIL :</strong> Déclaration n° XXXXXXXX (en cours d'obtention)</p>
+            <p><strong>Responsable du traitement des données :</strong> Duo Black & White SARL</p>
+            <p><strong>Contact DPO :</strong> <a href="mailto:privacy@duoblackandwhite.fr">privacy@duoblackandwhite.fr</a></p>
+        </div>
+
+        <p>Pour en savoir plus sur vos droits et la gestion de vos données personnelles, consultez notre <a th:href="@{/privacy-policy}">Politique de Confidentialité</a>.</p>
+
+        <h2>4. Propriété intellectuelle</h2>
+        <p>L'ensemble du contenu de ce site (textes, images, photographies, vidéos, musiques, logos, graphismes, etc.) est la propriété exclusive de <strong>Duo Black & White SARL</strong> ou fait l'objet d'une autorisation d'utilisation.</p>
+
+        <p><strong>Reproduction interdite :</strong> Toute reproduction, représentation, modification, publication, transmission, dénaturation, totale ou partielle du site ou de son contenu, par quelque procédé que ce soit, et sur quelque support que ce soit est interdite sans l'autorisation écrite préalable de Duo Black & White.</p>
+
+        <h3>4.1 Exceptions</h3>
+        <p>Sont autorisés :</p>
+        <ul>
+            <li>Les citations courtes à usage pédagogique ou d'information avec mention de la source</li>
+            <li>Le partage sur les réseaux sociaux via les boutons de partage prévus à cet effet</li>
+            <li>L'intégration des players Spotify/YouTube fournis par nos soins</li>
+        </ul>
+
+        <h3>4.2 Contenu musical</h3>
+        <p>Toutes les compositions musicales, enregistrements, arrangements et paroles sont protégés par le droit d'auteur et sont déposés à la <strong>SACEM</strong> (Société des Auteurs, Compositeurs et Éditeurs de Musique).</p>
+
+        <h3>4.3 Marque</h3>
+        <p>La dénomination <strong>"DUO BLACK & WHITE"</strong> et le logo associé sont des marques déposées auprès de l'INPI (Institut National de la Propriété Industrielle). Toute utilisation non autorisée est passible de poursuites.</p>
+
+        <h2>5. Liens hypertextes</h2>
+        <h3>5.1 Liens sortants</h3>
+        <p>Notre site peut contenir des liens vers des sites externes (Spotify, YouTube, billetteries, etc.). Nous n'exerçons aucun contrôle sur ces sites et déclinons toute responsabilité quant à leur contenu ou leurs pratiques de confidentialité.</p>
+
+        <h3>5.2 Liens entrants</h3>
+        <p>La création de liens hypertextes vers notre site est autorisée, sous réserve :</p>
+        <ul>
+            <li>Que le lien pointe vers la page d'accueil ou une page de contenu (pas de deep linking frauduleux)</li>
+            <li>Que le site tiers ne contienne pas de contenu illégal, diffamatoire ou contraire aux bonnes mœurs</li>
+            <li>Qu'aucun cadre (frame) ne soit utilisé pour afficher notre contenu</li>
+        </ul>
+
+        <h2>6. Responsabilité</h2>
+        <p><strong>Duo Black & White</strong> s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur ce site. Toutefois, nous déclinons toute responsabilité en cas d'erreur, d'omission ou de résultat obtenu suite à l'utilisation de ces informations.</p>
+
+        <h3>6.1 Disponibilité du site</h3>
+        <p>Nous ne garantissons pas la disponibilité continue du site. Des interruptions peuvent survenir pour des raisons de maintenance, de mise à jour ou de force majeure. Nous ne saurions être tenus responsables des préjudices résultant de l'indisponibilité temporaire ou permanente du site.</p>
+
+        <h3>6.2 Sécurité</h3>
+        <p>Malgré les mesures de sécurité mises en place, nous ne pouvons garantir une sécurité absolue. L'utilisateur reconnaît que l'utilisation d'Internet comporte des risques et dégage le site de toute responsabilité en cas d'atteinte à la sécurité de ses données.</p>
+
+        <h2>7. Cookies</h2>
+        <p>Notre site utilise des cookies et technologies similaires pour améliorer votre expérience. Pour en savoir plus : <a th:href="@{/cookies}">Politique des cookies</a></p>
+
+        <h2>8. Droit applicable et juridiction compétente</h2>
+        <p>Les présentes mentions légales sont régies par le droit français.</p>
+        <p>En cas de litige et à défaut d'accord amiable, le différend sera porté devant les tribunaux compétents du ressort de Paris, France.</p>
+
+        <h2>9. Médiation</h2>
+        <p>Conformément à l'article L.612-1 du Code de la consommation, en cas de litige, vous pouvez recourir gratuitement à un médiateur de la consommation :</p>
+        <div class="company-info">
+            <p><strong>Médiateur de la consommation</strong><br>
+            Centre de Médiation et d'Arbitrage de Paris (CMAP)<br>
+            39 avenue Franklin D. Roosevelt, 75008 Paris<br>
+            Site web : <a href="https://www.cmap.fr" target="_blank" rel="noopener noreferrer">www.cmap.fr</a></p>
+        </div>
+
+        <h2>10. Crédits</h2>
+        <ul>
+            <li><strong>Conception et développement :</strong> Duo Black & White</li>
+            <li><strong>Technologies :</strong> Spring Boot 3, Vue.js 3, MariaDB</li>
+            <li><strong>Photographies :</strong> © Duo Black & White (sauf mentions contraires)</li>
+            <li><strong>Musiques :</strong> © Duo Black & White - SACEM</li>
+        </ul>
+
+        <h2>11. Contact</h2>
+        <p>Pour toute question concernant les mentions légales, vous pouvez nous contacter :</p>
+        <ul>
+            <li>Par email : <a href="mailto:contact@duoblackandwhite.fr">contact@duoblackandwhite.fr</a></li>
+            <li>Par courrier : Duo Black & White SARL, 123 rue de la Musique, 75000 Paris</li>
+            <li>Par téléphone : +33 1 23 45 67 89</li>
+        </ul>
+
+        <a th:href="@{/}" class="back-link">Retour à l'accueil</a>
+    </main>
+
+    <!-- Footer (optionnel) -->
+</body>
+</html>

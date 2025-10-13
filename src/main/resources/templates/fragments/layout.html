@@ -22,7 +22,7 @@
                         <!-- Avatar avec image si disponible -->
                         <div th:if="${currentUser != null && currentUser.avatarFilename != null}" class="user-avatar-img">
                             <img th:src="@{/uploaded-avatars/{filename}(filename=${currentUser.avatarFilename})}"
-                                 alt="Avatar">
+                                 th:alt="'Avatar de ' + ${currentUser.username}">
                         </div>
 
                         <!-- Avatar avec initiales sinon -->

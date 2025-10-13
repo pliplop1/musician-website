@@ -33,8 +33,24 @@ const closeModal = () => {
   document.body.style.overflow = ''
 }
 
-// Charger les photos au montage
-loadFeaturedContent()
+// Gestion de la touche Échap pour fermer le modal
+const handleKeydown = (event) => {
+  if (event.key === 'Escape' && showModal.value) {
+    closeModal()
+  }
+}
+
+// Ajouter l'écouteur d'événement au montage
+import { onMounted, onUnmounted } from 'vue'
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+  loadFeaturedContent()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
@@ -82,12 +98,24 @@ loadFeaturedContent()
 
     <!-- Modal pour afficher la photo en plein écran -->
     <Teleport to="body">
-      <div v-if="showModal" class="photo-modal" @click.self="closeModal">
+      <div
+        v-if="showModal"
+        class="photo-modal"
+        @click.self="closeModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-photo-title">
         <div class="modal-content">
-          <button class="modal-close" @click="closeModal" aria-label="Fermer la photo">
+          <button
+            class="modal-close"
+            @click="closeModal"
+            aria-label="Fermer la photo (Échap)">
             <i class="fas fa-times" aria-hidden="true"></i>
           </button>
           <div class="modal-photo-wrapper">
+            <h2 id="modal-photo-title" class="sr-only">
+              {{ selectedPhoto?.caption || 'Photo en grand format' }}
+            </h2>
             <img
               v-if="selectedPhoto"
               :src="selectedPhoto.url"
@@ -435,6 +463,19 @@ loadFeaturedContent()
 
 .photo-card:nth-child(3) {
   animation-delay: 0.3s;
+}
+
+/* Classe pour lecteurs d'écran uniquement (RGAA) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Responsive */

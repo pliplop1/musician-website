@@ -18,8 +18,8 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div th:each="photo : ${photos}">
-                <img th:src="@{/uploaded-photos/{filename}(filename=${photo.filename})}" 
-                     alt="Photo de la galerie" 
+                <img th:src="@{/uploaded-photos/{filename}(filename=${photo.filename})}"
+                     th:alt="'Photo de galerie - ' + ${photo.filename}"
                      class="w-full h-64 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
             </div>
         </div>
@@ -32,9 +32,11 @@
             <a th:each="link : ${enabledSocialLinks}"
                th:href="${link.url}"
                target="_blank"
+               rel="noopener noreferrer"
                class="hover:text-white transition-colors flex items-center gap-2"
+               th:aria-label="'Visiter notre page ' + ${link.name} + ' (ouvre dans un nouvel onglet)'"
                th:title="${link.name}">
-                <i th:class="${link.icon} + ' text-xl'"></i>
+                <i th:class="${link.icon} + ' text-xl'" aria-hidden="true"></i>
                 <span th:text="${link.name}"></span>
             </a>
         </div>

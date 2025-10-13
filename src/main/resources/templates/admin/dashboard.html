@@ -69,7 +69,9 @@
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="grid grid-cols-3 gap-2">
                         <div th:each="p : ${photos.subList(0, T(java.lang.Math).min(photos.size(), 6))}">
-                            <img th:src="@{/uploaded-photos/{filename}(filename=${p.filename})}" class="rounded object-cover h-24 w-full">
+                            <img th:src="@{/uploaded-photos/{filename}(filename=${p.filename})}"
+                                 th:alt="'Photo de galerie - ' + ${p.filename}"
+                                 class="rounded object-cover h-24 w-full">
                         </div>
                     </div>
                     <a th:href="@{/admin/photos}" class="text-indigo-600 hover:underline mt-4 inline-block">→ Gérer la galerie</a>

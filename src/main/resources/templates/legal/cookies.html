@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique des Cookies - Duo Black & White</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            background: #fff;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .legal-container h1 {
+            color: #000;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #4a90e2;
+            padding-bottom: 0.5rem;
+        }
+
+        .legal-container h2 {
+            color: #000;
+            font-size: 1.75rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-container h3 {
+            color: #333;
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .legal-container p {
+            margin-bottom: 1rem;
+        }
+
+        .legal-container ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-container li {
+            margin-bottom: 0.5rem;
+        }
+
+        .cookie-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .cookie-table th,
+        .cookie-table td {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .cookie-table th {
+            background: #4a90e2;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .cookie-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .info-box {
+            background: #f0f8ff;
+            border-left: 4px solid #4a90e2;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: #4a90e2;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #357abd;
+        }
+
+        .update-date {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/layout :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="legal-container">
+        <h1>Politique des Cookies</h1>
+        <p class="update-date">Dernière mise à jour : 13 octobre 2025</p>
+
+        <div class="info-box">
+            <p>Cette page explique comment <strong>Duo Black & White</strong> utilise les cookies et technologies similaires (localStorage, sessionStorage) sur le site <strong>duoblackandwhite.fr</strong>.</p>
+        </div>
+
+        <h2>1. Qu'est-ce qu'un cookie ?</h2>
+        <p>Un cookie est un petit fichier texte stocké sur votre appareil (ordinateur, smartphone, tablette) lorsque vous visitez un site web. Il permet au site de mémoriser vos actions et préférences sur une période donnée.</p>
+
+        <p>Les cookies peuvent être :</p>
+        <ul>
+            <li><strong>Cookies de session</strong> : temporaires, supprimés à la fermeture du navigateur</li>
+            <li><strong>Cookies persistants</strong> : conservés sur votre appareil pendant une durée déterminée</li>
+        </ul>
+
+        <h2>2. Types de cookies utilisés sur notre site</h2>
+
+        <h3>2.1 Cookies strictement nécessaires (non soumis au consentement)</h3>
+        <p>Ces cookies sont essentiels au fonctionnement du site et ne peuvent pas être désactivés.</p>
+
+        <table class="cookie-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Finalité</th>
+                    <th>Durée</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>JSESSIONID</strong></td>
+                    <td>Maintien de la session utilisateur (authentification)</td>
+                    <td>Session (supprimé à la déconnexion)</td>
+                    <td>Cookie HTTP</td>
+                </tr>
+                <tr>
+                    <td><strong>cookie-consent</strong></td>
+                    <td>Mémorisation de votre choix concernant les cookies</td>
+                    <td>12 mois</td>
+                    <td>localStorage</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.2 Cookies de performance et fonctionnalité</h3>
+        <p>Ces cookies améliorent l'expérience utilisateur en mémorisant vos préférences.</p>
+
+        <table class="cookie-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Finalité</th>
+                    <th>Durée</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>featuredVideosCache</strong></td>
+                    <td>Mise en cache des vidéos featured pour améliorer les performances</td>
+                    <td>24 heures</td>
+                    <td>localStorage</td>
+                </tr>
+                <tr>
+                    <td><strong>featuredTracksCache</strong></td>
+                    <td>Mise en cache des morceaux featured pour améliorer les performances</td>
+                    <td>24 heures</td>
+                    <td>localStorage</td>
+                </tr>
+                <tr>
+                    <td><strong>featuredPhotosCache</strong></td>
+                    <td>Mise en cache des photos featured pour améliorer les performances</td>
+                    <td>24 heures</td>
+                    <td>localStorage</td>
+                </tr>
+                <tr>
+                    <td><strong>theme-preference</strong></td>
+                    <td>Mémorisation du thème choisi (clair/sombre) - future fonctionnalité</td>
+                    <td>12 mois</td>
+                    <td>localStorage</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.3 Cookies tiers (embeds externes)</h3>
+        <p>Notre site intègre des contenus externes qui peuvent déposer leurs propres cookies :</p>
+
+        <table class="cookie-table">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Finalité</th>
+                    <th>Politique de confidentialité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>YouTube</strong></td>
+                    <td>Lecture de vidéos intégrées</td>
+                    <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Politique YouTube</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Spotify</strong></td>
+                    <td>Lecture de morceaux intégrés</td>
+                    <td><a href="https://www.spotify.com/fr/privacy" target="_blank" rel="noopener noreferrer">Politique Spotify</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="warning-box">
+            <p><strong>Note importante :</strong> Ces services tiers peuvent déposer des cookies analytiques ou publicitaires. Nous n'avons aucun contrôle sur ces cookies. Nous vous recommandons de consulter leurs politiques de confidentialité respectives.</p>
+        </div>
+
+        <h2>3. Ce que nous n'utilisons PAS</h2>
+        <div class="info-box">
+            <p>Pour votre tranquillité d'esprit, voici ce que <strong>nous n'utilisons absolument pas</strong> :</p>
+            <ul>
+                <li><strong>Aucun cookie publicitaire</strong> (Google Ads, Meta Pixel, etc.)</li>
+                <li><strong>Aucun tracker de réseaux sociaux</strong> (Facebook Like, Twitter Follow, etc.)</li>
+                <li><strong>Aucun outil d'analytics tiers</strong> (Google Analytics, Matomo, etc.)</li>
+                <li><strong>Aucun cookie de profilage comportemental</strong></li>
+                <li><strong>Aucune revente de données</strong> à des tiers</li>
+            </ul>
+        </div>
+
+        <h2>4. localStorage et sessionStorage</h2>
+        <p>En plus des cookies, nous utilisons les technologies HTML5 suivantes :</p>
+
+        <h3>4.1 localStorage</h3>
+        <p>Stockage local persistant utilisé pour :</p>
+        <ul>
+            <li>Mise en cache des contenus featured (vidéos, tracks, photos) : 24h</li>
+            <li>Mémorisation du consentement cookies : 12 mois</li>
+            <li>Préférences utilisateur (thème, langue) : 12 mois</li>
+        </ul>
+
+        <h3>4.2 sessionStorage</h3>
+        <p>Stockage temporaire (supprimé à la fermeture de l'onglet) pour :</p>
+        <ul>
+            <li>État de navigation temporaire (page courante, filtres actifs)</li>
+            <li>Données de formulaire en cours de saisie (éviter la perte de données)</li>
+        </ul>
+
+        <h2>5. Gestion de vos préférences</h2>
+
+        <h3>5.1 Paramétrage du navigateur</h3>
+        <p>Vous pouvez configurer votre navigateur pour accepter ou refuser les cookies :</p>
+        <ul>
+            <li><strong>Google Chrome :</strong> Paramètres > Confidentialité et sécurité > Cookies</li>
+            <li><strong>Firefox :</strong> Préférences > Vie privée et sécurité > Cookies</li>
+            <li><strong>Safari :</strong> Préférences > Confidentialité > Bloquer les cookies</li>
+            <li><strong>Edge :</strong> Paramètres > Confidentialité > Cookies</li>
+        </ul>
+
+        <div class="warning-box">
+            <p><strong>Attention :</strong> Le blocage des cookies strictement nécessaires (JSESSIONID) empêchera la connexion au site.</p>
+        </div>
+
+        <h3>5.2 Suppression des cookies</h3>
+        <p>Vous pouvez supprimer les cookies existants à tout moment depuis les paramètres de votre navigateur.</p>
+
+        <h3>5.3 Banner de consentement</h3>
+        <p>Lors de votre première visite, un banner vous demande votre consentement pour les cookies non essentiels. Vous pouvez modifier votre choix à tout moment en cliquant sur le lien "Gérer les cookies" en bas de page.</p>
+
+        <h2>6. Durée de conservation</h2>
+        <table class="cookie-table">
+            <thead>
+                <tr>
+                    <th>Type de donnée</th>
+                    <th>Durée</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cookies de session (JSESSIONID)</td>
+                    <td>Jusqu'à déconnexion</td>
+                </tr>
+                <tr>
+                    <td>Consentement cookies</td>
+                    <td>12 mois</td>
+                </tr>
+                <tr>
+                    <td>Cache featured content</td>
+                    <td>24 heures</td>
+                </tr>
+                <tr>
+                    <td>Préférences utilisateur</td>
+                    <td>12 mois</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>7. Finalité des cookies</h2>
+        <p>Nos cookies sont utilisés pour :</p>
+        <ul>
+            <li><strong>Sécurité :</strong> maintenir votre session utilisateur de manière sécurisée</li>
+            <li><strong>Performance :</strong> réduire le nombre de requêtes serveur grâce au cache</li>
+            <li><strong>Fonctionnalité :</strong> mémoriser vos préférences d'affichage</li>
+            <li><strong>Conformité légale :</strong> enregistrer votre consentement RGPD</li>
+        </ul>
+
+        <h2>8. Base légale</h2>
+        <p>Conformément au RGPD et à la directive ePrivacy :</p>
+        <ul>
+            <li><strong>Cookies strictement nécessaires :</strong> exemptés de consentement (intérêt légitime)</li>
+            <li><strong>Cookies de performance :</strong> soumis à votre consentement préalable</li>
+            <li><strong>Cookies tiers :</strong> soumis à votre consentement (responsabilité du tiers)</li>
+        </ul>
+
+        <h2>9. Droits des utilisateurs</h2>
+        <p>Vous disposez des droits suivants concernant les cookies :</p>
+        <ul>
+            <li><strong>Droit d'être informé</strong> : cette page vous informe de l'utilisation des cookies</li>
+            <li><strong>Droit de choisir</strong> : vous pouvez accepter ou refuser les cookies via le banner</li>
+            <li><strong>Droit de supprimer</strong> : vous pouvez supprimer les cookies à tout moment</li>
+            <li><strong>Droit de retirer le consentement</strong> : vous pouvez changer d'avis à tout moment</li>
+        </ul>
+
+        <h2>10. Modifications de la politique</h2>
+        <p>Nous pouvons modifier cette politique de cookies à tout moment. La date de dernière mise à jour est indiquée en haut de cette page. Nous vous recommandons de consulter régulièrement cette page.</p>
+
+        <h2>11. Contact</h2>
+        <p>Pour toute question concernant notre utilisation des cookies :</p>
+        <ul>
+            <li>Email : <a href="mailto:privacy@duoblackandwhite.fr">privacy@duoblackandwhite.fr</a></li>
+            <li>Courrier : Duo Black & White, 123 rue de la Musique, 75000 Paris</li>
+        </ul>
+
+        <h2>12. Ressources utiles</h2>
+        <ul>
+            <li><a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs" target="_blank" rel="noopener noreferrer">CNIL - Guide des cookies</a></li>
+            <li><a href="https://www.allaboutcookies.org/fr/" target="_blank" rel="noopener noreferrer">All About Cookies</a></li>
+            <li><a th:href="@{/privacy-policy}">Notre Politique de Confidentialité</a></li>
+        </ul>
+
+        <a th:href="@{/}" class="back-link">Retour à l'accueil</a>
+    </main>
+
+    <!-- Footer (optionnel) -->
+</body>
+</html>

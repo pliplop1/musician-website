@@ -275,12 +275,24 @@ public class UserService {
         if (user == null) {
             throw new IllegalArgumentException("Utilisateur non trouvé.");
         }
-        
+
         if (user.getAvatarFilename() != null) {
             Path fileToDelete = avatarLocation.resolve(user.getAvatarFilename());
             Files.deleteIfExists(fileToDelete);
             user.setAvatarFilename(null);
             userRepository.save(user);
         }
+    }
+
+    /**
+     * Vérifie si le mot de passe fourni correspond au mot de passe de l'utilisateur
+     * Utilisé pour la confirmation avant suppression de compte (RGPD)
+     *
+     * @param user Utilisateur
+     * @param rawPassword Mot de passe en clair à vérifier
+     * @return true si le mot de passe correspond, false sinon
+     */
+    public boolean verifyPassword(User user, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, user.getPassword());
     }
 }

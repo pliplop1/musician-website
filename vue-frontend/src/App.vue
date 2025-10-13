@@ -60,9 +60,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app" lang="fr">
+    <!-- Skip link pour l'accessibilité -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
     <!-- Navigation Bar -->
-    <nav :class="['navbar', { 'scrolled': isScrolled }]">
+    <nav :class="['navbar', { 'scrolled': isScrolled }]" role="navigation" aria-label="Navigation principale">
       <div class="nav-container">
         <div class="nav-logo">DUO BLACK & WHITE</div>
 
@@ -126,7 +129,7 @@ onMounted(() => {
     </nav>
 
     <!-- Sections -->
-    <main>
+    <main id="main-content" role="main">
       <HeroSection id="hero" />
       <FeaturedVideosSection id="videos" />
       <FeaturedTracksSection id="music" />
@@ -136,13 +139,18 @@ onMounted(() => {
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" role="contentinfo">
       <div class="footer-content">
         <p>&copy; 2025 Duo Black & White. Tous droits réservés.</p>
         <div class="social-links">
-          <a href="https://www.facebook.com/DuoBlackandWhiteMP/" target="_blank">Facebook</a>
-          <a href="mailto:dumoulin.marilyne@gmail.com">Email</a>
-          <a href="tel:0601234547">Téléphone</a>
+          <a href="https://www.facebook.com/DuoBlackandWhiteMP/" target="_blank" rel="noopener noreferrer" aria-label="Suivez-nous sur Facebook (ouvre dans un nouvel onglet)">Facebook</a>
+          <a href="mailto:dumoulin.marilyne@gmail.com" aria-label="Envoyez-nous un email">Email</a>
+          <a href="tel:0601234547" aria-label="Appelez-nous au 06 01 23 45 47">Téléphone</a>
+        </div>
+        <div class="legal-links" style="margin-top: 1.5rem;">
+          <a href="http://localhost:8106/privacy-policy" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Politique de confidentialité</a> |
+          <a href="http://localhost:8106/mentions-legales" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Mentions légales</a> |
+          <a href="http://localhost:8106/cookies" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Cookies</a>
         </div>
       </div>
     </footer>
@@ -421,6 +429,24 @@ main {
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+}
+
+/* Skip link (RGAA) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #4a90e2;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 10000;
+  border-radius: 0 0 8px 0;
+  font-weight: bold;
+}
+
+.skip-link:focus {
+  top: 0;
 }
 
 /* Auth Buttons Styling */
