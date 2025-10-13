@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useFeaturedContent } from '../composables/useFeaturedContent'
+import { useRotationCache } from '../composables/useRotationCache'
+import axios from 'axios'
 
 // Utilisation du composable pour la logique auto/manuel + cache 24h
 const {
@@ -16,11 +18,40 @@ const {
   autoRotationFieldName: 'autoRotationEnabledGallery'
 })
 
+// Gestion du cache pour mettre à jour après un like/unlike
+const { getCachedData, setCachedData } = useRotationCache('featuredPhotos')
+
 const selectedPhoto = ref(null)
 const showModal = ref(false)
+const isAuthenticated = ref(false)
+const likedPhotos = ref(new Set())
+
+// Incrémenter le compteur de vues
+const incrementView = async (photo) => {
+  try {
+    await axios.post(`/api/photos/${photo.id}/view`)
+
+    // Recharger le viewCount depuis le serveur
+    const response = await axios.get(`/api/public/photos/${photo.id}`)
+    photo.viewCount = response.data.viewCount
+
+    // Mettre à jour le cache avec le nouveau viewCount
+    const cachedData = getCachedData()
+    if (cachedData && Array.isArray(cachedData)) {
+      const updatedCache = cachedData.map(p =>
+        p.id === photo.id ? { ...p, viewCount: response.data.viewCount } : p
+      )
+      setCachedData(updatedCache)
+      console.log('💾 Cache mis à jour avec le nouveau viewCount')
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'incrémentation des vues:', error)
+  }
+}
 
 // Ouvrir la photo dans un modal
 const openPhoto = (photo) => {
+  incrementView(photo)
   selectedPhoto.value = photo
   showModal.value = true
   document.body.style.overflow = 'hidden'
@@ -33,6 +64,71 @@ const closeModal = () => {
   document.body.style.overflow = ''
 }
 
+// Liker/unliker une photo
+const toggleLike = async (photo, event) => {
+  event.stopPropagation()
+
+  if (!isAuthenticated.value) {
+    alert('Vous devez être connecté pour liker une photo')
+    return
+  }
+
+  try {
+    const isLiked = likedPhotos.value.has(photo.id)
+
+    if (isLiked) {
+      await axios.delete(`/api/photos/${photo.id}/like`)
+      likedPhotos.value.delete(photo.id)
+    } else {
+      await axios.post(`/api/photos/${photo.id}/like`)
+      likedPhotos.value.add(photo.id)
+    }
+
+    // Recharger les données depuis le serveur pour avoir le compteur à jour
+    const response = await axios.get(`/api/public/photos/${photo.id}`)
+    photo.likeCount = response.data.likeCount
+
+    // Mettre à jour le cache avec le nouveau likeCount (sans supprimer le cache)
+    const cachedData = getCachedData()
+    if (cachedData && Array.isArray(cachedData)) {
+      const updatedCache = cachedData.map(p =>
+        p.id === photo.id ? { ...p, likeCount: response.data.likeCount } : p
+      )
+      setCachedData(updatedCache)
+      console.log('💾 Cache mis à jour avec le nouveau likeCount')
+    }
+  } catch (error) {
+    console.error('Erreur lors du like:', error)
+    if (error.response?.status === 401) {
+      isAuthenticated.value = false
+      alert('Session expirée, veuillez vous reconnecter')
+    }
+  }
+}
+
+// Vérifier l'authentification et charger les likes
+const checkAuth = async () => {
+  try {
+    const response = await axios.get('/api/user/current')
+    isAuthenticated.value = !!response.data
+
+    if (isAuthenticated.value) {
+      for (const photo of photos.value) {
+        try {
+          const likeStatus = await axios.get(`/api/photos/${photo.id}/like-status`)
+          if (likeStatus.data.liked) {
+            likedPhotos.value.add(photo.id)
+          }
+        } catch (err) {
+          console.error('Erreur chargement status like:', err)
+        }
+      }
+    }
+  } catch (error) {
+    isAuthenticated.value = false
+  }
+}
+
 // Gestion de la touche Échap pour fermer le modal
 const handleKeydown = (event) => {
   if (event.key === 'Escape' && showModal.value) {
@@ -43,9 +139,10 @@ const handleKeydown = (event) => {
 // Ajouter l'écouteur d'événement au montage
 import { onMounted, onUnmounted } from 'vue'
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('keydown', handleKeydown)
-  loadFeaturedContent()
+  await loadFeaturedContent()
+  await checkAuth()
 })
 
 onUnmounted(() => {
@@ -82,6 +179,19 @@ onUnmounted(() => {
             <div class="hover-overlay">
               <i class="fas fa-search-plus"></i>
             </div>
+          </div>
+          <div class="photo-card-footer">
+            <span class="view-count-badge" :title="`${photo.viewCount || 0} vues`">
+              <i class="fas fa-eye"></i>
+              <span>{{ photo.viewCount || 0 }}</span>
+            </span>
+            <button
+              @click="toggleLike(photo, $event)"
+              :class="['like-button', { 'liked': likedPhotos.has(photo.id) }]"
+              :title="likedPhotos.has(photo.id) ? 'Retirer le like' : 'Aimer cette photo'">
+              <i :class="likedPhotos.has(photo.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+              <span>{{ photo.likeCount || 0 }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -244,6 +354,82 @@ onUnmounted(() => {
 .hover-overlay i {
   font-size: 3rem;
   color: #fff;
+}
+
+.photo-card-footer {
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Badge de compteur de vues */
+.view-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 15px;
+  color: #60a5fa;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.view-count-badge:hover {
+  background: rgba(59, 130, 246, 0.25);
+  transform: scale(1.05);
+}
+
+.like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.like-button:hover {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.3);
+  color: #a855f7;
+  transform: scale(1.05);
+}
+
+.like-button.liked {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #a855f7;
+}
+
+.like-button.liked i {
+  color: #a855f7;
+  animation: heartBeat 0.5s ease;
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.25);
+  }
 }
 
 /* Bouton Voir toute la galerie */

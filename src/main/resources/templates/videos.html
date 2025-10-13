@@ -196,17 +196,104 @@
             line-height: 1.4;
         }
 
+        .video-meta {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            position: relative !important;
+        }
+
         .video-type-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.8rem;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            padding: 0.4rem 0.8rem !important;
+            background: rgba(239, 68, 68, 0.15) !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            border-radius: 15px !important;
+            color: #f87171 !important;
+            font-size: 0.8rem !important;
+            width: fit-content !important;
+            position: relative !important;
+        }
+
+        .like-button {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.4rem !important;
+            padding: 0.4rem 0.8rem !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 15px !important;
+            color: #9ca3af !important;
+            font-size: 0.85rem !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            font-weight: 600 !important;
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+        }
+
+        .like-button:hover {
             background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 15px;
-            color: #f87171;
-            font-size: 0.8rem;
-            width: fit-content;
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            transform: scale(1.05);
+        }
+
+        .like-button.liked {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+
+        .like-button.liked i {
+            color: #ef4444;
+            animation: heartBeat 0.5s ease;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.3);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            75% {
+                transform: scale(1.25);
+            }
+        }
+
+        /* Badge du compteur de vues */
+        .view-count-badge {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.4rem !important;
+            padding: 0.4rem 0.8rem !important;
+            background: rgba(59, 130, 246, 0.15) !important;
+            border: 1px solid rgba(59, 130, 246, 0.3) !important;
+            border-radius: 15px !important;
+            color: #60a5fa !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+        }
+
+        .view-count-badge i {
+            color: #60a5fa;
         }
 
         /* Modal */
@@ -547,6 +634,8 @@ let allVideos = [];
 let filteredVideos = [];
 let currentPage = 1;
 const videosPerPage = 9;
+let isAuthenticated = false;
+let likedVideos = new Set();
 
 // Extraire l'ID YouTube depuis l'URL embed
 function getYouTubeId(embedCode) {
@@ -603,22 +692,50 @@ function displayVideos(videos) {
             </div>
             <div class="video-card-footer">
                 <h3>${video.title}</h3>
-                <span class="video-type-badge">
-                    <i class="fas fa-video"></i>
-                    ${video.videoType === 'EMBED' ? 'YouTube' : 'Vidéo locale'}
-                </span>
+                <div class="video-meta">
+                    <span class="video-type-badge">
+                        <i class="fas fa-video"></i>
+                        ${video.videoType === 'EMBED' ? 'YouTube' : 'Vidéo locale'}
+                    </span>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span class="view-count-badge" data-view-video-id="${video.id}" title="Nombre de vues">
+                            <i class="fas fa-eye"></i>
+                            <span>${video.viewCount || 0}</span>
+                        </span>
+                        <button
+                            class="like-button ${likedVideos.has(video.id) ? 'liked' : ''}"
+                            data-like-video-id="${video.id}"
+                            title="${likedVideos.has(video.id) ? 'Retirer le like' : 'Aimer cette vidéo'}">
+                            <i class="${likedVideos.has(video.id) ? 'fas' : 'far'} fa-heart"></i>
+                            <span>${video.likeCount || 0}</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     `).join('');
 
     // Ajouter les événements de clic
     document.querySelectorAll('.video-card').forEach(card => {
-        card.addEventListener('click', function() {
+        card.addEventListener('click', function(e) {
+            // Ne pas ouvrir le modal si on clique sur le bouton like
+            if (e.target.closest('.like-button')) {
+                return;
+            }
             const videoId = parseInt(this.dataset.videoId);
             const video = allVideos.find(v => v.id === videoId);
             if (video) {
                 openVideoModal(video);
             }
+        });
+    });
+
+    // Ajouter les événements de like
+    document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const videoId = parseInt(this.dataset.likeVideoId);
+            toggleLike(videoId, this);
         });
     });
 
@@ -696,6 +813,37 @@ function openVideoModal(video) {
     modalVideoWrapper.innerHTML = videoContent;
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Incrémenter le compteur de vues (sans authentification requise)
+    incrementViewCount(video.id);
+}
+
+// Incrémenter le compteur de vues d'une vidéo
+async function incrementViewCount(videoId) {
+    try {
+        const response = await fetch(`/api/videos/${videoId}/view`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log(`📊 Vue enregistrée pour la vidéo ${videoId}: ${data.viewCount} vues`);
+
+            // Mettre à jour le compteur local
+            const video = allVideos.find(v => v.id === videoId);
+            if (video) {
+                video.viewCount = data.viewCount;
+
+                // Mettre à jour l'affichage visuel du compteur de vues
+                const viewBadge = document.querySelector(`.view-count-badge[data-view-video-id="${videoId}"] span`);
+                if (viewBadge) {
+                    viewBadge.textContent = data.viewCount;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'incrémentation des vues:', error);
+    }
 }
 
 // Fermer le modal
@@ -723,6 +871,110 @@ function searchVideos(query) {
     // Réinitialiser à la page 1 lors d'une recherche
     currentPage = 1;
     displayVideos(filteredVideos);
+}
+
+// Récupérer le token CSRF
+function getCsrfToken() {
+    const token = document.querySelector('meta[name="_csrf"]')?.content;
+    const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+    return { token, header };
+}
+
+// Toggle like
+async function toggleLike(videoId, button) {
+    if (!isAuthenticated) {
+        alert('Vous devez être connecté pour liker une vidéo');
+        window.location.href = '/login';
+        return;
+    }
+
+    const csrf = getCsrfToken();
+    const isLiked = likedVideos.has(videoId);
+
+    try {
+        const url = `/api/videos/${videoId}/like`;
+        const response = await fetch(url, {
+            method: isLiked ? 'DELETE' : 'POST',
+            headers: {
+                [csrf.header]: csrf.token
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                isAuthenticated = false;
+                alert('Session expirée, veuillez vous reconnecter');
+                window.location.href = '/login';
+                return;
+            }
+            throw new Error('Erreur lors du like');
+        }
+
+        // Mettre à jour l'état local
+        if (isLiked) {
+            likedVideos.delete(videoId);
+        } else {
+            likedVideos.add(videoId);
+        }
+
+        // Récupérer le nouveau compteur depuis le serveur
+        const videoResponse = await fetch(`/api/public/videos/${videoId}`);
+        if (videoResponse.ok) {
+            const videoData = await videoResponse.json();
+            const video = allVideos.find(v => v.id === videoId);
+            if (video) {
+                video.likeCount = videoData.likeCount;
+            }
+
+            // Mettre à jour l'affichage du bouton
+            const icon = button.querySelector('i');
+            const count = button.querySelector('span');
+
+            if (likedVideos.has(videoId)) {
+                button.classList.add('liked');
+                icon.className = 'fas fa-heart';
+                button.title = 'Retirer le like';
+            } else {
+                button.classList.remove('liked');
+                icon.className = 'far fa-heart';
+                button.title = 'Aimer cette vidéo';
+            }
+
+            count.textContent = videoData.likeCount || 0;
+        }
+    } catch (error) {
+        console.error('Erreur lors du like:', error);
+        alert('Une erreur est survenue');
+    }
+}
+
+// Vérifier l'authentification
+async function checkAuth() {
+    try {
+        const response = await fetch('/api/user/current');
+        isAuthenticated = response.ok && (await response.json());
+    } catch (error) {
+        isAuthenticated = false;
+    }
+}
+
+// Charger les status de like
+async function loadLikeStatuses() {
+    if (!isAuthenticated) return;
+
+    for (const video of allVideos) {
+        try {
+            const response = await fetch(`/api/videos/${video.id}/like-status`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.liked) {
+                    likedVideos.add(video.id);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur chargement status like:', error);
+        }
+    }
 }
 
 // Charger les vidéos
@@ -764,9 +1016,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return response.json();
         })
-        .then(videos => {
+        .then(async videos => {
             allVideos = videos;
             filteredVideos = videos;
+
+            // Vérifier l'authentification
+            await checkAuth();
+
+            // Charger les statuts de like
+            await loadLikeStatuses();
+
             loadingMessage.style.display = 'none';
             displayVideos(videos);
         })

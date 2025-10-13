@@ -11,6 +11,7 @@ public class TrackDTO {
     private String audioUrl;
     private String spotifyUrl;
     private int likeCount; // Nombre de likes
+    private int playCount; // Nombre d'écoutes
 
     public TrackDTO() {
     }
@@ -23,6 +24,7 @@ public class TrackDTO {
         this.audioUrl = audioUrl;
         this.spotifyUrl = spotifyUrl;
         this.likeCount = 0;
+        this.playCount = 0;
     }
 
     public TrackDTO(Long id, String title, Integer trackNumber, String duration, String audioUrl, String spotifyUrl, int likeCount) {
@@ -33,6 +35,18 @@ public class TrackDTO {
         this.audioUrl = audioUrl;
         this.spotifyUrl = spotifyUrl;
         this.likeCount = likeCount;
+        this.playCount = 0;
+    }
+
+    public TrackDTO(Long id, String title, Integer trackNumber, String duration, String audioUrl, String spotifyUrl, int likeCount, int playCount) {
+        this.id = id;
+        this.title = title;
+        this.trackNumber = trackNumber;
+        this.duration = duration;
+        this.audioUrl = audioUrl;
+        this.spotifyUrl = spotifyUrl;
+        this.likeCount = likeCount;
+        this.playCount = playCount;
     }
 
     public Long getId() {
@@ -89,5 +103,13 @@ public class TrackDTO {
 
     public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
+    }
+
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    public void setPlayCount(int playCount) {
+        this.playCount = playCount;
     }
 }

@@ -10,6 +10,8 @@ public class PhotoDTO {
     private String caption;
     private String category;
     private Integer displayOrder;
+    private int likeCount; // Nombre de likes
+    private int viewCount; // Nombre de vues
 
     public PhotoDTO() {
     }
@@ -21,6 +23,30 @@ public class PhotoDTO {
         this.caption = caption;
         this.category = category;
         this.displayOrder = displayOrder;
+        this.likeCount = 0;
+        this.viewCount = 0;
+    }
+
+    public PhotoDTO(Long id, String url, String thumbnailUrl, String caption, String category, Integer displayOrder, int likeCount) {
+        this.id = id;
+        this.url = url;
+        this.thumbnailUrl = thumbnailUrl;
+        this.caption = caption;
+        this.category = category;
+        this.displayOrder = displayOrder;
+        this.likeCount = likeCount;
+        this.viewCount = 0;
+    }
+
+    public PhotoDTO(Long id, String url, String thumbnailUrl, String caption, String category, Integer displayOrder, int likeCount, int viewCount) {
+        this.id = id;
+        this.url = url;
+        this.thumbnailUrl = thumbnailUrl;
+        this.caption = caption;
+        this.category = category;
+        this.displayOrder = displayOrder;
+        this.likeCount = likeCount;
+        this.viewCount = viewCount;
     }
 
     public Long getId() {
@@ -69,5 +95,21 @@ public class PhotoDTO {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
     }
 }

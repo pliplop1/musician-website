@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useFeaturedContent } from '../composables/useFeaturedContent'
+import { useRotationCache } from '../composables/useRotationCache'
 import axios from 'axios'
 
 // Utilisation du composable pour la logique auto/manuel + cache 24h
@@ -16,6 +17,9 @@ const {
   cacheKey: 'featuredTracks',
   autoRotationFieldName: 'autoRotationEnabledTracks'
 })
+
+// Gestion du cache pour mettre à jour après un like/unlike
+const { getCachedData, setCachedData } = useRotationCache('featuredTracks')
 
 const selectedTrack = ref(null)
 const showModal = ref(false)
@@ -133,11 +137,23 @@ const toggleLike = async (track, event) => {
     if (isLiked) {
       await axios.delete(`/api/tracks/${track.id}/like`)
       likedTracks.value.delete(track.id)
-      track.likeCount = Math.max(0, (track.likeCount || 0) - 1)
     } else {
       await axios.post(`/api/tracks/${track.id}/like`)
       likedTracks.value.add(track.id)
-      track.likeCount = (track.likeCount || 0) + 1
+    }
+
+    // Recharger les données depuis le serveur pour avoir le compteur à jour
+    const response = await axios.get(`/api/public/tracks/${track.id}`)
+    track.likeCount = response.data.likeCount
+
+    // Mettre à jour le cache avec le nouveau likeCount (sans supprimer le cache)
+    const cachedData = getCachedData()
+    if (cachedData && Array.isArray(cachedData)) {
+      const updatedCache = cachedData.map(t =>
+        t.id === track.id ? { ...t, likeCount: response.data.likeCount } : t
+      )
+      setCachedData(updatedCache)
+      console.log('💾 Cache mis à jour avec le nouveau likeCount')
     }
   } catch (error) {
     console.error('Erreur lors du like:', error)
@@ -149,9 +165,23 @@ const toggleLike = async (track, event) => {
 }
 
 // Incrémenter le compteur de plays
-const incrementPlay = async (trackId) => {
+const incrementPlay = async (track) => {
   try {
-    await axios.post(`/api/tracks/${trackId}/play`)
+    await axios.post(`/api/tracks/${track.id}/play`)
+
+    // Recharger le playCount depuis le serveur
+    const response = await axios.get(`/api/public/tracks/${track.id}`)
+    track.playCount = response.data.playCount
+
+    // Mettre à jour le cache avec le nouveau playCount
+    const cachedData = getCachedData()
+    if (cachedData && Array.isArray(cachedData)) {
+      const updatedCache = cachedData.map(t =>
+        t.id === track.id ? { ...t, playCount: response.data.playCount } : t
+      )
+      setCachedData(updatedCache)
+      console.log('💾 Cache mis à jour avec le nouveau playCount')
+    }
   } catch (error) {
     console.error('Erreur lors de l\'incrémentation des plays:', error)
   }
@@ -182,7 +212,7 @@ const checkAuth = async () => {
 
 // Ouvrir track et incrémenter plays
 const openTrackWithPlay = (track) => {
-  incrementPlay(track.id)
+  incrementPlay(track)
   openTrack(track)
 }
 

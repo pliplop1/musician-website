@@ -36,9 +36,9 @@ public class ContentSecurityPolicyFilter extends OncePerRequestFilter {
     private static final String CSP_POLICY =
         "default-src 'self'; " +
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5173; " +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
         "img-src 'self' data: https:; " +
-        "font-src 'self' https://fonts.gstatic.com; " +
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
         "connect-src 'self' http://localhost:5173 http://localhost:8106; " +
         "media-src 'self'; " +
         "frame-ancestors 'none'; " +
