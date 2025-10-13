@@ -531,6 +531,64 @@ public class PublicApiController {
     }
 
     /**
+     * Récupérer les photos featured (1-3)
+     */
+    @Operation(
+        summary = "Récupérer les photos featured",
+        description = "Retourne les photos mises en avant sur la page d'accueil (maximum 3)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Photos récupérées avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PhotoDTO.class)))
+    })
+    @GetMapping("/featured/photos")
+    public ResponseEntity<List<PhotoDTO>> getFeaturedPhotos() {
+        HomepageSettings settings = homepageSettingsService.getSettings();
+
+        List<PhotoDTO> photos = settings.getFeaturedPhotos().stream()
+            .map(photo -> new PhotoDTO(
+                photo.getId(),
+                "/uploaded-photos/" + photo.getFilename(),
+                "/uploaded-photos/" + photo.getFilename(), // thumbnail = same
+                null, // caption
+                "concert", // category par défaut
+                photo.getDisplayOrder()
+            ))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(photos);
+    }
+
+    /**
+     * Récupérer toutes les photos (pour la galerie complète)
+     */
+    @Operation(
+        summary = "Récupérer toutes les photos",
+        description = "Retourne toutes les photos pour la galerie photos complète"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Photos récupérées avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PhotoDTO.class)))
+    })
+    @GetMapping("/photos")
+    public ResponseEntity<List<PhotoDTO>> getAllPhotos() {
+        List<Photo> photos = photoService.getAllPhotos();
+
+        List<PhotoDTO> photoDTOs = photos.stream()
+            .map(photo -> new PhotoDTO(
+                photo.getId(),
+                "/uploaded-photos/" + photo.getFilename(),
+                "/uploaded-photos/" + photo.getFilename(), // thumbnail = same
+                null, // caption
+                "concert", // category par défaut
+                photo.getDisplayOrder()
+            ))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(photoDTOs);
+    }
+
+    /**
      * Inscription d'un utilisateur depuis Vue.js
      */
     @Operation(

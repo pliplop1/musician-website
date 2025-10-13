@@ -4,7 +4,7 @@ import HeroSection from './components/HeroSection.vue'
 import FeaturedVideosSection from './components/FeaturedVideosSection.vue'
 import FeaturedTracksSection from './components/FeaturedTracksSection.vue'
 import BiographySection from './components/BiographySection.vue'
-import GallerySection from './components/GallerySection.vue'
+import FeaturedPhotosSection from './components/FeaturedPhotosSection.vue'
 import ConcertsSection from './components/ConcertsSection.vue'
 
 // Navigation state
@@ -131,7 +131,7 @@ onMounted(() => {
       <FeaturedVideosSection id="videos" />
       <FeaturedTracksSection id="music" />
       <BiographySection id="biography" />
-      <GallerySection id="gallery" />
+      <FeaturedPhotosSection id="gallery" />
       <ConcertsSection id="concerts" />
     </main>
 
