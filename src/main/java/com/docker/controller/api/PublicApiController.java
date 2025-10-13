@@ -140,28 +140,7 @@ public class PublicApiController {
         // Grouper les morceaux par album (simplified - à adapter)
         // Pour l'instant, on retourne un album fictif avec tous les tracks
         List<TrackDTO> trackDTOs = tracks.stream()
-            .map(track -> {
-                String audioUrl = null;
-                String spotifyUrl = null;
-
-                // Construire l'URL selon le type de track
-                if (TrackType.EMBED.equals(track.getTrackType())) {
-                    // Pour les embeds, utiliser le embedCode comme spotifyUrl
-                    spotifyUrl = track.getEmbedCode();
-                } else if (TrackType.UPLOADED_FILE.equals(track.getTrackType()) && track.getFilename() != null) {
-                    // Pour les fichiers uploadés, construire l'URL
-                    audioUrl = "/uploaded-music/" + track.getFilename();
-                }
-
-                return new TrackDTO(
-                    track.getId(),
-                    track.getTitle(),
-                    null, // trackNumber - à ajouter dans l'entité si besoin
-                    null, // duration - à calculer ou ajouter dans l'entité
-                    audioUrl,
-                    spotifyUrl
-                );
-            })
+            .map(this::mapToTrackDTO)
             .collect(Collectors.toList());
 
         AlbumDTO album = new AlbumDTO(
@@ -194,14 +173,7 @@ public class PublicApiController {
         List<Photo> photos = photoService.getAllPhotos();
 
         List<PhotoDTO> photoDTOs = photos.stream()
-            .map(photo -> new PhotoDTO(
-                photo.getId(),
-                "/uploaded-photos/" + photo.getFilename(),
-                "/uploaded-photos/" + photo.getFilename(), // thumbnail = same for now
-                null, // caption - à ajouter dans l'entité Photo si besoin
-                "concert", // category par défaut - à ajouter dans l'entité si besoin
-                photo.getDisplayOrder()
-            ))
+            .map(this::mapToPhotoDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(photoDTOs);
@@ -410,13 +382,7 @@ public class PublicApiController {
         HomepageSettings settings = homepageSettingsService.getSettings();
 
         List<VideoDTO> videos = settings.getFeaturedVideos().stream()
-            .map(video -> new VideoDTO(
-                video.getId(),
-                video.getTitle(),
-                video.getVideoType().toString(),
-                video.getEmbedCode(),
-                video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null
-            ))
+            .map(this::mapToVideoDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(videos);
@@ -438,13 +404,7 @@ public class PublicApiController {
         List<Video> videos = videoService.getAllVideos();
 
         List<VideoDTO> videoDTOs = videos.stream()
-            .map(video -> new VideoDTO(
-                video.getId(),
-                video.getTitle(),
-                video.getVideoType().toString(),
-                video.getEmbedCode(),
-                video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null
-            ))
+            .map(this::mapToVideoDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(videoDTOs);
@@ -466,25 +426,7 @@ public class PublicApiController {
         HomepageSettings settings = homepageSettingsService.getSettings();
 
         List<TrackDTO> tracks = settings.getFeaturedTracks().stream()
-            .map(track -> {
-                String audioUrl = null;
-                String spotifyUrl = null;
-
-                if (TrackType.EMBED.equals(track.getTrackType())) {
-                    spotifyUrl = track.getEmbedCode();
-                } else if (TrackType.UPLOADED_FILE.equals(track.getTrackType()) && track.getFilename() != null) {
-                    audioUrl = "/uploaded-music/" + track.getFilename();
-                }
-
-                return new TrackDTO(
-                    track.getId(),
-                    track.getTitle(),
-                    null, // trackNumber
-                    null, // duration
-                    audioUrl,
-                    spotifyUrl
-                );
-            })
+            .map(this::mapToTrackDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(tracks);
@@ -506,25 +448,7 @@ public class PublicApiController {
         List<Track> tracks = trackService.getAllTracks();
 
         List<TrackDTO> trackDTOs = tracks.stream()
-            .map(track -> {
-                String audioUrl = null;
-                String spotifyUrl = null;
-
-                if (TrackType.EMBED.equals(track.getTrackType())) {
-                    spotifyUrl = track.getEmbedCode();
-                } else if (TrackType.UPLOADED_FILE.equals(track.getTrackType()) && track.getFilename() != null) {
-                    audioUrl = "/uploaded-music/" + track.getFilename();
-                }
-
-                return new TrackDTO(
-                    track.getId(),
-                    track.getTitle(),
-                    null, // trackNumber
-                    null, // duration
-                    audioUrl,
-                    spotifyUrl
-                );
-            })
+            .map(this::mapToTrackDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(trackDTOs);
@@ -546,14 +470,7 @@ public class PublicApiController {
         HomepageSettings settings = homepageSettingsService.getSettings();
 
         List<PhotoDTO> photos = settings.getFeaturedPhotos().stream()
-            .map(photo -> new PhotoDTO(
-                photo.getId(),
-                "/uploaded-photos/" + photo.getFilename(),
-                "/uploaded-photos/" + photo.getFilename(), // thumbnail = same
-                null, // caption
-                "concert", // category par défaut
-                photo.getDisplayOrder()
-            ))
+            .map(this::mapToPhotoDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(photos);
@@ -575,14 +492,7 @@ public class PublicApiController {
         List<Photo> photos = photoService.getAllPhotos();
 
         List<PhotoDTO> photoDTOs = photos.stream()
-            .map(photo -> new PhotoDTO(
-                photo.getId(),
-                "/uploaded-photos/" + photo.getFilename(),
-                "/uploaded-photos/" + photo.getFilename(), // thumbnail = same
-                null, // caption
-                "concert", // category par défaut
-                photo.getDisplayOrder()
-            ))
+            .map(this::mapToPhotoDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(photoDTOs);
@@ -644,5 +554,71 @@ public class PublicApiController {
             return ResponseEntity.status(500)
                 .body(Map.of("message", "Erreur serveur lors de l'inscription"));
         }
+    }
+
+    // ========================================================================
+    // MÉTHODES HELPER POUR ÉVITER LA DUPLICATION DE CODE (DRY PRINCIPLE)
+    // ========================================================================
+
+    /**
+     * Convertit une Track en TrackDTO avec gestion des URLs
+     * Méthode helper pour éviter la duplication de code dans getFeaturedTracks, getAllTracks, et getDiscography
+     *
+     * @param track L'entité Track à convertir
+     * @return TrackDTO avec les URLs correctement construites
+     */
+    private TrackDTO mapToTrackDTO(Track track) {
+        String audioUrl = null;
+        String spotifyUrl = null;
+
+        if (TrackType.EMBED.equals(track.getTrackType())) {
+            spotifyUrl = track.getEmbedCode();
+        } else if (TrackType.UPLOADED_FILE.equals(track.getTrackType()) && track.getFilename() != null) {
+            audioUrl = "/uploaded-music/" + track.getFilename();
+        }
+
+        return new TrackDTO(
+            track.getId(),
+            track.getTitle(),
+            null, // trackNumber
+            null, // duration
+            audioUrl,
+            spotifyUrl
+        );
+    }
+
+    /**
+     * Convertit une Photo en PhotoDTO avec construction des URLs
+     * Méthode helper pour éviter la duplication de code dans getFeaturedPhotos, getAllPhotos, et getGallery
+     *
+     * @param photo L'entité Photo à convertir
+     * @return PhotoDTO avec les URLs correctement construites
+     */
+    private PhotoDTO mapToPhotoDTO(Photo photo) {
+        return new PhotoDTO(
+            photo.getId(),
+            "/uploaded-photos/" + photo.getFilename(),
+            "/uploaded-photos/" + photo.getFilename(), // thumbnail = same for now
+            null, // caption
+            "concert", // category par défaut
+            photo.getDisplayOrder()
+        );
+    }
+
+    /**
+     * Convertit une Video en VideoDTO avec gestion des URLs
+     * Méthode helper pour éviter la duplication de code dans getFeaturedVideos et getAllVideos
+     *
+     * @param video L'entité Video à convertir
+     * @return VideoDTO avec les URLs correctement construites
+     */
+    private VideoDTO mapToVideoDTO(Video video) {
+        return new VideoDTO(
+            video.getId(),
+            video.getTitle(),
+            video.getVideoType().toString(),
+            video.getEmbedCode(),
+            video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null
+        );
     }
 }
