@@ -36,17 +36,15 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final ConcertRepository concertRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordValidationService passwordValidationService;
     private BadgeService badgeService; // Injection tardive pour éviter les dépendances circulaires
 
-    private static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
-
-
-
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, ConcertRepository concertRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, ConcertRepository concertRepository, PasswordEncoder passwordEncoder, PasswordValidationService passwordValidationService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.concertRepository = concertRepository;
         this.passwordEncoder = passwordEncoder;
+        this.passwordValidationService = passwordValidationService;
     }
 
     // Injection du BadgeService après la construction pour éviter les dépendances circulaires
@@ -65,16 +63,19 @@ public class UserService {
 
     @Transactional
     public void saveUser(User user) {
-        if (!user.getPassword().matches(PASSWORD_PATTERN)) {
-             throw new IllegalArgumentException("Le mot de passe ne respecte pas les critères de sécurité.");
+        // Valider le mot de passe avec le nouveau service de validation
+        String validationError = passwordValidationService.getValidationErrorMessage(user.getPassword());
+        if (validationError != null) {
+            throw new IllegalArgumentException(validationError);
         }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        
+
         Role userRole = roleRepository.findByName("ROLE_USER");
         if (userRole == null) {
             throw new RuntimeException("Error: Role 'ROLE_USER' is not found.");
         }
-        
+
         user.setRoles(new HashSet<>(Collections.singletonList(userRole)));
         userRepository.save(user);
     }
@@ -128,14 +129,10 @@ public class UserService {
             throw new IllegalArgumentException("Le nouveau mot de passe et sa confirmation ne correspondent pas.");
         }
 
-        if (!newPassword.matches(PASSWORD_PATTERN)) {
-            String errorMessage = "Le mot de passe doit contenir au moins :\n"
-                                + "- 8 caractères\n"
-                                + "- Une lettre majuscule\n"
-                                + "- Une lettre minuscule\n"
-                                + "- Un chiffre\n"
-                                + "- Un caractère spécial (@, $, !, %, *, ?, &)";
-            throw new IllegalArgumentException(errorMessage);
+        // Valider le mot de passe avec le nouveau service de validation
+        String validationError = passwordValidationService.getValidationErrorMessage(newPassword);
+        if (validationError != null) {
+            throw new IllegalArgumentException(validationError);
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
