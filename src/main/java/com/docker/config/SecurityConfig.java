@@ -3,6 +3,9 @@ package com.docker.config;
 import java.util.Arrays;
 import java.util.Set;
 
+import com.docker.security.CustomAuthenticationFailureHandler;
+import com.docker.security.CustomAuthenticationSuccessHandler;
+import com.docker.security.LoginAttemptFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -13,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -25,9 +29,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
 	private final UserDetailsService userDetailsService;
+	private final CustomAuthenticationSuccessHandler successHandler;
+	private final CustomAuthenticationFailureHandler failureHandler;
+	private final LoginAttemptFilter loginAttemptFilter;
 
-	public SecurityConfig(UserDetailsService userDetailsService) {
+	public SecurityConfig(UserDetailsService userDetailsService,
+	                      CustomAuthenticationSuccessHandler successHandler,
+	                      CustomAuthenticationFailureHandler failureHandler,
+	                      LoginAttemptFilter loginAttemptFilter) {
 		this.userDetailsService = userDetailsService;
+		this.successHandler = successHandler;
+		this.failureHandler = failureHandler;
+		this.loginAttemptFilter = loginAttemptFilter;
 	}
 
 	/**
@@ -147,25 +160,15 @@ public class SecurityConfig {
 				.anyRequest().authenticated())
 				// Configuration CSRF : activé par défaut (pas de configuration supplémentaire nécessaire)
 				// Spring Security active automatiquement la protection CSRF pour toutes les requêtes POST/PUT/DELETE
-				.formLogin(formLogin -> formLogin.loginPage("/login")
-						.successHandler((request, response, authentication) -> {
-							System.out.println("--- Authentication Success Handler ---");
-							System.out.println("User: " + authentication.getName());
-							Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-							System.out.println("Roles: " + roles);
-
-							if (roles.contains("ROLE_ADMIN")) {
-								System.out.println("Redirecting to /admin/dashboard");
-								response.sendRedirect("/admin/dashboard");
-							} else if (roles.contains("ROLE_USER")) {
-								System.out.println("Redirecting to /user/profile");
-								response.sendRedirect("/user/profile");
-							} else {
-								System.out.println("No specific role found, redirecting to /");
-								response.sendRedirect("/");
-							}
-						}).permitAll())
+				.formLogin(formLogin -> formLogin
+						.loginPage("/login")
+						.successHandler(successHandler)
+						.failureHandler(failureHandler)
+						.permitAll())
 				.logout(logout -> logout.logoutSuccessUrl("/login?logout").permitAll());
+
+		// Ajouter le filtre anti-brute force AVANT le filtre d'authentification
+		http.addFilterBefore(loginAttemptFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
