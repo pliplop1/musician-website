@@ -40,6 +40,20 @@ public class TrackService {
         return trackRepository.findAll();
     }
 
+	/**
+	 * Récupère une piste par son ID
+	 */
+	public Track findById(Long id) {
+		return trackRepository.findById(id).orElse(null);
+	}
+
+	/**
+	 * Sauvegarde une piste
+	 */
+	public Track save(Track track) {
+		return trackRepository.save(track);
+	}
+
 	// Méthode pour sauvegarder une piste de type EMBED
 	public void saveEmbedTrack(String title, String embedCode) {
 		Track track = new Track();
