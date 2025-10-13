@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useFeaturedContent } from '../composables/useFeaturedContent'
+import axios from 'axios'
 
 // Utilisation du composable pour la logique auto/manuel + cache 24h
 const {
@@ -19,6 +20,8 @@ const {
 const selectedTrack = ref(null)
 const showModal = ref(false)
 const previousFocusElement = ref(null)
+const isAuthenticated = ref(false)
+const likedTracks = ref(new Set())
 
 // Détecter si c'est du HTML ou une URL
 const isHtmlEmbed = (embedCode) => {
@@ -115,8 +118,77 @@ watch(showModal, (isOpen) => {
   }
 })
 
-onMounted(() => {
-  loadFeaturedContent()
+// Liker/unliker une track
+const toggleLike = async (track, event) => {
+  event.stopPropagation()
+
+  if (!isAuthenticated.value) {
+    alert('Vous devez être connecté pour liker une musique')
+    return
+  }
+
+  try {
+    const isLiked = likedTracks.value.has(track.id)
+
+    if (isLiked) {
+      await axios.delete(`/api/tracks/${track.id}/like`)
+      likedTracks.value.delete(track.id)
+      track.likeCount = Math.max(0, (track.likeCount || 0) - 1)
+    } else {
+      await axios.post(`/api/tracks/${track.id}/like`)
+      likedTracks.value.add(track.id)
+      track.likeCount = (track.likeCount || 0) + 1
+    }
+  } catch (error) {
+    console.error('Erreur lors du like:', error)
+    if (error.response?.status === 401) {
+      isAuthenticated.value = false
+      alert('Session expirée, veuillez vous reconnecter')
+    }
+  }
+}
+
+// Incrémenter le compteur de plays
+const incrementPlay = async (trackId) => {
+  try {
+    await axios.post(`/api/tracks/${trackId}/play`)
+  } catch (error) {
+    console.error('Erreur lors de l\'incrémentation des plays:', error)
+  }
+}
+
+// Vérifier l'authentification et charger les likes
+const checkAuth = async () => {
+  try {
+    const response = await axios.get('/api/user/current')
+    isAuthenticated.value = !!response.data
+
+    if (isAuthenticated.value) {
+      for (const track of tracks.value) {
+        try {
+          const likeStatus = await axios.get(`/api/tracks/${track.id}/like-status`)
+          if (likeStatus.data.liked) {
+            likedTracks.value.add(track.id)
+          }
+        } catch (err) {
+          console.error('Erreur chargement status like:', err)
+        }
+      }
+    }
+  } catch (error) {
+    isAuthenticated.value = false
+  }
+}
+
+// Ouvrir track et incrémenter plays
+const openTrackWithPlay = (track) => {
+  incrementPlay(track.id)
+  openTrack(track)
+}
+
+onMounted(async () => {
+  await loadFeaturedContent()
+  await checkAuth()
 })
 </script>
 
@@ -143,7 +215,7 @@ onMounted(() => {
           v-for="track in tracks"
           :key="track.id"
           class="track-card"
-          @click="openTrack(track)">
+          @click="openTrackWithPlay(track)">
           <div class="track-thumbnail">
             <div class="music-icon-overlay">
               <i class="fas fa-music"></i>
@@ -151,13 +223,29 @@ onMounted(() => {
             <div class="play-overlay">
               <i class="fas fa-play-circle"></i>
             </div>
+            <!-- Stats overlay -->
+            <div class="stats-overlay">
+              <span class="stat-item">
+                <i class="fas fa-headphones"></i>
+                {{ track.playCount || 0 }}
+              </span>
+            </div>
           </div>
           <div class="track-card-footer">
             <h3>{{ track.title }}</h3>
-            <span class="track-type-badge">
-              <i :class="getPlayerType(track).icon"></i>
-              {{ getPlayerType(track).label }}
-            </span>
+            <div class="track-meta">
+              <span class="track-type-badge">
+                <i :class="getPlayerType(track).icon"></i>
+                {{ getPlayerType(track).label }}
+              </span>
+              <button
+                @click="toggleLike(track, $event)"
+                :class="['like-button', { 'liked': likedTracks.has(track.id) }]"
+                :title="likedTracks.has(track.id) ? 'Retirer le like' : 'Aimer cette musique'">
+                <i :class="likedTracks.has(track.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                <span>{{ track.likeCount || 0 }}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -362,6 +450,13 @@ onMounted(() => {
   line-height: 1.4;
 }
 
+.track-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .track-type-badge {
   display: inline-flex;
   align-items: center;
@@ -373,6 +468,81 @@ onMounted(() => {
   color: #4ade80;
   font-size: 0.8rem;
   width: fit-content;
+}
+
+.stats-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.stat-item i {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.like-button:hover {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  transform: scale(1.05);
+}
+
+.like-button.liked {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #22c55e;
+}
+
+.like-button.liked i {
+  color: #22c55e;
+  animation: heartBeat 0.5s ease;
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.25);
+  }
 }
 
 .view-all-tracks {

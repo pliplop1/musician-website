@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useFeaturedContent } from '../composables/useFeaturedContent'
+import axios from 'axios'
 
 // Utilisation du composable pour la logique auto/manuel + cache 24h
 const {
@@ -18,6 +19,8 @@ const {
 
 const selectedVideo = ref(null)
 const showModal = ref(false)
+const isAuthenticated = ref(false)
+const likedVideos = ref(new Set())
 
 // Extraire l'ID YouTube depuis l'URL embed
 const getYouTubeId = (embedCode) => {
@@ -51,8 +54,78 @@ const closeModal = () => {
   document.body.style.overflow = ''
 }
 
-onMounted(() => {
-  loadFeaturedContent()
+// Liker/unliker une vidéo
+const toggleLike = async (video, event) => {
+  event.stopPropagation() // Empêcher l'ouverture du modal
+
+  if (!isAuthenticated.value) {
+    alert('Vous devez être connecté pour liker une vidéo')
+    return
+  }
+
+  try {
+    const isLiked = likedVideos.value.has(video.id)
+
+    if (isLiked) {
+      await axios.delete(`/api/videos/${video.id}/like`)
+      likedVideos.value.delete(video.id)
+      video.likeCount = Math.max(0, (video.likeCount || 0) - 1)
+    } else {
+      await axios.post(`/api/videos/${video.id}/like`)
+      likedVideos.value.add(video.id)
+      video.likeCount = (video.likeCount || 0) + 1
+    }
+  } catch (error) {
+    console.error('Erreur lors du like:', error)
+    if (error.response?.status === 401) {
+      isAuthenticated.value = false
+      alert('Session expirée, veuillez vous reconnecter')
+    }
+  }
+}
+
+// Incrémenter le compteur de vues
+const incrementView = async (videoId) => {
+  try {
+    await axios.post(`/api/videos/${videoId}/view`)
+  } catch (error) {
+    console.error('Erreur lors de l\'incrémentation des vues:', error)
+  }
+}
+
+// Vérifier l'authentification et charger les likes
+const checkAuth = async () => {
+  try {
+    const response = await axios.get('/api/user/current')
+    isAuthenticated.value = !!response.data
+
+    // Charger les status de like pour chaque vidéo
+    if (isAuthenticated.value) {
+      for (const video of videos.value) {
+        try {
+          const likeStatus = await axios.get(`/api/videos/${video.id}/like-status`)
+          if (likeStatus.data.liked) {
+            likedVideos.value.add(video.id)
+          }
+        } catch (err) {
+          console.error('Erreur chargement status like:', err)
+        }
+      }
+    }
+  } catch (error) {
+    isAuthenticated.value = false
+  }
+}
+
+// Ouvrir vidéo et incrémenter vues
+const openVideoWithView = (video) => {
+  incrementView(video.id)
+  openVideo(video)
+}
+
+onMounted(async () => {
+  await loadFeaturedContent()
+  await checkAuth()
 })
 </script>
 
@@ -79,19 +152,35 @@ onMounted(() => {
           v-for="video in videos"
           :key="video.id"
           class="video-card"
-          @click="openVideo(video)">
+          @click="openVideoWithView(video)">
           <div class="video-thumbnail">
             <img :src="getThumbnailUrl(video)" :alt="video.title" />
             <div class="play-overlay">
               <i class="fas fa-play-circle"></i>
             </div>
+            <!-- Stats overlay -->
+            <div class="stats-overlay">
+              <span class="stat-item">
+                <i class="fas fa-eye"></i>
+                {{ video.viewCount || 0 }}
+              </span>
+            </div>
           </div>
           <div class="video-card-footer">
             <h3>{{ video.title }}</h3>
-            <span class="video-type-badge">
-              <i class="fas fa-video"></i>
-              {{ video.videoType === 'EMBED' ? 'YouTube' : 'Vidéo locale' }}
-            </span>
+            <div class="video-meta">
+              <span class="video-type-badge">
+                <i class="fas fa-video"></i>
+                {{ video.videoType === 'EMBED' ? 'YouTube' : 'Vidéo locale' }}
+              </span>
+              <button
+                @click="toggleLike(video, $event)"
+                :class="['like-button', { 'liked': likedVideos.has(video.id) }]"
+                :title="likedVideos.has(video.id) ? 'Retirer le like' : 'Aimer cette vidéo'">
+                <i :class="likedVideos.has(video.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                <span>{{ video.likeCount || 0 }}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -267,6 +356,13 @@ onMounted(() => {
   line-height: 1.4;
 }
 
+.video-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .video-type-badge {
   display: inline-flex;
   align-items: center;
@@ -278,6 +374,81 @@ onMounted(() => {
   color: #f87171;
   font-size: 0.8rem;
   width: fit-content;
+}
+
+.stats-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.stat-item i {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.like-button:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  transform: scale(1.05);
+}
+
+.like-button.liked {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.like-button.liked i {
+  color: #ef4444;
+  animation: heartBeat 0.5s ease;
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.25);
+  }
 }
 
 /* Bouton Voir toutes les vidéos */
