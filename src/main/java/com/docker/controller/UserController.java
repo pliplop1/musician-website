@@ -26,9 +26,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.docker.entity.User;
 import com.docker.service.UserService;
 import com.docker.service.BadgeService;
+import com.docker.service.DataExportService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequestMapping("/user")
@@ -36,10 +40,12 @@ public class UserController {
 
     private final UserService userService;
     private final BadgeService badgeService;
+    private final DataExportService dataExportService;
 
-    public UserController(UserService userService, BadgeService badgeService) {
+    public UserController(UserService userService, BadgeService badgeService, DataExportService dataExportService) {
         this.userService = userService;
         this.badgeService = badgeService;
+        this.dataExportService = dataExportService;
     }
 
     @GetMapping("/profile")
@@ -191,5 +197,88 @@ public class UserController {
             redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la suppression : " + e.getMessage());
         }
         return "redirect:/user/profile";
+    }
+
+    // ============================================
+    // RGPD - EXPORT ET SUPPRESSION DES DONNÉES
+    // ============================================
+
+    /**
+     * Télécharge toutes les données personnelles de l'utilisateur (RGPD - Article 20)
+     * Format JSON structuré et lisible
+     */
+    @GetMapping("/export-data")
+    public ResponseEntity<String> exportUserData(Principal principal) {
+        try {
+            String username = principal.getName();
+            String jsonData = dataExportService.exportUserDataByUsername(username);
+            String filename = dataExportService.generateExportFilename(username);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentDispositionFormData("attachment", filename);
+            headers.setCacheControl("no-cache, no-store, must-revalidate");
+            headers.setPragma("no-cache");
+            headers.setExpires(0);
+
+            return ResponseEntity.ok()
+                .headers(headers)
+                .body(jsonData);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body("{\"error\": \"Erreur lors de l'export des données : " + e.getMessage() + "\"}");
+        }
+    }
+
+    /**
+     * Affiche la page de confirmation de suppression de compte
+     */
+    @GetMapping("/delete-account")
+    public String showDeleteAccountPage(Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        return "user/delete-account";
+    }
+
+    /**
+     * Supprime définitivement le compte utilisateur (RGPD - Article 17 - Droit à l'oubli)
+     * Après confirmation, le compte et toutes les données associées sont supprimés
+     */
+    @PostMapping("/delete-account")
+    public String deleteAccount(@RequestParam String confirmPassword,
+                               Principal principal,
+                               RedirectAttributes redirectAttributes,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+        try {
+            String username = principal.getName();
+            User user = userService.findByUsername(username);
+
+            // Vérifier que le mot de passe de confirmation est correct
+            if (!userService.verifyPassword(user, confirmPassword)) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                    "Mot de passe incorrect. Suppression annulée.");
+                return "redirect:/user/delete-account";
+            }
+
+            // Déconnecter l'utilisateur avant la suppression
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null) {
+                new SecurityContextLogoutHandler().logout(request, response, auth);
+            }
+
+            // Supprimer le compte
+            userService.deleteUser(user.getId());
+
+            redirectAttributes.addFlashAttribute("successMessage",
+                "Votre compte a été supprimé définitivement. Nous espérons vous revoir bientôt.");
+            return "redirect:/";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                "Erreur lors de la suppression du compte : " + e.getMessage());
+            return "redirect:/user/delete-account";
+        }
     }
 }

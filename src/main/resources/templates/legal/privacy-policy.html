@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique de Confidentialité - Duo Black & White</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            background: #fff;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .legal-container h1 {
+            color: #000;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #4a90e2;
+            padding-bottom: 0.5rem;
+        }
+
+        .legal-container h2 {
+            color: #000;
+            font-size: 1.75rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-container h3 {
+            color: #333;
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .legal-container p {
+            margin-bottom: 1rem;
+        }
+
+        .legal-container ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-container li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: #f0f8ff;
+            border-left: 4px solid #4a90e2;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .contact-info {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: #4a90e2;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #357abd;
+        }
+
+        .update-date {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/layout :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="legal-container">
+        <h1>Politique de Confidentialité (RGPD)</h1>
+        <p class="update-date">Dernière mise à jour : 13 octobre 2025</p>
+
+        <div class="highlight-box">
+            <p><strong>Duo Black & White</strong> s'engage à protéger votre vie privée et vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD - UE 2016/679).</p>
+        </div>
+
+        <h2>1. Responsable du traitement des données</h2>
+        <p><strong>Duo Black & White</strong><br>
+        SARL au capital de 10 000 euros<br>
+        123 rue de la Musique, 75000 Paris, France<br>
+        Email : <a href="mailto:privacy@duoblackandwhite.fr">privacy@duoblackandwhite.fr</a></p>
+
+        <h2>2. Données personnelles collectées</h2>
+        <p>Nous collectons les données personnelles suivantes :</p>
+
+        <h3>2.1 Données d'inscription</h3>
+        <ul>
+            <li><strong>Nom d'utilisateur</strong> : pour vous identifier sur le site</li>
+            <li><strong>Adresse email</strong> : pour la gestion de votre compte et les communications</li>
+            <li><strong>Mot de passe</strong> : crypté pour sécuriser votre compte</li>
+            <li><strong>Prénom et Nom</strong> (optionnel) : pour personnaliser votre profil</li>
+            <li><strong>Photo de profil</strong> (optionnel) : avatar affiché sur le site</li>
+        </ul>
+
+        <h3>2.2 Données d'utilisation</h3>
+        <ul>
+            <li><strong>Adresse IP</strong> : pour la sécurité et les statistiques</li>
+            <li><strong>Cookies et localStorage</strong> : pour améliorer l'expérience utilisateur</li>
+            <li><strong>Historique de navigation</strong> : pages visitées sur notre site</li>
+        </ul>
+
+        <h3>2.3 Données de contenu</h3>
+        <ul>
+            <li><strong>Commentaires</strong> : sur les articles et actualités</li>
+            <li><strong>Messages</strong> : communications via le formulaire de contact</li>
+            <li><strong>Biographie</strong> (optionnel) : description de votre profil</li>
+        </ul>
+
+        <h2>3. Finalité du traitement</h2>
+        <p>Vos données personnelles sont collectées et traitées pour les finalités suivantes :</p>
+        <ul>
+            <li><strong>Gestion de votre compte utilisateur</strong> : création, authentification, modification</li>
+            <li><strong>Communication</strong> : envoi d'informations sur nos concerts et actualités</li>
+            <li><strong>Amélioration du service</strong> : statistiques d'utilisation anonymisées</li>
+            <li><strong>Sécurité</strong> : prévention des abus et fraudes</li>
+            <li><strong>Obligations légales</strong> : réponse aux demandes des autorités compétentes</li>
+        </ul>
+
+        <h2>4. Base légale du traitement</h2>
+        <p>Le traitement de vos données repose sur :</p>
+        <ul>
+            <li><strong>Votre consentement</strong> : lors de l'inscription et de l'utilisation du site</li>
+            <li><strong>L'exécution d'un contrat</strong> : gestion de votre compte et des services associés</li>
+            <li><strong>Notre intérêt légitime</strong> : amélioration du service et sécurité</li>
+            <li><strong>Obligations légales</strong> : conservation des données pour respecter la loi</li>
+        </ul>
+
+        <h2>5. Destinataires des données</h2>
+        <p>Vos données personnelles sont accessibles :</p>
+        <ul>
+            <li>Au personnel autorisé de <strong>Duo Black & White</strong></li>
+            <li>À nos prestataires techniques (hébergement : OVH)</li>
+            <li>Aux autorités compétentes sur demande légale</li>
+        </ul>
+        <p><strong>Nous ne vendons jamais vos données à des tiers.</strong></p>
+
+        <h2>6. Durée de conservation</h2>
+        <ul>
+            <li><strong>Comptes actifs</strong> : tant que le compte est actif</li>
+            <li><strong>Comptes inactifs</strong> : 3 ans après la dernière connexion</li>
+            <li><strong>Commentaires et messages</strong> : 3 ans après publication</li>
+            <li><strong>Logs de connexion</strong> : 12 mois</li>
+        </ul>
+        <p>Passé ces délais, vos données seront supprimées ou anonymisées.</p>
+
+        <h2>7. Vos droits (RGPD)</h2>
+        <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+
+        <h3>7.1 Droit d'accès (Art. 15 RGPD)</h3>
+        <p>Vous pouvez demander une copie de toutes vos données personnelles.</p>
+
+        <h3>7.2 Droit de rectification (Art. 16 RGPD)</h3>
+        <p>Vous pouvez corriger vos données inexactes ou incomplètes depuis votre profil.</p>
+
+        <h3>7.3 Droit à l'effacement / Droit à l'oubli (Art. 17 RGPD)</h3>
+        <p>Vous pouvez demander la suppression définitive de vos données.</p>
+
+        <h3>7.4 Droit à la portabilité (Art. 20 RGPD)</h3>
+        <p>Vous pouvez télécharger vos données dans un format structuré (JSON).</p>
+
+        <h3>7.5 Droit d'opposition (Art. 21 RGPD)</h3>
+        <p>Vous pouvez vous opposer au traitement de vos données à des fins de prospection.</p>
+
+        <h3>7.6 Droit de limitation (Art. 18 RGPD)</h3>
+        <p>Vous pouvez demander la limitation du traitement dans certains cas.</p>
+
+        <div class="highlight-box">
+            <h3>Comment exercer vos droits ?</h3>
+            <p>Pour exercer l'un de ces droits, vous pouvez :</p>
+            <ul>
+                <li>Utiliser les fonctionnalités de votre profil (pour l'export et la suppression)</li>
+                <li>Nous contacter par email : <a href="mailto:privacy@duoblackandwhite.fr">privacy@duoblackandwhite.fr</a></li>
+                <li>Nous envoyer un courrier postal à l'adresse indiquée ci-dessus</li>
+            </ul>
+            <p><strong>Délai de réponse :</strong> 1 mois maximum (extensible à 3 mois en cas de demande complexe)</p>
+        </div>
+
+        <h2>8. Cookies et technologies similaires</h2>
+        <p>Notre site utilise :</p>
+        <ul>
+            <li><strong>Cookies de session (JSESSIONID)</strong> : pour maintenir votre connexion</li>
+            <li><strong>localStorage</strong> : pour mettre en cache les contenus featured (24h)</li>
+            <li><strong>Cookies de consentement</strong> : pour mémoriser votre choix concernant les cookies</li>
+        </ul>
+        <p>Nous n'utilisons <strong>aucun cookie publicitaire</strong> ou de tracking tiers.</p>
+        <p>Pour en savoir plus : <a th:href="@{/cookies}">Politique des cookies</a></p>
+
+        <h2>9. Sécurité des données</h2>
+        <p>Nous mettons en œuvre les mesures techniques et organisationnelles suivantes :</p>
+        <ul>
+            <li><strong>Cryptage des mots de passe</strong> : BCrypt avec salage</li>
+            <li><strong>Connexion HTTPS</strong> : chiffrement SSL/TLS</li>
+            <li><strong>Sauvegardes régulières</strong> : protection contre la perte de données</li>
+            <li><strong>Contrôle d'accès</strong> : accès restreint aux données personnelles</li>
+            <li><strong>Mises à jour de sécurité</strong> : serveurs et logiciels maintenus à jour</li>
+        </ul>
+
+        <h2>10. Transferts internationaux</h2>
+        <p>Vos données sont hébergées en France (OVH, Roubaix) et ne sont <strong>pas transférées hors de l'Union Européenne</strong>.</p>
+
+        <h2>11. Mineurs</h2>
+        <p>Notre site n'est pas destiné aux personnes de moins de 16 ans. Si vous avez moins de 16 ans, veuillez obtenir le consentement de vos parents avant de créer un compte.</p>
+
+        <h2>12. Modifications de la politique</h2>
+        <p>Nous pouvons modifier cette politique de confidentialité à tout moment. Les modifications seront publiées sur cette page avec une nouvelle date de mise à jour. Nous vous recommandons de consulter régulièrement cette page.</p>
+
+        <h2>13. Réclamation auprès de la CNIL</h2>
+        <p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) :</p>
+        <div class="contact-info">
+            <p><strong>CNIL</strong><br>
+            3 Place de Fontenoy<br>
+            TSA 80715<br>
+            75334 Paris Cedex 07<br>
+            Tél : 01 53 73 22 22<br>
+            Site web : <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">www.cnil.fr</a></p>
+        </div>
+
+        <h2>14. Contact DPO (Délégué à la Protection des Données)</h2>
+        <div class="contact-info">
+            <p>Pour toute question concernant vos données personnelles :</p>
+            <p><strong>Email :</strong> <a href="mailto:privacy@duoblackandwhite.fr">privacy@duoblackandwhite.fr</a><br>
+            <strong>Courrier :</strong> Duo Black & White - DPO, 123 rue de la Musique, 75000 Paris</p>
+        </div>
+
+        <a th:href="@{/}" class="back-link">Retour à l'accueil</a>
+    </main>
+
+    <!-- Footer (optionnel) -->
+</body>
+</html>

@@ -48,6 +48,7 @@ onMounted(() => {
         muted
         loop
         playsinline
+        aria-label="Vidéo d'ambiance montrant une performance du Duo Black & White"
         class="hero-video">
         <source :src="heroData.backgroundVideoUrl" type="video/mp4">
       </video>
@@ -78,11 +79,11 @@ onMounted(() => {
 
         <!-- CTA Buttons -->
         <div class="hero-actions">
-          <a href="#videos" class="btn btn-primary">
-            <i class="fas fa-play-circle"></i> Découvrir nos vidéos
+          <a href="#videos" class="btn btn-primary" aria-label="Accéder à la section vidéos">
+            <i class="fas fa-play-circle" aria-hidden="true"></i> Découvrir nos vidéos
           </a>
-          <a href="#music" class="btn btn-secondary">
-            <i class="fas fa-music"></i> Écouter notre musique
+          <a href="#music" class="btn btn-secondary" aria-label="Accéder à la section musique">
+            <i class="fas fa-music" aria-hidden="true"></i> Écouter notre musique
           </a>
         </div>
 

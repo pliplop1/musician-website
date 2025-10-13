@@ -36,21 +36,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="concerts-section">
+  <section class="concerts-section" aria-labelledby="concerts-heading">
     <div class="container">
-      <h2 class="section-title">Prochains Concerts</h2>
+      <h2 id="concerts-heading" class="section-title">Prochains Concerts</h2>
 
-      <div v-if="loading" class="loading">Chargement...</div>
+      <div v-if="loading" class="loading" role="status" aria-live="polite">Chargement des concerts...</div>
 
-      <div v-else-if="concerts.length === 0" class="no-concerts">
+      <div v-else-if="concerts.length === 0" class="no-concerts" role="status">
         <p>Aucun concert prévu pour le moment. Revenez bientôt!</p>
       </div>
 
-      <div v-else class="concerts-list">
-        <div v-for="concert in concerts" :key="concert.id" class="concert-card">
-          <div class="concert-date">
-            <div class="date-day">{{ new Date(concert.date).getDate() }}</div>
-            <div class="date-month">{{ new Date(concert.date).toLocaleDateString('fr-FR', { month: 'short' }) }}</div>
+      <div v-else class="concerts-list" role="list">
+        <article v-for="concert in concerts" :key="concert.id" class="concert-card" role="listitem">
+          <div class="concert-date" aria-label="Date du concert">
+            <div class="date-day" aria-label="Jour">{{ new Date(concert.date).getDate() }}</div>
+            <div class="date-month" aria-label="Mois">{{ new Date(concert.date).toLocaleDateString('fr-FR', { month: 'short' }) }}</div>
           </div>
           <div class="concert-info">
             <h3>{{ concert.location }}</h3>
@@ -61,11 +61,11 @@ onMounted(() => {
             </p>
           </div>
           <div class="concert-action">
-            <a v-if="concert.ticketUrl" :href="concert.ticketUrl" target="_blank" class="btn-ticket">
+            <a v-if="concert.ticketUrl" :href="concert.ticketUrl" target="_blank" rel="noopener noreferrer" class="btn-ticket" :aria-label="`Acheter des billets pour le concert à ${concert.location} (ouvre dans un nouvel onglet)`">
               Billets
             </a>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </section>

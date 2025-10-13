@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useFeaturedContent } from '../composables/useFeaturedContent'
 
 // Utilisation du composable pour la logique auto/manuel + cache 24h
@@ -18,6 +18,7 @@ const {
 
 const selectedTrack = ref(null)
 const showModal = ref(false)
+const previousFocusElement = ref(null)
 
 // Détecter si c'est du HTML ou une URL
 const isHtmlEmbed = (embedCode) => {
@@ -69,6 +70,9 @@ const getExternalLink = (track) => {
 
 // Ouvrir le lecteur dans un modal
 const openTrack = (track) => {
+  // Sauvegarder l'élément qui avait le focus
+  previousFocusElement.value = document.activeElement
+
   selectedTrack.value = track
   showModal.value = true
   document.body.style.overflow = 'hidden'
@@ -79,7 +83,37 @@ const closeModal = () => {
   showModal.value = false
   selectedTrack.value = null
   document.body.style.overflow = ''
+
+  // Restaurer le focus à l'élément précédent
+  nextTick(() => {
+    if (previousFocusElement.value) {
+      previousFocusElement.value.focus()
+    }
+  })
 }
+
+// Gestion de la touche Escape
+const handleEscape = (e) => {
+  if (e.key === 'Escape' && showModal.value) {
+    closeModal()
+  }
+}
+
+// Watcher pour ajouter/retirer les event listeners
+watch(showModal, (isOpen) => {
+  if (isOpen) {
+    document.addEventListener('keydown', handleEscape)
+    // Déplacer le focus dans le modal après le rendu
+    nextTick(() => {
+      const modalCloseButton = document.querySelector('.modal-close')
+      if (modalCloseButton) {
+        modalCloseButton.focus()
+      }
+    })
+  } else {
+    document.removeEventListener('keydown', handleEscape)
+  }
+})
 
 onMounted(() => {
   loadFeaturedContent()
@@ -140,10 +174,10 @@ onMounted(() => {
 
     <!-- Modal pour afficher le lecteur -->
     <Teleport to="body">
-      <div v-if="showModal" class="track-modal" @click.self="closeModal">
+      <div v-if="showModal" class="track-modal" @click.self="closeModal" role="dialog" aria-modal="true" :aria-labelledby="'modal-title-' + selectedTrack?.id">
         <div class="modal-content">
-          <button class="modal-close" @click="closeModal">
-            <i class="fas fa-times"></i>
+          <button class="modal-close" @click="closeModal" aria-label="Fermer le lecteur audio">
+            <i class="fas fa-times" aria-hidden="true"></i>
           </button>
           <div class="modal-player-wrapper">
             <!-- Embed avec HTML complet (SoundCloud, etc.) -->
@@ -159,6 +193,7 @@ onMounted(() => {
               class="spotify-container">
               <iframe
                 :src="selectedTrack.spotifyUrl"
+                :title="'Lecteur audio pour ' + selectedTrack.title"
                 width="100%"
                 height="352"
                 frameborder="0"
@@ -172,13 +207,14 @@ onMounted(() => {
               v-else-if="selectedTrack && selectedTrack.audioUrl"
               controls
               autoplay
+              :aria-label="'Lecteur audio pour ' + selectedTrack.title"
               class="audio-player">
               <source :src="selectedTrack.audioUrl" type="audio/mpeg">
               Votre navigateur ne supporte pas la lecture audio.
             </audio>
           </div>
           <div class="modal-title">
-            <h2>{{ selectedTrack?.title }}</h2>
+            <h2 :id="'modal-title-' + selectedTrack?.id">{{ selectedTrack?.title }}</h2>
           </div>
 
           <!-- Bouton pour ouvrir dans le service -->
