@@ -98,6 +98,60 @@
             margin-bottom: 0.5rem;
         }
 
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-error p {
+            color: #ef4444;
+            margin: 0;
+        }
+
+        .alert-error .font-bold {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-warning p {
+            color: #f59e0b;
+            margin: 0;
+        }
+
+        .alert-warning .font-bold {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info p {
+            color: #3b82f6;
+            margin: 0;
+        }
+
+        .alert-info .font-bold {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -236,6 +290,30 @@
         <div th:if="${successMessage}" class="alert-success">
             <p class="font-bold">Succès !</p>
             <p th:text="${successMessage}"></p>
+        </div>
+
+        <!-- Message d'erreur personnalisé (anti-brute force) -->
+        <div th:if="${session.errorMessage}" class="alert-error">
+            <p class="font-bold">⚠️ Erreur</p>
+            <p th:text="${session.errorMessage}"></p>
+        </div>
+
+        <!-- Message d'erreur générique -->
+        <div th:if="${param.error != null and session.errorMessage == null}" class="alert-error">
+            <p class="font-bold">⚠️ Erreur</p>
+            <p>Identifiants invalides. Veuillez réessayer.</p>
+        </div>
+
+        <!-- Message de blocage -->
+        <div th:if="${param.blocked != null}" class="alert-warning">
+            <p class="font-bold">🚫 Compte bloqué</p>
+            <p>Votre compte a été temporairement bloqué. Veuillez réessayer dans 15 minutes.</p>
+        </div>
+
+        <!-- Message de déconnexion -->
+        <div th:if="${param.logout != null}" class="alert-info">
+            <p class="font-bold">✓ Déconnexion</p>
+            <p>Vous avez été déconnecté avec succès.</p>
         </div>
 
         <form th:action="@{/login}" method="post">
