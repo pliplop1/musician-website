@@ -196,6 +196,13 @@
             line-height: 1.4;
         }
 
+        .track-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
         .track-type-badge {
             display: inline-flex;
             align-items: center;
@@ -207,6 +214,69 @@
             color: #4ade80;
             font-size: 0.8rem;
             width: fit-content;
+        }
+
+        .like-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .like-button:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            transform: scale(1.05);
+        }
+
+        .like-button.liked {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+
+        .like-button.liked i {
+            animation: heartBeat 0.6s ease-in-out;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1.1); }
+            75% { transform: scale(1.25); }
+        }
+
+        /* Badge de compteur d'écoutes */
+        .play-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 15px;
+            color: #c084fc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .play-count-badge:hover {
+            background: rgba(168, 85, 247, 0.25);
+            transform: scale(1.05);
+        }
+
+        .play-count-badge i {
+            font-size: 0.9rem;
         }
 
         /* Modal */
@@ -591,6 +661,8 @@ let allTracks = [];
 let filteredTracks = [];
 let currentPage = 1;
 const tracksPerPage = 9;
+let isAuthenticated = false;
+let likedTracks = new Set();
 
 // Déterminer le type de lecteur et l'icône
 function getPlayerType(track) {
@@ -667,10 +739,25 @@ function displayTracks(tracks) {
                 </div>
                 <div class="track-card-footer">
                     <h3>${track.title}</h3>
-                    <span class="track-type-badge">
-                        <i class="${playerType.icon}"></i>
-                        ${playerType.label}
-                    </span>
+                    <div class="track-meta">
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span class="track-type-badge">
+                                <i class="${playerType.icon}"></i>
+                                ${playerType.label}
+                            </span>
+                            <span class="play-count-badge" data-play-track-id="${track.id}" title="${track.playCount || 0} écoutes">
+                                <i class="fas fa-headphones"></i>
+                                <span>${track.playCount || 0}</span>
+                            </span>
+                        </div>
+                        <button
+                            class="like-button ${likedTracks.has(track.id) ? 'liked' : ''}"
+                            data-like-track-id="${track.id}"
+                            title="${likedTracks.has(track.id) ? 'Retirer le like' : 'Aimer ce morceau'}">
+                            <i class="${likedTracks.has(track.id) ? 'fas' : 'far'} fa-heart"></i>
+                            <span>${track.likeCount || 0}</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -684,6 +771,15 @@ function displayTracks(tracks) {
             if (track) {
                 openTrackModal(track);
             }
+        });
+    });
+
+    // Ajouter les événements de clic pour les boutons like
+    document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const trackId = parseInt(this.dataset.likeTrackId);
+            toggleLike(trackId, this);
         });
     });
 
@@ -785,6 +881,41 @@ function openTrackModal(track) {
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Incrémenter le compteur d'écoutes (sans authentification requise)
+    incrementPlayCount(track.id);
+}
+
+// Incrémenter le compteur d'écoutes d'un morceau
+async function incrementPlayCount(trackId) {
+    try {
+        const response = await fetch(`/api/tracks/${trackId}/play`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log(`🎵 Écoute enregistrée pour le morceau ${trackId}: ${data.playCount} écoutes`);
+
+            // Mettre à jour le compteur local dans allTracks
+            const track = allTracks.find(t => t.id === trackId);
+            if (track) {
+                track.playCount = data.playCount;
+            }
+
+            // Mettre à jour le badge affiché sur la page
+            const playBadge = document.querySelector(`[data-play-track-id="${trackId}"]`);
+            if (playBadge) {
+                const countSpan = playBadge.querySelector('span');
+                if (countSpan) {
+                    countSpan.textContent = data.playCount;
+                }
+                playBadge.title = `${data.playCount} écoutes`;
+            }
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'incrémentation des écoutes:', error);
+    }
 }
 
 // Fermer le modal
@@ -811,6 +942,107 @@ function searchTracks(query) {
 
     currentPage = 1;
     displayTracks(filteredTracks);
+}
+
+// Obtenir le token CSRF
+function getCsrfToken() {
+    const token = document.querySelector('meta[name="_csrf"]')?.content;
+    const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+    return { token, header };
+}
+
+// Toggle like
+async function toggleLike(trackId, button) {
+    if (!isAuthenticated) {
+        alert('Vous devez être connecté pour liker un morceau');
+        window.location.href = '/login';
+        return;
+    }
+
+    const csrf = getCsrfToken();
+    const isLiked = likedTracks.has(trackId);
+
+    try {
+        const response = await fetch(`/api/tracks/${trackId}/like`, {
+            method: isLiked ? 'DELETE' : 'POST',
+            headers: {
+                [csrf.header]: csrf.token
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                isAuthenticated = false;
+                alert('Session expirée, veuillez vous reconnecter');
+                window.location.href = '/login';
+                return;
+            }
+            throw new Error('Erreur lors du like');
+        }
+
+        // Mettre à jour l'état local
+        if (isLiked) {
+            likedTracks.delete(trackId);
+        } else {
+            likedTracks.add(trackId);
+        }
+
+        // Récupérer le nombre de likes mis à jour
+        const trackResponse = await fetch(`/api/public/tracks/${trackId}`);
+        if (trackResponse.ok) {
+            const trackData = await trackResponse.json();
+            const track = allTracks.find(t => t.id === trackId);
+            if (track) {
+                track.likeCount = trackData.likeCount;
+            }
+
+            // Mettre à jour l'affichage du bouton
+            const icon = button.querySelector('i');
+            const count = button.querySelector('span');
+
+            if (likedTracks.has(trackId)) {
+                button.classList.add('liked');
+                icon.className = 'fas fa-heart';
+            } else {
+                button.classList.remove('liked');
+                icon.className = 'far fa-heart';
+            }
+            count.textContent = trackData.likeCount || 0;
+        }
+    } catch (error) {
+        console.error('Erreur lors du like:', error);
+        alert('Une erreur est survenue');
+    }
+}
+
+// Vérifier l'authentification
+async function checkAuth() {
+    try {
+        const response = await fetch('/api/user/current');
+        isAuthenticated = response.ok && (await response.json());
+    } catch (error) {
+        console.error('Erreur vérification auth:', error);
+        isAuthenticated = false;
+    }
+}
+
+// Charger les statuts de like
+async function loadLikeStatuses() {
+    if (!isAuthenticated) return;
+
+    for (const track of allTracks) {
+        try {
+            const response = await fetch(`/api/tracks/${track.id}/like-status`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.liked) {
+                    likedTracks.add(track.id);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur chargement status like:', error);
+        }
+    }
 }
 
 // Charger les morceaux
@@ -852,10 +1084,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return response.json();
         })
-        .then(tracks => {
+        .then(async tracks => {
             allTracks = tracks;
             filteredTracks = tracks;
             loadingMessage.style.display = 'none';
+
+            // Vérifier l'authentification et charger les likes
+            await checkAuth();
+            await loadLikeStatuses();
+
             displayTracks(tracks);
         })
         .catch(error => {

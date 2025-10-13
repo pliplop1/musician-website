@@ -46,10 +46,29 @@ defineEmits(['click'])
 
     <div :class="`${mediaType}-card-footer media-card-footer`">
       <h3>{{ item.title }}</h3>
-      <span :class="`${mediaType}-type-badge media-type-badge`">
-        <i :class="playerTypeInfo.icon"></i>
-        {{ playerTypeInfo.label }}
-      </span>
+      <div class="media-meta">
+        <span :class="`${mediaType}-type-badge media-type-badge`">
+          <i :class="playerTypeInfo.icon"></i>
+          {{ playerTypeInfo.label }}
+        </span>
+        <div class="media-stats">
+          <!-- Compteur de vues (vidéos uniquement) -->
+          <span v-if="mediaType === 'video'" class="view-count-badge" :title="`${item.viewCount || 0} vues`">
+            <i class="fas fa-eye"></i>
+            <span>{{ item.viewCount || 0 }}</span>
+          </span>
+          <!-- Compteur de lectures (tracks uniquement) -->
+          <span v-if="mediaType === 'track'" class="play-count-badge" :title="`${item.playCount || 0} écoutes`">
+            <i class="fas fa-headphones"></i>
+            <span>{{ item.playCount || 0 }}</span>
+          </span>
+          <!-- Compteur de likes (commun) -->
+          <span class="like-count-badge" :title="`${item.likeCount || 0} likes`">
+            <i class="fas fa-heart"></i>
+            <span>{{ item.likeCount || 0 }}</span>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -194,6 +213,77 @@ defineEmits(['click'])
   color: #f87171;
 }
 
+/* Styles pour les statistiques */
+.media-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.media-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Badges de statistiques communs */
+.view-count-badge,
+.play-count-badge,
+.like-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Badge de vues (bleu) */
+.view-count-badge {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.view-count-badge:hover {
+  background: rgba(59, 130, 246, 0.25);
+  transform: scale(1.05);
+}
+
+/* Badge de lectures (violet) */
+.play-count-badge {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #c084fc;
+}
+
+.play-count-badge:hover {
+  background: rgba(168, 85, 247, 0.25);
+  transform: scale(1.05);
+}
+
+/* Badge de likes (rose/rouge) */
+.like-count-badge {
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  color: #f472b6;
+}
+
+.like-count-badge:hover {
+  background: rgba(236, 72, 153, 0.25);
+  transform: scale(1.05);
+}
+
+/* Icônes dans les badges */
+.view-count-badge i,
+.play-count-badge i,
+.like-count-badge i {
+  font-size: 0.9rem;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -222,6 +312,24 @@ defineEmits(['click'])
   .media-type-badge {
     font-size: 0.75rem;
     padding: 0.4rem 0.8rem;
+  }
+
+  .media-stats {
+    gap: 0.5rem;
+  }
+
+  .view-count-badge,
+  .play-count-badge,
+  .like-count-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    gap: 0.3rem;
+  }
+
+  .view-count-badge i,
+  .play-count-badge i,
+  .like-count-badge i {
+    font-size: 0.8rem;
   }
 }
 </style>

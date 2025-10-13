@@ -479,6 +479,30 @@ public class PublicApiController {
     }
 
     /**
+     * Récupérer un track par ID
+     */
+    @Operation(
+        summary = "Récupérer un morceau par ID",
+        description = "Retourne un morceau spécifique avec ses détails (compteur de likes inclus)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Morceau récupéré avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TrackDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Morceau introuvable", content = @Content)
+    })
+    @GetMapping("/tracks/{id}")
+    public ResponseEntity<TrackDTO> getTrackById(@PathVariable Long id) {
+        Track track = trackService.findById(id);
+
+        if (track == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        TrackDTO trackDTO = mapToTrackDTO(track);
+        return ResponseEntity.ok(trackDTO);
+    }
+
+    /**
      * Récupérer les photos featured (1-3)
      */
     @Operation(
@@ -520,6 +544,30 @@ public class PublicApiController {
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(photoDTOs);
+    }
+
+    /**
+     * Récupérer une photo par ID
+     */
+    @Operation(
+        summary = "Récupérer une photo par ID",
+        description = "Retourne une photo spécifique avec ses détails (compteur de likes inclus)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Photo récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PhotoDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Photo introuvable", content = @Content)
+    })
+    @GetMapping("/photos/{id}")
+    public ResponseEntity<PhotoDTO> getPhotoById(@PathVariable Long id) {
+        Photo photo = photoService.findById(id);
+
+        if (photo == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        PhotoDTO photoDTO = mapToPhotoDTO(photo);
+        return ResponseEntity.ok(photoDTO);
     }
 
     /**
@@ -607,7 +655,9 @@ public class PublicApiController {
             null, // trackNumber
             null, // duration
             audioUrl,
-            spotifyUrl
+            spotifyUrl,
+            track.getLikeCount() != null ? track.getLikeCount() : 0,
+            track.getPlayCount() != null ? track.getPlayCount().intValue() : 0
         );
     }
 
@@ -625,7 +675,9 @@ public class PublicApiController {
             "/uploaded-photos/" + photo.getFilename(), // thumbnail = same for now
             null, // caption
             "concert", // category par défaut
-            photo.getDisplayOrder()
+            photo.getDisplayOrder(),
+            photo.getLikeCount() != null ? photo.getLikeCount() : 0,
+            photo.getViewCount() != null ? photo.getViewCount().intValue() : 0
         );
     }
 
@@ -643,7 +695,8 @@ public class PublicApiController {
             video.getVideoType().toString(),
             video.getEmbedCode(),
             video.getFilename() != null ? "/uploaded-videos/" + video.getFilename() : null,
-            video.getLikeCount() != null ? video.getLikeCount() : 0
+            video.getLikeCount() != null ? video.getLikeCount() : 0,
+            video.getViewCount() != null ? video.getViewCount().intValue() : 0
         );
     }
 }

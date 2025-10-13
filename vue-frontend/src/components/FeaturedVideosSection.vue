@@ -101,9 +101,23 @@ const toggleLike = async (video, event) => {
 }
 
 // Incrémenter le compteur de vues
-const incrementView = async (videoId) => {
+const incrementView = async (video) => {
   try {
-    await axios.post(`/api/videos/${videoId}/view`)
+    await axios.post(`/api/videos/${video.id}/view`)
+
+    // Recharger le viewCount depuis le serveur
+    const response = await axios.get(`/api/public/videos/${video.id}`)
+    video.viewCount = response.data.viewCount
+
+    // Mettre à jour le cache avec le nouveau viewCount
+    const cachedData = getCachedData()
+    if (cachedData && Array.isArray(cachedData)) {
+      const updatedCache = cachedData.map(v =>
+        v.id === video.id ? { ...v, viewCount: response.data.viewCount } : v
+      )
+      setCachedData(updatedCache)
+      console.log('💾 Cache mis à jour avec le nouveau viewCount')
+    }
   } catch (error) {
     console.error('Erreur lors de l\'incrémentation des vues:', error)
   }
@@ -135,7 +149,7 @@ const checkAuth = async () => {
 
 // Ouvrir vidéo et incrémenter vues
 const openVideoWithView = (video) => {
-  incrementView(video.id)
+  incrementView(video)
   openVideo(video)
 }
 
