@@ -22,15 +22,29 @@ const authState = ref({
 // Check authentication status
 const checkAuthStatus = async () => {
   try {
-    const response = await fetch('/api/public/auth/status', {
+    const response = await fetch('/api/user/current', {
       credentials: 'include' // Important pour envoyer les cookies de session
     })
     if (response.ok) {
       const data = await response.json()
       authState.value = data
+    } else {
+      // Si 404 ou autre erreur, l'utilisateur n'est pas connecté
+      authState.value = {
+        authenticated: false,
+        username: null,
+        isAdmin: false,
+        roles: []
+      }
     }
   } catch (error) {
     console.error('Error checking auth status:', error)
+    authState.value = {
+      authenticated: false,
+      username: null,
+      isAdmin: false,
+      roles: []
+    }
   }
 }
 

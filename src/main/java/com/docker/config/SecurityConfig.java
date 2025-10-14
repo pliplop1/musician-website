@@ -25,9 +25,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
 	private final UserDetailsService userDetailsService;
@@ -126,7 +128,7 @@ public class SecurityConfig {
 			.frameOptions(frameOptions -> frameOptions.deny())
 
 			// X-Content-Type-Options: Empêche le navigateur de deviner le type MIME
-			.contentTypeOptions(contentTypeOptions -> contentTypeOptions.disable())
+			.contentTypeOptions(contentTypeOptions -> {})
 
 			// X-XSS-Protection: Protection XSS (obsolète mais garde la compatibilité)
 			.xssProtection(xssProtection -> xssProtection
@@ -186,6 +188,8 @@ public class SecurityConfig {
 						"/forgot-password", // Demande de réinitialisation de mot de passe
 						"/reset-password", // Réinitialisation de mot de passe avec token
 						"/privacy-policy", // Politique de confidentialité RGPD
+						"/mentions-legales", // Mentions légales
+						"/cookies", // Politique des cookies
 						"/css/**", // Fichiers CSS
 						"/js/**", // Fichiers JavaScript
 						"/images/**", // Images statiques

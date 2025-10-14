@@ -70,3 +70,6 @@ application-local.properties
 
 ### Claude Code configuration (local only) ###
 .claude/
+
+### Gemini Code configuration (local only) ###
+.gemini/

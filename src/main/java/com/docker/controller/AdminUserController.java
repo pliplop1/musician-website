@@ -52,12 +52,17 @@ public class AdminUserController {
     }
 
     @GetMapping("/users/edit/{id}")
-    public String showUserEditForm(@PathVariable Long id, Model model) {
-        User user = userService.findUserById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        model.addAttribute("user", user);
-        model.addAttribute("allRoles", roleRepository.findAll());
-        return "admin/edit-user";
+    public String showUserEditForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findUserById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+            model.addAttribute("user", user);
+            model.addAttribute("allRoles", roleRepository.findAll());
+            return "admin/edit-user";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Utilisateur non trouvé.");
+            return "redirect:/admin/users";
+        }
     }
 
     @PostMapping("/users/update")

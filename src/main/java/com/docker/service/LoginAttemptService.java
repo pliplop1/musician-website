@@ -1,5 +1,9 @@
 package com.docker.service;
 
+import com.docker.dto.DailyStatsDTO;
+import com.docker.dto.LoginAttemptDTO;
+import com.docker.dto.SecurityStatsDTO;
+import com.docker.dto.SuspiciousIpDTO;
 import com.docker.entity.LoginAttempt;
 import com.docker.repository.LoginAttemptRepository;
 import org.slf4j.Logger;
@@ -7,8 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service pour gérer la protection anti-brute force des connexions
@@ -144,7 +151,7 @@ public class LoginAttemptService {
      */
     @Transactional(readOnly = true)
     public LoginAttempt getLastSuccessfulLogin(String username) {
-        return loginAttemptRepository.findLastSuccessfulLogin(username);
+        return loginAttemptRepository.findFirstByUsernameAndSuccessTrueOrderByAttemptTimeDesc(username);
     }
 
     /**
@@ -193,5 +200,156 @@ public class LoginAttemptService {
             "Identifiants invalides. Il vous reste %d tentative(s) avant le blocage temporaire du compte.",
             remainingAttempts
         );
+    }
+
+    // ========================================
+    // MÉTHODES POUR LE DASHBOARD ADMIN
+    // ========================================
+
+    /**
+     * Récupère les statistiques complètes de sécurité pour le dashboard admin
+     *
+     * @return SecurityStatsDTO avec toutes les statistiques
+     */
+    @Transactional(readOnly = true)
+    public SecurityStatsDTO getSecurityStats() {
+        SecurityStatsDTO stats = new SecurityStatsDTO();
+
+        // Statistiques globales
+        stats.setTotalAttempts(loginAttemptRepository.count());
+        stats.setSuccessfulAttempts(loginAttemptRepository.countBySuccess(true));
+        stats.setFailedAttempts(loginAttemptRepository.countBySuccess(false));
+        stats.setBlockedAccounts(countCurrentlyBlockedAccounts());
+
+        // 50 dernières tentatives
+        List<LoginAttempt> recentAttempts = loginAttemptRepository.findTop50ByOrderByAttemptTimeDesc();
+        stats.setRecentAttempts(convertToLoginAttemptDTOs(recentAttempts));
+
+        // IPs suspectes (plus de 3 échecs dans les dernières 24h)
+        stats.setSuspiciousIps(getSuspiciousIps());
+
+        // Statistiques par jour (7 derniers jours)
+        stats.setDailyStats(getDailyStats(7));
+
+        return stats;
+    }
+
+    /**
+     * Compte le nombre de comptes actuellement bloqués
+     *
+     * @return Nombre de comptes bloqués
+     */
+    @Transactional(readOnly = true)
+    public long countCurrentlyBlockedAccounts() {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(BLOCK_DURATION_MINUTES);
+
+        // Récupère tous les usernames avec échecs récents
+        List<String> usernamesWithFailures = loginAttemptRepository
+            .findDistinctUsernamesBySuccessFalseAndAttemptTimeGreaterThanEqual(cutoffTime);
+
+        // Compte ceux qui sont effectivement bloqués
+        return usernamesWithFailures.stream()
+            .filter(this::isBlocked)
+            .count();
+    }
+
+    /**
+     * Récupère les IPs suspectes avec nombreuses tentatives échouées
+     *
+     * @return Liste des IPs suspectes
+     */
+    @Transactional(readOnly = true)
+    public List<SuspiciousIpDTO> getSuspiciousIps() {
+        LocalDateTime last24Hours = LocalDateTime.now().minusHours(24);
+
+        // Récupère toutes les tentatives des dernières 24h
+        List<LoginAttempt> recentAttempts = loginAttemptRepository
+            .findByAttemptTimeGreaterThanEqualOrderByAttemptTimeDesc(last24Hours);
+
+        // Groupe par IP
+        Map<String, List<LoginAttempt>> attemptsByIp = recentAttempts.stream()
+            .collect(Collectors.groupingBy(LoginAttempt::getIpAddress));
+
+        // Filtre les IPs avec plus de 3 échecs
+        List<SuspiciousIpDTO> suspiciousIps = new ArrayList<>();
+
+        attemptsByIp.forEach((ip, attempts) -> {
+            long failedCount = attempts.stream().filter(a -> !a.isSuccess()).count();
+            long successCount = attempts.stream().filter(LoginAttempt::isSuccess).count();
+
+            if (failedCount >= 3) {
+                LoginAttempt lastAttempt = attempts.get(0); // Liste déjà triée par date desc
+                SuspiciousIpDTO dto = new SuspiciousIpDTO(
+                    ip,
+                    failedCount,
+                    successCount,
+                    lastAttempt.getUsername(),
+                    lastAttempt.getAttemptTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
+                );
+                suspiciousIps.add(dto);
+            }
+        });
+
+        // Trie par nombre d'échecs décroissant
+        suspiciousIps.sort((a, b) -> Long.compare(b.getFailedAttempts(), a.getFailedAttempts()));
+
+        return suspiciousIps;
+    }
+
+    /**
+     * Récupère les statistiques journalières pour les N derniers jours
+     *
+     * @param days Nombre de jours
+     * @return Map avec les statistiques par jour
+     */
+    @Transactional(readOnly = true)
+    public Map<String, DailyStatsDTO> getDailyStats(int days) {
+        LocalDateTime startDate = LocalDateTime.now().minusDays(days).withHour(0).withMinute(0).withSecond(0);
+        List<LoginAttempt> attempts = loginAttemptRepository
+            .findByAttemptTimeGreaterThanEqualOrderByAttemptTimeDesc(startDate);
+
+        // Groupe par jour
+        Map<LocalDate, List<LoginAttempt>> attemptsByDay = attempts.stream()
+            .collect(Collectors.groupingBy(a -> a.getAttemptTime().toLocalDate()));
+
+        // Convertit en DailyStatsDTO
+        Map<String, DailyStatsDTO> dailyStats = new LinkedHashMap<>();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        // Crée une entrée pour chaque jour (même si pas d'activité)
+        for (int i = days - 1; i >= 0; i--) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            String dateKey = date.format(dateFormatter);
+
+            List<LoginAttempt> dayAttempts = attemptsByDay.getOrDefault(date, Collections.emptyList());
+
+            long total = dayAttempts.size();
+            long successful = dayAttempts.stream().filter(LoginAttempt::isSuccess).count();
+            long failed = dayAttempts.stream().filter(a -> !a.isSuccess()).count();
+
+            dailyStats.put(dateKey, new DailyStatsDTO(dateKey, total, successful, failed));
+        }
+
+        return dailyStats;
+    }
+
+    /**
+     * Convertit les entités LoginAttempt en DTOs
+     *
+     * @param attempts Liste d'entités
+     * @return Liste de DTOs
+     */
+    private List<LoginAttemptDTO> convertToLoginAttemptDTOs(List<LoginAttempt> attempts) {
+        return attempts.stream()
+            .map(a -> new LoginAttemptDTO(
+                a.getId(),
+                a.getUsername(),
+                a.getIpAddress(),
+                a.getAttemptTime(),
+                a.isSuccess(),
+                a.getFailureReason(),
+                a.getUserAgent()
+            ))
+            .collect(Collectors.toList());
     }
 }

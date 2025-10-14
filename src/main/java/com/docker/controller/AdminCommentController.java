@@ -48,8 +48,12 @@ public class AdminCommentController {
      */
     @PostMapping("/approve/{id}")
     public String approveComment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        commentService.approveComment(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Commentaire approuvé avec succès !");
+        try {
+            commentService.approveComment(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Commentaire approuvé avec succès !");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur : Commentaire non trouvé.");
+        }
         return "redirect:/admin/comments";
     }
 
@@ -58,8 +62,12 @@ public class AdminCommentController {
      */
     @PostMapping("/delete/{id}")
     public String deleteComment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        commentService.deleteComment(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Commentaire supprimé avec succès !");
+        try {
+            commentService.deleteComment(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Commentaire supprimé avec succès !");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la suppression du commentaire.");
+        }
         return "redirect:/admin/comments";
     }
 
@@ -67,7 +75,7 @@ public class AdminCommentController {
      * Approuver plusieurs commentaires en masse
      */
     @PostMapping("/bulk-approve")
-    public String bulkApproveComments(@RequestParam("commentIds") List<Long> commentIds, RedirectAttributes redirectAttributes) {
+    public String bulkApproveComments(@RequestParam(name = "commentIds", required = false) List<Long> commentIds, RedirectAttributes redirectAttributes) {
         if (commentIds == null || commentIds.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Aucun commentaire sélectionné");
             return "redirect:/admin/comments";
@@ -87,7 +95,7 @@ public class AdminCommentController {
      * Supprimer plusieurs commentaires en masse
      */
     @PostMapping("/bulk-delete")
-    public String bulkDeleteComments(@RequestParam("commentIds") List<Long> commentIds, RedirectAttributes redirectAttributes) {
+    public String bulkDeleteComments(@RequestParam(name = "commentIds", required = false) List<Long> commentIds, RedirectAttributes redirectAttributes) {
         if (commentIds == null || commentIds.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Aucun commentaire sélectionné");
             return "redirect:/admin/comments";

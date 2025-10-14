@@ -95,6 +95,7 @@ class SecurityConfigTest {
     // ===========================================
 
     @Test
+    @WithAnonymousUser
     void testCors_AllowedOrigin_ReturnsOk() throws Exception {
         mockMvc.perform(get("/api/public/tracks")
                         .header("Origin", "http://localhost:5173"))
@@ -107,6 +108,7 @@ class SecurityConfigTest {
     // ===========================================
 
     @Test
+    @WithAnonymousUser
     void testSecurityHeaders_ArePresent() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(header().exists("X-Content-Type-Options"))
