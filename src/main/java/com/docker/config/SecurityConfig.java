@@ -26,6 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.core.env.Environment;
 
 @Configuration
 @EnableWebSecurity
@@ -39,19 +40,21 @@ public class SecurityConfig {
 	private final CsrfTokenLogger csrfTokenLogger;
 	private final ContentSecurityPolicyFilter cspFilter;
 
-	public SecurityConfig(UserDetailsService userDetailsService,
-	                      CustomAuthenticationSuccessHandler successHandler,
-	                      CustomAuthenticationFailureHandler failureHandler,
-	                      LoginAttemptFilter loginAttemptFilter,
-	                      CsrfTokenLogger csrfTokenLogger,
-	                      ContentSecurityPolicyFilter cspFilter) {
-		this.userDetailsService = userDetailsService;
-		this.successHandler = successHandler;
-		this.failureHandler = failureHandler;
-		this.loginAttemptFilter = loginAttemptFilter;
-		this.csrfTokenLogger = csrfTokenLogger;
-		this.cspFilter = cspFilter;
-	}
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          CustomAuthenticationSuccessHandler successHandler,
+                          CustomAuthenticationFailureHandler failureHandler,
+                          LoginAttemptFilter loginAttemptFilter,
+                          CsrfTokenLogger csrfTokenLogger,
+                          ContentSecurityPolicyFilter cspFilter,
+                          Environment environment) {
+        this.userDetailsService = userDetailsService;
+        this.successHandler = successHandler;
+        this.failureHandler = failureHandler;
+        this.loginAttemptFilter = loginAttemptFilter;
+        this.csrfTokenLogger = csrfTokenLogger;
+        this.cspFilter = cspFilter;
+        this.environment = environment;
+    }
 
 	/**
 	 * NOTE: Utilisation de web.ignoring() pour les fichiers statiques
@@ -113,8 +116,10 @@ public class SecurityConfig {
 		return source;
 	}
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    private final Environment environment;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authenticationProvider(authenticationProvider());
 
 		// Activer CORS avec la configuration définie dans corsConfigurationSource()
@@ -123,9 +128,11 @@ public class SecurityConfig {
 		// ========================================
 		// EN-TÊTES DE SÉCURITÉ HTTP
 		// ========================================
-		http.headers(headers -> headers
-			// X-Frame-Options: Protège contre les attaques de clickjacking
-			.frameOptions(frameOptions -> frameOptions.deny())
+        final boolean isProd = java.util.Arrays.asList(environment.getActiveProfiles()).contains("prod");
+
+        http.headers(headers -> headers
+            // X-Frame-Options: Protège contre les attaques de clickjacking
+            .frameOptions(frameOptions -> frameOptions.deny())
 
 			// X-Content-Type-Options: Empêche le navigateur de deviner le type MIME
 			.contentTypeOptions(contentTypeOptions -> {})
@@ -135,18 +142,17 @@ public class SecurityConfig {
 				.headerValue(org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
 			)
 
-			// Strict-Transport-Security (HSTS): Force HTTPS (à activer en production)
-			// NOTE: Commenté pour le développement local
-			// .httpStrictTransportSecurity(hsts -> hsts
-			//     .maxAgeInSeconds(31536000)
-			//     .includeSubDomains(true)
-			//     .preload(true)
-			// )
-
-			// Referrer-Policy: Contrôle les informations envoyées dans l'en-tête Referer
-			.referrerPolicy(referrerPolicy -> referrerPolicy
-				.policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-			)
+            // Strict-Transport-Security (HSTS): Force HTTPS en production
+            .httpStrictTransportSecurity(hsts -> {
+                if (isProd) {
+                    hsts.maxAgeInSeconds(31536000).includeSubDomains(true).preload(true);
+                }
+            })
+        
+            // Referrer-Policy: Contrôle les informations envoyées dans l'en-tête Referer
+            .referrerPolicy(referrerPolicy -> referrerPolicy
+                .policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+            )
 
 			// Permissions-Policy: Contrôle les fonctionnalités du navigateur
 			.permissionsPolicy(permissionsPolicy -> permissionsPolicy

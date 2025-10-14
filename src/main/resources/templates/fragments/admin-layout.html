@@ -12,7 +12,7 @@
                 <div th:if="${currentUser != null && currentUser.avatarFilename != null}">
                     <img th:src="@{/uploaded-avatars/{filename}(filename=${currentUser.avatarFilename})}"
                          alt="Avatar" 
-                         class="w-20 h-20 rounded-full border-4 border-indigo-500 object-cover">
+                         class="w-20 h-20 rounded-full border-4 border-indigo-500 object-cover" loading="lazy" decoding="async" width="32" height="32">
                 </div>
                 <div th:if="${currentUser == null || currentUser.avatarFilename == null}" 
                      class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-indigo-500">

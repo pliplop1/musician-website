@@ -157,6 +157,24 @@ onMounted(async () => {
   await loadFeaturedContent()
   await checkAuth()
 })
+
+// Consentement pour contenus externes (utilise le consentement "performance" comme proxy)
+function hasExternalConsent() {
+  try {
+    const consent = JSON.parse(localStorage.getItem('cookie-consent') || 'null')
+    return !!(consent && consent.performance)
+  } catch {
+    return false
+  }
+}
+
+function openConsentSettings() {
+  if (typeof window !== 'undefined' && typeof window.resetCookieConsent === 'function') {
+    window.resetCookieConsent()
+  } else {
+    alert('Ouvrez les paramètres de cookies depuis le pied de page.')
+  }
+}
 </script>
 
 <template>
@@ -184,7 +202,7 @@ onMounted(async () => {
           class="video-card"
           @click="openVideoWithView(video)">
           <div class="video-thumbnail">
-            <img :src="getThumbnailUrl(video)" :alt="video.title" />
+            <img :src="getThumbnailUrl(video)" :alt="video.title" loading="lazy" decoding="async" />
             <div class="play-overlay">
               <i class="fas fa-play-circle"></i>
             </div>
@@ -233,9 +251,14 @@ onMounted(async () => {
             <i class="fas fa-times"></i>
           </button>
           <div class="modal-video-wrapper">
+            <!-- Consent gate for external embeds -->
+            <div v-if="selectedVideo && selectedVideo.videoType === 'EMBED' && selectedVideo.embedCode && !hasExternalConsent()" class="consent-placeholder">
+              <p>Lecture externe désactivée sans consentement.</p>
+              <button @click="openConsentSettings" class="btn-open-consent">Gérer mes cookies</button>
+            </div>
             <!-- Video EMBED (YouTube/Vimeo) -->
             <div
-              v-if="selectedVideo && selectedVideo.videoType === 'EMBED' && selectedVideo.embedCode"
+              v-else-if="selectedVideo && selectedVideo.videoType === 'EMBED' && selectedVideo.embedCode"
               v-html="selectedVideo.embedCode"
               class="embed-container">
             </div>

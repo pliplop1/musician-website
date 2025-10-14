@@ -6,7 +6,7 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Vidéos - Duo Black & White</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preload" as="style" th:href="@\{/css/style.css(v=${#dates.createNow().time})\}" onload="this.onload=null;this.rel='stylesheet'">`n    <noscript><link rel="stylesheet" th:href="@\{/css/style.css(v=${#dates.createNow().time})\}"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/video-page.css}">
 </head>
@@ -490,3 +490,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+

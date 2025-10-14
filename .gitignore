@@ -45,6 +45,15 @@ dependency-reduced-pom.xml
 # AJOUT - Ignore le dossier de build du frontend
 /frontend/dist/
 
+# Node modules à la racine (si présents)
+/node_modules/
+
+# Dossiers d'uploads (non versionnés)
+/uploaded-photos/
+/uploaded-music/
+/uploaded-videos/
+/uploaded-avatars/
+
 ### Vue.js Frontend ###
 /vue-frontend/node_modules/
 /vue-frontend/dist/

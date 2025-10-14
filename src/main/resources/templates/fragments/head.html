@@ -1,0 +1,19 @@
+<th:block th:fragment="head(title, description, canonicalUrl, ogImageUrl)">
+    <title th:text="${title} ?: 'Duo Black & White - Site officiel'"></title>
+    <meta name="description" th:content="${description} ?: 'Site officiel du Duo Black & White. Biographie, concerts, galerie, musique et actualités.'" />
+
+    <link rel="canonical" th:if="${canonicalUrl}" th:href="${canonicalUrl}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" th:content="${title} ?: 'Duo Black & White - Site officiel'" />
+    <meta property="og:description" th:content="${description} ?: 'Site officiel du Duo Black & White. Biographie, concerts, galerie, musique et actualités.'" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" th:if="${canonicalUrl}" th:content="${canonicalUrl}" />
+    <meta property="og:image" th:if="${ogImageUrl}" th:content="${ogImageUrl}" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" th:content="${title} ?: 'Duo Black & White - Site officiel'" />
+    <meta name="twitter:description" th:content="${description} ?: 'Site officiel du Duo Black & White. Biographie, concerts, galerie, musique et actualités.'" />
+    <meta name="twitter:image" th:if="${ogImageUrl}" th:content="${ogImageUrl}" />
+</th:block>

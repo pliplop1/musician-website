@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title>Galerie - Duo Black & White</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <th:block th:replace="~{fragments/head :: head(
+        'Galerie - Duo Black & White',
+        'Toute notre galerie photo: souvenirs de concerts et moments partagés.',
+        null,
+        null
+    )}"></th:block>
+
+    <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/gallery-page.css}">
 </head>
@@ -116,7 +123,7 @@ function displayPhotos(photos) {
     grid.innerHTML = photosToShow.map(photo => `
         <div class="photo-card" data-photo-id="${photo.id}">
             <div class="photo-thumbnail">
-                <img src="${photo.url}" alt="${photo.caption || 'Photo de galerie'}">
+                <img src="${photo.url}" alt="${photo.caption || 'Photo de galerie'}" loading="lazy" decoding="async">
                 <div class="zoom-overlay">
                     <i class="fas fa-search-plus"></i>
                 </div>
@@ -225,7 +232,7 @@ function openPhotoModal(photo) {
     incrementViewCount(photo.id);
 
     modalTitle.textContent = photo.caption || 'Photo #' + photo.id;
-    modalImageWrapper.innerHTML = `<img src="${photo.url}" alt="${photo.caption || 'Photo de galerie'}">`;
+    modalImageWrapper.innerHTML = `<img src="${photo.url}" alt="${photo.caption || 'Photo de galerie'}" loading="lazy" decoding="async">`;
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';

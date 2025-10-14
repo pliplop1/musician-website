@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biographie - Duo Black & White</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <th:block th:replace="~{fragments/head :: head(
+        'Biographie - Duo Black & White',
+        'Biographie officielle du Duo Black & White.',
+        null,
+        null
+    )}"></th:block>
+    <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
 </head>
 <body class="bg-gray-900 text-white">
 
