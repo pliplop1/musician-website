@@ -5,6 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -89,6 +92,52 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Gestion des erreurs d'accès refusé (401/403)
+     * Retourne 401 pour les utilisateurs non authentifiés
+     * Retourne 403 pour les utilisateurs authentifiés sans permissions
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDeniedException(
+            AccessDeniedException ex,
+            HttpServletRequest request) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Check if user is truly authenticated (not anonymous)
+        // Anonymous users have the ROLE_ANONYMOUS authority
+        boolean isAuthenticated = authentication != null &&
+                                 authentication.isAuthenticated() &&
+                                 authentication.getAuthorities().stream()
+                                     .noneMatch(a -> "ROLE_ANONYMOUS".equals(a.getAuthority()));
+
+        if (isAuthenticated) {
+            // Utilisateur authentifié mais sans les permissions nécessaires
+            logger.warn("Access denied for user {}: {}", authentication.getName(), ex.getMessage());
+
+            ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                "You don't have permission to access this resource",
+                request.getRequestURI()
+            );
+
+            return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
+        } else {
+            // Utilisateur non authentifié
+            logger.warn("Unauthorized access attempt: {}", ex.getMessage());
+
+            ApiError apiError = new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
+                "Authentication is required to access this resource",
+                request.getRequestURI()
+            );
+
+            return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     /**

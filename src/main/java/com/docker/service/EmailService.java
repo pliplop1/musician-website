@@ -98,4 +98,35 @@ public class EmailService {
 
         sendSimpleEmail(to, subject, text);
     }
+
+    /**
+     * Envoie un email de réinitialisation de mot de passe avec un token sécurisé
+     *
+     * @param to       Adresse email du destinataire
+     * @param userName Nom de l'utilisateur
+     * @param resetUrl URL de réinitialisation contenant le token sécurisé
+     */
+    public void sendPasswordResetEmail(String to, String userName, String resetUrl) {
+        String subject = "🔒 Réinitialisation de votre mot de passe";
+
+        String text = String.format(
+            "Bonjour %s,\n\n" +
+            "Vous avez demandé la réinitialisation de votre mot de passe.\n\n" +
+            "Cliquez sur le lien ci-dessous pour créer un nouveau mot de passe :\n" +
+            "%s\n\n" +
+            "⏰ Ce lien est valide pendant 1 heure.\n\n" +
+            "⚠️ Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n" +
+            "Votre mot de passe actuel restera inchangé.\n\n" +
+            "Pour votre sécurité :\n" +
+            "- Ne partagez jamais ce lien\n" +
+            "- Utilisez un mot de passe fort et unique\n" +
+            "- Changez votre mot de passe régulièrement\n\n" +
+            "Cordialement,\n" +
+            "L'équipe Musician Website",
+            userName,
+            resetUrl
+        );
+
+        sendSimpleEmail(to, subject, text);
+    }
 }

@@ -60,6 +60,12 @@
                 </a>
             </li>
             <li>
+                <a th:href="@{/admin/security}" class="block py-2 px-3 rounded hover:bg-gray-700"
+                   th:classappend="${#strings.startsWith(currentUri, '/admin/security')} ? 'bg-gray-900 font-semibold' : ''">
+                   🔒 Sécurité
+                </a>
+            </li>
+            <li>
                 <a th:href="@{/admin/concerts}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/concerts')} ? 'bg-gray-900 font-semibold' : ''">
                    🎵 Concerts

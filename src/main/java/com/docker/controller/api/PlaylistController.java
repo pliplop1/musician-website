@@ -4,6 +4,7 @@ import com.docker.entity.Playlist;
 import com.docker.service.PlaylistService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -64,6 +65,8 @@ public class PlaylistController {
         try {
             Playlist saved = playlistService.save(playlist);
             return ResponseEntity.ok(saved);
+        } catch (AccessDeniedException e) {
+            throw e;  // Rethrow security exceptions
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -84,6 +87,8 @@ public class PlaylistController {
             playlist.setId(id);
             Playlist updated = playlistService.save(playlist);
             return ResponseEntity.ok(updated);
+        } catch (AccessDeniedException e) {
+            throw e;  // Rethrow security exceptions
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -104,6 +109,8 @@ public class PlaylistController {
             response.put("success", true);
             response.put("message", "Musique ajoutée à la playlist");
             return ResponseEntity.ok(response);
+        } catch (AccessDeniedException e) {
+            throw e;  // Rethrow security exceptions
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                 .body(Map.of("error", "Erreur lors de l'ajout: " + e.getMessage()));
@@ -125,6 +132,8 @@ public class PlaylistController {
             response.put("success", true);
             response.put("message", "Musique retirée de la playlist");
             return ResponseEntity.ok(response);
+        } catch (AccessDeniedException e) {
+            throw e;  // Rethrow security exceptions
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                 .body(Map.of("error", "Erreur lors de la suppression: " + e.getMessage()));
@@ -141,6 +150,8 @@ public class PlaylistController {
         try {
             playlistService.deletePlaylist(id);
             return ResponseEntity.ok(Map.of("success", true, "message", "Playlist supprimée"));
+        } catch (AccessDeniedException e) {
+            throw e;  // Rethrow security exceptions
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                 .body(Map.of("error", "Erreur lors de la suppression: " + e.getMessage()));

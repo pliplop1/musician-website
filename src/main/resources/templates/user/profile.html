@@ -134,17 +134,28 @@
 					</div>
 
 					<div th:if="${user.createdAt != null}"
-						class="text-sm text-gray-500 mb-4">
+						class="text-sm text-gray-500 mb-2">
 						📅 Membre depuis le <span
 							th:text="${#temporals.format(user.createdAt, 'dd MMMM yyyy')}"></span>
+					</div>
+
+					<div th:if="${lastLogin != null}"
+						class="text-sm text-gray-500 mb-4">
+						🔐 Dernière connexion: <span
+							th:text="${#temporals.format(lastLogin.attemptTime, 'dd/MM/yyyy HH:mm')}"></span>
+						<span class="text-xs">(<span th:text="${lastLogin.ipAddress}"></span>)</span>
 					</div>
 
 					<div class="flex flex-wrap gap-2 justify-center md:justify-start">
 						<a th:href="@{/user/profile/details}"
 							class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">
-							✏️ Modifier mes informations </a> <a th:href="@{/user/profile/edit}"
+							✏️ Modifier mes informations </a>
+						<a th:href="@{/user/profile/edit}"
 							class="inline-block bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">
 							⚙️ Paramètres du compte </a>
+						<a th:href="@{/user/login-history}"
+							class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
+							🔒 Historique de connexion </a>
 					</div>
 					<!-- Statistiques -->
 					<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

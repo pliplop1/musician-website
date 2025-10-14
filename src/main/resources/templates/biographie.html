@@ -19,24 +19,7 @@
     </section>
 </main>
 
-<footer class="bg-gray-800 mt-20 py-8">
-    <div class="container mx-auto px-6 text-center text-gray-400">
-        <div class="flex justify-center space-x-6 mb-6" th:if="${!#lists.isEmpty(enabledSocialLinks)}">
-            <a th:each="link : ${enabledSocialLinks}"
-               th:href="${link.url}"
-               target="_blank"
-               class="hover:text-white transition-colors flex items-center gap-2"
-               th:title="${link.name}">
-                <i th:class="${link.icon} + ' text-xl'"></i>
-                <span th:text="${link.name}"></span>
-            </a>
-        </div>
-        <div th:if="${#lists.isEmpty(enabledSocialLinks)}" class="mb-6 text-sm">
-            <p>Aucun réseau social configuré</p>
-        </div>
-        <p>© 2025 Duo Black & White. Tous droits réservés.</p>
-    </div>
-</footer>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
 </body>
 </html>

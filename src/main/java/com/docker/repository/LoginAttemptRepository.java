@@ -70,8 +70,7 @@ public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, Long
      * @param username Nom d'utilisateur
      * @return Dernière tentative réussie ou null
      */
-    @Query("SELECT la FROM LoginAttempt la WHERE la.username = :username AND la.success = true ORDER BY la.attemptTime DESC")
-    LoginAttempt findLastSuccessfulLogin(@Param("username") String username);
+    LoginAttempt findFirstByUsernameAndSuccessTrueOrderByAttemptTimeDesc(String username);
 
     /**
      * Supprime les tentatives plus anciennes qu'une date donnée (nettoyage)
@@ -79,4 +78,40 @@ public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, Long
      * @param before Date avant laquelle supprimer
      */
     void deleteByAttemptTimeBefore(LocalDateTime before);
+
+    // ========================================
+    // MÉTHODES POUR LE DASHBOARD ADMIN
+    // ========================================
+
+    /**
+     * Compte le nombre total de tentatives par statut
+     *
+     * @param success Statut (true pour succès, false pour échecs)
+     * @return Nombre de tentatives
+     */
+    long countBySuccess(boolean success);
+
+    /**
+     * Récupère les 50 dernières tentatives (toutes)
+     *
+     * @return Liste des 50 dernières tentatives
+     */
+    List<LoginAttempt> findTop50ByOrderByAttemptTimeDesc();
+
+    /**
+     * Récupère toutes les tentatives depuis une date donnée
+     *
+     * @param since Date à partir de laquelle récupérer
+     * @return Liste des tentatives
+     */
+    List<LoginAttempt> findByAttemptTimeGreaterThanEqualOrderByAttemptTimeDesc(LocalDateTime since);
+
+    /**
+     * Récupère la liste des usernames distincts avec échecs récents
+     *
+     * @param since Date à partir de laquelle chercher
+     * @return Liste des usernames
+     */
+    @Query("SELECT DISTINCT la.username FROM LoginAttempt la WHERE la.success = false AND la.attemptTime >= :since")
+    List<String> findDistinctUsernamesBySuccessFalseAndAttemptTimeGreaterThanEqual(@Param("since") LocalDateTime since);
 }

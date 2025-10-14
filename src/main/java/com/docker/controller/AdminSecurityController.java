@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Contrôleur pour la gestion de la sécurité et du monitoring des connexions
@@ -34,7 +35,7 @@ public class AdminSecurityController {
      * @return Vue du dashboard de sécurité
      */
     @GetMapping
-    public String showSecurityDashboard(Model model) {
+    public String showSecurityDashboard(Model model, RedirectAttributes redirectAttributes) {
         logger.info("Accès au dashboard de sécurité");
 
         try {
@@ -52,8 +53,8 @@ public class AdminSecurityController {
 
         } catch (Exception e) {
             logger.error("Erreur lors du chargement du dashboard de sécurité", e);
-            model.addAttribute("errorMessage", "Erreur lors du chargement des statistiques");
-            return "admin/dashboard";
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors du chargement des statistiques de sécurité.");
+            return "redirect:/admin/dashboard";
         }
     }
 }
