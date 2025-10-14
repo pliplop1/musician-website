@@ -220,6 +220,24 @@ onMounted(async () => {
   await loadFeaturedContent()
   await checkAuth()
 })
+
+// Consentement pour contenus externes (utilise le consentement "performance" comme proxy)
+function hasExternalConsent() {
+  try {
+    const consent = JSON.parse(localStorage.getItem('cookie-consent') || 'null')
+    return !!(consent && consent.performance)
+  } catch {
+    return false
+  }
+}
+
+function openConsentSettings() {
+  if (typeof window !== 'undefined' && typeof window.resetCookieConsent === 'function') {
+    window.resetCookieConsent()
+  } else {
+    alert('Ouvrez les paramètres de cookies depuis le pied de page.')
+  }
+}
 </script>
 
 <template>
@@ -299,8 +317,12 @@ onMounted(async () => {
           </button>
           <div class="modal-player-wrapper">
             <!-- Embed avec HTML complet (SoundCloud, etc.) -->
+            <div v-if="selectedTrack && selectedTrack.spotifyUrl && !hasExternalConsent()" class="consent-placeholder">
+              <p>Lecteur externe désactivé sans consentement.</p>
+              <button @click="openConsentSettings" class="btn-open-consent">Gérer mes cookies</button>
+            </div>
             <div
-              v-if="selectedTrack && selectedTrack.spotifyUrl && isHtmlEmbed(selectedTrack.spotifyUrl)"
+              v-else-if="selectedTrack && selectedTrack.spotifyUrl && isHtmlEmbed(selectedTrack.spotifyUrl)"
               v-html="selectedTrack.spotifyUrl"
               class="embed-html-container">
             </div>

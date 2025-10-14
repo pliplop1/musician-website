@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://duoblackandwhite.com/sitemap.xml
+

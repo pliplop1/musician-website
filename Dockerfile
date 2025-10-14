@@ -46,7 +46,9 @@ COPY pom.xml ./
 COPY src/ ./src/
 
 # Copier les frontends buildés depuis le stage précédent
-COPY --from=frontend-builder /app/frontend/dist/ ./src/main/resources/static/css/
+# Copier le CSS généré par Tailwind
+# Le build frontend a généré le CSS dans /app/src/main/resources/static/css
+COPY --from=frontend-builder /app/src/main/resources/static/css/style.css ./src/main/resources/static/css/style.css
 COPY --from=frontend-builder /app/vue-frontend/dist/ ./src/main/resources/static/vue/
 
 # Builder l'application Spring Boot (sans executer les builds frontend)

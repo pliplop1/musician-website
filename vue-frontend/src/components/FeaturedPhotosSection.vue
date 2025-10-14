@@ -175,7 +175,7 @@ onUnmounted(() => {
           class="photo-card"
           @click="openPhoto(photo)">
           <div class="photo-thumbnail">
-            <img :src="photo.url" :alt="photo.caption || 'Photo de galerie'" />
+            <img :src="photo.url" :alt="photo.caption || 'Photo de galerie'" loading="lazy" decoding="async" />
             <div class="hover-overlay">
               <i class="fas fa-search-plus"></i>
             </div>

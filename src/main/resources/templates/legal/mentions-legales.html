@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentions Légales - Duo Black & White</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <th:block th:replace="~{fragments/head :: head('Duo Black & White - Legal','Informations l�gales et politique.', null, null)}"></th:block>`n<link rel="preload" as="style" th:href="@\{/css/style.css(v=${#dates.createNow().time})\}" onload="this.onload=null;this.rel='stylesheet'">`n<noscript><link rel="stylesheet" th:href="@\{/css/style.css(v=${#dates.createNow().time})\}"></noscript>
     <style>
         .legal-container {
             max-width: 900px;
@@ -91,7 +91,7 @@
     <div th:replace="~{fragments/layout :: header}"></div>
 
     <!-- Main Content -->
-    <main class="legal-container">
+    <main id="main-content" class="legal-container">
         <h1>Mentions Légales</h1>
         <p class="update-date">Dernière mise à jour : 13 octobre 2025</p>
 
@@ -212,3 +212,4 @@
     <!-- Footer (optionnel) -->
 </body>
 </html>
+

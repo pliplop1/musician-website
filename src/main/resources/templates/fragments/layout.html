@@ -2,6 +2,8 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
+    <a href="#main-content" class="skip-link">Aller au contenu</a>
+
     <header th:fragment="header" class="header-black">
         <div class="header-container">
             <a th:href="@{/}" class="header-logo">DUO BLACK & WHITE</a>
@@ -22,7 +24,7 @@
                         <!-- Avatar avec image si disponible -->
                         <div th:if="${currentUser != null && currentUser.avatarFilename != null}" class="user-avatar-img">
                             <img th:src="@{/uploaded-avatars/{filename}(filename=${currentUser.avatarFilename})}"
-                                 th:alt="'Avatar de ' + ${currentUser.username}">
+                                 th:alt="'Avatar de ' + ${currentUser.username}" loading="lazy" decoding="async" width="32" height="32">
                         </div>
 
                         <!-- Avatar avec initiales sinon -->
@@ -42,6 +44,20 @@
         </div>
 
         <style>
+            .skip-link {
+                position: absolute;
+                left: -9999px;
+                top: 0;
+                background: #4a90e2;
+                color: #fff;
+                padding: 8px 12px;
+                z-index: 10000;
+            }
+            .skip-link:focus {
+                left: 8px;
+                top: 8px;
+                outline: 3px solid #fff;
+            }
             .header-black {
                 background: rgba(0, 0, 0, 0.95);
                 backdrop-filter: blur(10px);
@@ -238,10 +254,11 @@
             <div style="margin-top: 1.5rem;">
                 <a th:href="@{/privacy-policy}" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Politique de confidentialité</a> |
                 <a th:href="@{/mentions-legales}" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Mentions légales</a> |
-                <a th:href="@{/cookies}" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Cookies</a>
+                <a th:href="@{/cookies}" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Cookies</a> |\n                <a href="#" onclick="window.resetCookieConsent(); return false;" style="color: #888; text-decoration: none; margin: 0 0.5rem;">G�rer les cookies</a>
             </div>
         </div>
     </footer>
 
 </body>
 </html>
+
