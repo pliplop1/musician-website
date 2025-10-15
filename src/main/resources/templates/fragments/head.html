@@ -16,4 +16,25 @@
     <meta name="twitter:title" th:content="${title} ?: 'Duo Black & White - Site officiel'" />
     <meta name="twitter:description" th:content="${description} ?: 'Site officiel du Duo Black & White. Biographie, concerts, galerie, musique et actualités.'" />
     <meta name="twitter:image" th:if="${ogImageUrl}" th:content="${ogImageUrl}" />
+
+    <!-- Resource Hints: preconnect/dns-prefetch for external providers -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+    <link rel="dns-prefetch" href="//www.youtube.com">
+    <link rel="preconnect" href="https://www.youtube.com" crossorigin>
+    <link rel="dns-prefetch" href="//www.youtube-nocookie.com">
+    <link rel="preconnect" href="https://www.youtube-nocookie.com" crossorigin>
+    <link rel="dns-prefetch" href="//img.youtube.com">
+    <link rel="preconnect" href="https://img.youtube.com" crossorigin>
+
+    <link rel="dns-prefetch" href="//open.spotify.com">
+    <link rel="preconnect" href="https://open.spotify.com" crossorigin>
+    <link rel="dns-prefetch" href="//w.soundcloud.com">
+    <link rel="preconnect" href="https://w.soundcloud.com" crossorigin>
 </th:block>

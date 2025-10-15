@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-<link rel="preload" as="style" th:href="@{/css/style.css}">
-    <title>Actualités - Duo Black & White</title>
-<link rel="stylesheet" th:href="@{/css/style.css}">
+<th:block th:replace="~{fragments/head :: head('Actualités - Duo Black & White','Toutes les actualités, annonces et publications du duo.', null, null)}"></th:block>
+<link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
 <script th:src="@{/js/comments.js}" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
