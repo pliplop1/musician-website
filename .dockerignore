@@ -34,8 +34,7 @@ mvnw.cmd
 .springBeans
 .sts4-cache
 
-# Claude Code
-.claude/
+# (section removed)
 
 # Docker
 Dockerfile

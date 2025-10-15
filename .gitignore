@@ -77,8 +77,7 @@ Thumbs.db
 # AJOUT - Ignore les fichiers de configuration locaux
 application-local.properties
 
-### Claude Code configuration (local only) ###
-.claude/
+### (section removed) ###
 
 ### Gemini Code configuration (local only) ###
 .gemini/
