@@ -58,7 +58,24 @@ public class StaticFileController {
      */
     @GetMapping("/uploaded-avatars/{filename:.+}")
     public ResponseEntity<Resource> serveAvatar(@PathVariable String filename) {
-        return serveFile("uploaded-avatars", filename, "image/png");
+        ResponseEntity<Resource> response = serveFile("uploaded-avatars", filename, "image/png");
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response;
+        }
+        // Fallback: renvoyer un avatar par défaut en SVG si le fichier est introuvable
+        String svg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"128\" height=\"128\" viewBox=\"0 0 128 128\">" +
+                "<defs><linearGradient id=\"g\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">" +
+                "<stop offset=\"0%\" stop-color=\"#e5e7eb\"/><stop offset=\"100%\" stop-color=\"#d1d5db\"/></linearGradient></defs>" +
+                "<rect width=\"128\" height=\"128\" rx=\"64\" fill=\"url(#g)\"/>" +
+                "<circle cx=\"64\" cy=\"50\" r=\"22\" fill=\"#9ca3af\"/>" +
+                "<path d=\"M16 116c8-22 28-32 48-32s40 10 48 32\" fill=\"#9ca3af\"/>" +
+                "</svg>";
+        byte[] bytes = svg.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("image/svg+xml; charset=UTF-8"))
+                .header(HttpHeaders.CACHE_CONTROL, "max-age=600")
+                .body(new org.springframework.core.io.ByteArrayResource(bytes));
     }
 
     /**
