@@ -421,13 +421,13 @@ sequenceDiagram
 
 | Date | Commit | Description | Auteur |
 |------|--------|-------------|--------|
-| 2025-01-XX | 970c819 | Implémentation complète RGPD | Claude |
-| 2025-01-XX | c80c8f8 | Enrichissement entités multimédia | Claude |
-| 2025-01-XX | 5d36e79 | API REST interactions sociales | Claude |
-| 2025-01-XX | 5a91334 | Entité Playlist + CommentType | Claude |
-| 2025-01-XX | 123adfe | Service et API Playlist | Claude |
-| 2025-01-XX | a9b7f06 | Tests unitaires Playlist | Claude |
-| 2025-10-13 | [actuel] | Document de conformité RGPD/RGAA | Claude |
+| 2025-01-XX | 970c819 | Implémentation complète RGPD | pliplop1 |
+| 2025-01-XX | c80c8f8 | Enrichissement entités multimédia | pliplop1 |
+| 2025-01-XX | 5d36e79 | API REST interactions sociales | pliplop1 |
+| 2025-01-XX | 5a91334 | Entité Playlist + CommentType | pliplop1 |
+| 2025-01-XX | 123adfe | Service et API Playlist | pliplop1 |
+| 2025-01-XX | a9b7f06 | Tests unitaires Playlist | pliplop1 |
+| 2025-10-13 | [actuel] | Document de conformité RGPD/RGAA | pliplop1 |
 
 ---
 
@@ -469,3 +469,4 @@ sequenceDiagram
 **Document généré le:** 2025-10-13
 **Version:** 1.0
 **Statut:** Document de référence pour conformité RGPD et RGAA
+

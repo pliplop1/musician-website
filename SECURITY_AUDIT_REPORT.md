@@ -353,4 +353,4 @@ Le système de sécurité est **complet, opérationnel et production-ready** ave
 
 ---
 
-*Rapport généré automatiquement par Claude Code*
+*Rapport g�n�r� automatiquement*
