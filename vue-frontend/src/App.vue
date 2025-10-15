@@ -6,6 +6,7 @@ import FeaturedTracksSection from './components/FeaturedTracksSection.vue'
 import BiographySection from './components/BiographySection.vue'
 import FeaturedPhotosSection from './components/FeaturedPhotosSection.vue'
 import ConcertsSection from './components/ConcertsSection.vue'
+import CookieConsent from './components/CookieConsent.vue'
 
 // Navigation state
 const isScrolled = ref(false)
@@ -144,6 +145,7 @@ onMounted(() => {
 
     <!-- Sections -->
     <main id="main-content" role="main">
+      <CookieConsent />
       <HeroSection id="hero" />
       <FeaturedVideosSection id="videos" />
       <FeaturedTracksSection id="music" />
@@ -161,10 +163,10 @@ onMounted(() => {
           <a href="mailto:dumoulin.marilyne@gmail.com" aria-label="Envoyez-nous un email">Email</a>
           <a href="tel:0601234547" aria-label="Appelez-nous au 06 01 23 45 47">Téléphone</a>
         </div>
-        <div class="legal-links" style="margin-top: 1.5rem;">
-          <a href="http://localhost:8106/privacy-policy" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Politique de confidentialité</a> |
-          <a href="http://localhost:8106/mentions-legales" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Mentions légales</a> |
-          <a href="http://localhost:8106/cookies" style="color: #888; text-decoration: none; margin: 0 0.5rem;">Cookies</a>
+        <div class="legal-links">
+          <a href="http://localhost:8106/privacy-policy">Politique de confidentialité</a> |
+          <a href="http://localhost:8106/mentions-legales">Mentions légales</a> |
+          <a href="http://localhost:8106/cookies">Cookies</a>
         </div>
       </div>
     </footer>
@@ -184,6 +186,10 @@ body {
   color: #fff;
   overflow-x: hidden;
 }
+
+.legal-links { margin-top: 1.5rem; }
+.legal-links a { color: #888; text-decoration: none; margin: 0 0.5rem; }
+.legal-links a:focus, .legal-links a:hover { text-decoration: underline; }
 
 .app {
   min-height: 100vh;

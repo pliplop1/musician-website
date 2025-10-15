@@ -58,6 +58,28 @@ const closeModal = () => {
   document.body.style.overflow = ''
 }
 
+// Améliorer l'iframe embed (accessibilité + performance)
+const enhanceEmbed = (code, title = 'Vidéo embarquée') => {
+  if (!code) return ''
+  try {
+    // Ajouter attributs sur <iframe ...>
+    let enhanced = code.replace(
+      /<iframe(\s+[^>]*)?>/i,
+      (m) => {
+        const attrs = m.includes('title=') ? '' : ` title="${title.replace(/"/g, '')}"`
+        const loading = m.includes('loading=') ? '' : ' loading="lazy"'
+        const allow = m.includes('allow=') ? '' : ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"'
+        const allowfs = m.includes('allowfullscreen') ? '' : ' allowfullscreen'
+        const refpol = m.includes('referrerpolicy=') ? '' : ' referrerpolicy="strict-origin-when-cross-origin"'
+        return m.replace('<iframe', `<iframe${attrs}${loading}${allow}${allowfs}${refpol}`)
+      }
+    )
+    return enhanced
+  } catch {
+    return code
+  }
+}
+
 // Liker/unliker une vidéo
 const toggleLike = async (video, event) => {
   event.stopPropagation() // Empêcher l'ouverture du modal
@@ -142,7 +164,7 @@ const checkAuth = async () => {
         }
       }
     }
-  } catch (error) {
+  } catch {
     isAuthenticated.value = false
   }
 }
@@ -161,8 +183,8 @@ onMounted(async () => {
 // Consentement pour contenus externes (utilise le consentement "performance" comme proxy)
 function hasExternalConsent() {
   try {
-    const consent = JSON.parse(localStorage.getItem('cookie-consent') || 'null')
-    return !!(consent && consent.performance)
+    const consent = JSON.parse(localStorage.getItem('cookie-consent-v1') || 'null')
+    return !!(consent && (consent.performance || consent.consent === true))
   } catch {
     return false
   }
@@ -259,7 +281,7 @@ function openConsentSettings() {
             <!-- Video EMBED (YouTube/Vimeo) -->
             <div
               v-else-if="selectedVideo && selectedVideo.videoType === 'EMBED' && selectedVideo.embedCode"
-              v-html="selectedVideo.embedCode"
+              v-html="enhanceEmbed(selectedVideo.embedCode, selectedVideo.title)"
               class="embed-container">
             </div>
 

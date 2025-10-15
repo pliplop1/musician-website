@@ -19,16 +19,7 @@ const fetchConcerts = async () => {
   }
 }
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+// L'affichage de la date est géré directement dans le template pour éviter du code inutilisé
 
 onMounted(() => {
   fetchConcerts()
