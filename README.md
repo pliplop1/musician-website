@@ -334,6 +334,25 @@ logging.level.root=WARN
 logging.level.com.docker=INFO
 ```
 
+## Tests
+
+- Backend (Spring Boot, JUnit)
+  - `mvn -q -DskipITs test`
+- Frontend (Vue 3, Vitest)
+  - `cd vue-frontend && npm install && npm test`
+  - Lint: `cd vue-frontend && npm run lint`
+  - Format: `cd vue-frontend && npm run format`
+
+- Qualité & Sécurité (Maven):
+  - `mvn -q -DskipITs -Pquality verify` (Checkstyle, SpotBugs, OWASP Dependency-Check)
+
+Intégration continue: un workflow GitHub Actions exécute automatiquement les tests backend et frontend à chaque `push` et `pull_request` (voir `.github/workflows/ci.yml`).
+
+SEO/Accessibilité/Performance:
+- SEO: métadonnées Open Graph/Twitter, `robots.txt`, balise `lang="fr"` et `meta description` ajoutées (`vue-frontend/index.html`, `vue-frontend/public/robots.txt`).
+- Accessibilité: composant `CookieConsent.vue`, liens d’évitement, landmarks ARIA, test axe-core minimal.
+- Performance: preconnect CDN, noscript, CI lint + audit, JaCoCo déjà configuré.
+
 ## Sécurité
 
 - Spring Security avec authentification par formulaire

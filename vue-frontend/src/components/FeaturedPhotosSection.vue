@@ -124,7 +124,7 @@ const checkAuth = async () => {
         }
       }
     }
-  } catch (error) {
+  } catch {
     isAuthenticated.value = false
   }
 }
@@ -231,6 +231,7 @@ onUnmounted(() => {
               :src="selectedPhoto.url"
               :alt="selectedPhoto.caption || 'Photo en grand format'"
               class="modal-photo"
+              decoding="async"
             />
           </div>
         </div>

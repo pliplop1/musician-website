@@ -205,7 +205,7 @@ const checkAuth = async () => {
         }
       }
     }
-  } catch (error) {
+  } catch {
     isAuthenticated.value = false
   }
 }
@@ -224,8 +224,8 @@ onMounted(async () => {
 // Consentement pour contenus externes (utilise le consentement "performance" comme proxy)
 function hasExternalConsent() {
   try {
-    const consent = JSON.parse(localStorage.getItem('cookie-consent') || 'null')
-    return !!(consent && consent.performance)
+    const consent = JSON.parse(localStorage.getItem('cookie-consent-v1') || 'null')
+    return !!(consent && (consent.performance || consent.consent === true))
   } catch {
     return false
   }

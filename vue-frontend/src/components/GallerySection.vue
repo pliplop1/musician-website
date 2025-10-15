@@ -29,7 +29,7 @@ onMounted(() => {
 
       <div v-else class="gallery-grid">
         <div v-for="photo in photos" :key="photo.id" class="photo-item">
-          <img :src="photo.url" :alt="photo.caption || 'Photo'" />
+          <img :src="photo.url" :alt="photo.caption || 'Photo'" loading="lazy" decoding="async" />
           <div v-if="photo.caption" class="photo-caption">
             {{ photo.caption }}
           </div>

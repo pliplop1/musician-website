@@ -1,83 +1,13 @@
-# =============================================================
-# .gitignore FINAL pour le projet musician-website
-# =============================================================
+# Backups and local env
+backups/
+.env
 
-### STS / Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Node
+node_modules/
+vue-frontend/node/
+vue-frontend/node_modules/
+vue-frontend/dist/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# Java/Maven
+target/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-### Maven ###
-/target/
-# AJOUT - Ignore les fichiers temporaires du plugin Maven Release
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-
-### Node / Frontend ###
-/frontend/node_modules/
-# AJOUT - Ignore le dossier de build du frontend
-/frontend/dist/
-
-# Node modules à la racine (si présents)
-/node_modules/
-
-# Dossiers d'uploads (non versionnés)
-/uploaded-photos/
-/uploaded-music/
-/uploaded-videos/
-/uploaded-avatars/
-
-### Vue.js Frontend ###
-/vue-frontend/node_modules/
-/vue-frontend/dist/
-/vue-frontend/.vite/
-/vue-frontend/.env
-/vue-frontend/.env.local
-/vue-frontend/.env.production
-
-### Fichiers de log ###
-*.log
-# AJOUT - Ignore le répertoire de logs complet
-logs/
-
-### Fichiers système ###
-.DS_Store
-Thumbs.db
-
-### Fichiers sensibles ou de configuration ###
-# AJOUT IMPORTANT - Ignore les sauvegardes de la base de données
-*.sql
-# AJOUT - Ignore les fichiers de configuration locaux
-application-local.properties
-
-### (section removed) ###
-
-### Gemini Code configuration (local only) ###
-.gemini/

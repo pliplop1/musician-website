@@ -31,7 +31,9 @@ defineEmits(['click'])
       <img
         v-if="mediaType === 'video' && thumbnailUrl"
         :src="thumbnailUrl"
-        :alt="item.title" />
+        :alt="item.title"
+        loading="lazy"
+        decoding="async" />
 
       <!-- Thumbnail pour tracks (icône musique) -->
       <div v-if="mediaType === 'track'" class="music-icon-overlay">

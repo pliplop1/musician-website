@@ -48,6 +48,7 @@ onMounted(() => {
         muted
         loop
         playsinline
+        preload="metadata"
         aria-label="Vidéo d'ambiance montrant une performance du Duo Black & White"
         class="hero-video">
         <source :src="heroData.backgroundVideoUrl" type="video/mp4">
