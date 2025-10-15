@@ -570,4 +570,5 @@ Contrôleurs → Services → Repositories → Entities
 
 **Temps total estimé pour mise en conformité RGPD + RGAA:** 12-18 heures
 
-*Rapport généré le 13 Octobre 2025 par Claude Code*
+*Rapport généré le 13 Octobre 2025*
+
