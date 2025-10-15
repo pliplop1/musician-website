@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-<title>Actualités - Duo Black & White</title>
-<link rel="preload" as="style" th:href="@\{/css/style.css(v=${#dates.createNow().time})\}" onload="this.onload=null;this.rel='stylesheet'">`n<link rel="stylesheet" th:href="@\{/css/style.css(v=${#dates.createNow().time})\}">
+<link rel="preload" as="style" th:href="@{/css/style.css}">
+    <title>Actualités - Duo Black & White</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
 <script th:src="@{/js/comments.js}" defer></script>
 </head>
 <body class="bg-gray-900 text-white">
 
 <header th:replace="~{fragments/layout :: header}"></header>
 
-<main id="main-content" class="container mx-auto px-6 py-12">
+<main class="container mx-auto px-6 py-12">
     <section id="articles">
         <h2 class="text-4xl font-bold text-center mb-10">Toutes les Actualités</h2>
         <div class="max-w-4xl mx-auto space-y-8">
@@ -63,7 +64,7 @@
                                     <div th:if="${comment.user.avatarFilename != null}">
                                         <img th:src="@{/uploaded-avatars/{filename}(filename=${comment.user.avatarFilename})}"
                                              alt="Avatar"
-                                             class="w-8 h-8 rounded-full object-cover" loading="lazy" decoding="async" width="32" height="32">
+                                             class="w-8 h-8 rounded-full object-cover">
                                     </div>
                                     <div th:if="${comment.user.avatarFilename == null}"
                                          class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
@@ -90,4 +91,3 @@
 
 </body>
 </html>
-
