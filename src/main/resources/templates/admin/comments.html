@@ -65,18 +65,18 @@
                 <form id="pendingForm" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <!-- Actions groupées -->
-                    <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center gap-4">
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                         <label class="flex items-center gap-2">
                             <input type="checkbox" onclick="toggleAll(this, 'pendingForm')" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                             <span class="text-sm font-medium">Tout sélectionner</span>
                         </label>
                         <div class="flex-1"></div>
                         <button type="button" onclick="handleBulkAction('pendingForm', 'approve')"
-                                class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+                                class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors whitespace-nowrap">
                             ✓ Approuver la sélection
                         </button>
                         <button type="button" onclick="handleBulkAction('pendingForm', 'delete')"
-                                class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+                                class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors whitespace-nowrap">
                             🗑 Supprimer la sélection
                         </button>
                     </div>
@@ -134,18 +134,18 @@
                 <form id="allForm" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <!-- Actions groupées -->
-                    <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center gap-4">
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                         <label class="flex items-center gap-2">
                             <input type="checkbox" onclick="toggleAll(this, 'allForm')" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                             <span class="text-sm font-medium">Tout sélectionner</span>
                         </label>
                         <div class="flex-1"></div>
                         <button type="button" onclick="handleBulkAction('allForm', 'approve')"
-                                class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+                                class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors whitespace-nowrap">
                             ✓ Approuver la sélection
                         </button>
                         <button type="button" onclick="handleBulkAction('allForm', 'delete')"
-                                class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+                                class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors whitespace-nowrap">
                             🗑 Supprimer la sélection
                         </button>
                     </div>
