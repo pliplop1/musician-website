@@ -284,10 +284,29 @@ function openTrackModal(track) {
             playerContent = `<div class="embed-container">${embedCode}</div>`;
         }
     } else if (track.audioUrl) {
-        playerContent = `<audio controls autoplay><source src="${track.audioUrl}" type="audio/mpeg">Votre navigateur ne supporte pas la lecture audio.</audio>`;
+        playerContent = `
+            <div class="custom-audio-player" role="group" aria-label="Lecteur audio">
+                <audio id="audioElement" preload="metadata">
+                    <source src="${track.audioUrl}" type="audio/mpeg">
+                </audio>
+                <button class="ap-btn ap-play" id="apPlay" aria-label="Lire" title="Lire">
+                    <i class="fas fa-play"></i><span class="ap-label">Lecture</span>
+                </button>
+                <div class="ap-time" aria-live="polite">
+                    <span id="apCurrent">0:00</span> / <span id="apDuration">0:00</span>
+                </div>
+                <input id="apSeek" class="ap-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Position dans le morceau">
+                <button class="ap-btn ap-mute" id="apMute" aria-label="Couper le son" title="Couper le son">
+                    <i class="fas fa-volume-up"></i><span class="ap-label">Son</span>
+                </button>
+                <input id="apVolume" class="ap-volume" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+            </div>`;
     }
 
     modalPlayerWrapper.innerHTML = playerContent;
+    if (track.audioUrl) {
+        initCustomAudioPlayer(modalPlayerWrapper);
+    }
 
     // Ajouter le bouton "Ouvrir dans [Service]"
     const externalLink = getExternalLink(track);
@@ -529,6 +548,87 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         });
 });
+</script>
+
+<script>
+// Lecteur audio personnalisé (accessibilité et performances)
+function initCustomAudioPlayer(container) {
+    const audio = container.querySelector('#audioElement');
+    const btnPlay = container.querySelector('#apPlay');
+    const btnMute = container.querySelector('#apMute');
+    const rngSeek = container.querySelector('#apSeek');
+    const rngVol = container.querySelector('#apVolume');
+    const lblCurrent = container.querySelector('#apCurrent');
+    const lblDuration = container.querySelector('#apDuration');
+
+    const fmt = (sec) => {
+        if (!isFinite(sec)) return '0:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    };
+
+    // Evénements
+    btnPlay.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+            btnPlay.innerHTML = '<i class="fas fa-pause"></i><span class="ap-label">Pause</span>';
+            btnPlay.setAttribute('aria-label', 'Pause');
+            btnPlay.setAttribute('title', 'Pause');
+        } else {
+            audio.pause();
+            btnPlay.innerHTML = '<i class="fas fa-play"></i><span class="ap-label">Lecture</span>';
+            btnPlay.setAttribute('aria-label', 'Lire');
+            btnPlay.setAttribute('title', 'Lire');
+        }
+    });
+
+    btnMute.addEventListener('click', () => {
+        audio.muted = !audio.muted;
+        btnMute.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i><span class="ap-label">Muet</span>' : '<i class="fas fa-volume-up"></i><span class="ap-label">Son</span>';
+        btnMute.setAttribute('aria-label', audio.muted ? 'Activer le son' : 'Couper le son');
+        btnMute.setAttribute('title', audio.muted ? 'Activer le son' : 'Couper le son');
+    });
+
+    rngVol.addEventListener('input', () => {
+        audio.volume = parseFloat(rngVol.value);
+        if (audio.volume === 0) {
+            audio.muted = true;
+            btnMute.innerHTML = '<i class="fas fa-volume-mute"></i>';
+        } else if (audio.muted) {
+            audio.muted = false;
+            btnMute.innerHTML = '<i class="fas fa-volume-up"></i>';
+        }
+    });
+
+    rngSeek.addEventListener('input', () => {
+        if (isFinite(audio.duration)) {
+            const t = (parseFloat(rngSeek.value) / 100) * audio.duration;
+            audio.currentTime = t;
+        }
+    });
+
+    audio.addEventListener('loadedmetadata', () => {
+        lblDuration.textContent = fmt(audio.duration || 0);
+        lblCurrent.textContent = fmt(0);
+        rngSeek.value = 0;
+        // Attendre l'action explicite de l'utilisateur pour démarrer la lecture
+    });
+
+    audio.addEventListener('timeupdate', () => {
+        lblCurrent.textContent = fmt(audio.currentTime);
+        if (isFinite(audio.duration) && audio.duration > 0) {
+            rngSeek.value = (audio.currentTime / audio.duration) * 100;
+        }
+    });
+
+    // Accessibilité clavier
+    container.addEventListener('keydown', (e) => {
+        if (e.key === ' ') { e.preventDefault(); btnPlay.click(); }
+        if (e.key === 'ArrowRight') { audio.currentTime = Math.min((audio.currentTime || 0) + 5, audio.duration || 0); }
+        if (e.key === 'ArrowLeft') { audio.currentTime = Math.max((audio.currentTime || 0) - 5, 0); }
+    });
+}
 </script>
 
 </body>

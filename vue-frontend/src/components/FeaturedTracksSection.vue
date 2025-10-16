@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue'
+import AudioPlayer from './shared/AudioPlayer.vue'
 import { useFeaturedContent } from '../composables/useFeaturedContent'
 import { useRotationCache } from '../composables/useRotationCache'
 import axios from 'axios'
@@ -338,20 +339,17 @@ function openConsentSettings() {
                 height="352"
                 frameborder="0"
                 allowtransparency="true"
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
                 allow="encrypted-media">
               </iframe>
             </div>
 
             <!-- Fichier audio uploadé -->
-            <audio
+            <AudioPlayer
               v-else-if="selectedTrack && selectedTrack.audioUrl"
-              controls
-              autoplay
-              :aria-label="'Lecteur audio pour ' + selectedTrack.title"
-              class="audio-player">
-              <source :src="selectedTrack.audioUrl" type="audio/mpeg">
-              Votre navigateur ne supporte pas la lecture audio.
-            </audio>
+              :src="selectedTrack.audioUrl"
+            />
           </div>
           <div class="modal-title">
             <h2 :id="'modal-title-' + selectedTrack?.id">{{ selectedTrack?.title }}</h2>
