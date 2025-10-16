@@ -10,6 +10,7 @@
 <body class="bg-gray-100 text-gray-800">
 
 	<div class="flex min-h-screen">
+		<div th:replace="~{fragments/admin-layout :: mobile-menu-toggle}"></div>
 		<div th:replace="~{fragments/admin-layout :: sidebar}"></div>
 
 		<main class="flex-grow p-8">
@@ -117,6 +118,7 @@
 			</div>
 		</main>
 	</div>
+	<div th:replace="~{fragments/admin-layout :: admin-sidebar-mobile}"></div>
 
 </body>
 </html>

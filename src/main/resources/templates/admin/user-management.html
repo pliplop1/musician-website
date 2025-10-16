@@ -34,6 +34,7 @@
 
 	<div class="flex min-h-screen">
 		<!-- AJOUT : Inclusion de la sidebar -->
+		<div th:replace="~{fragments/admin-layout :: mobile-menu-toggle}"></div>
 		<div th:replace="~{fragments/admin-layout :: sidebar}"></div>
 
 		<main class="flex-grow p-8">
@@ -166,6 +167,7 @@
 
 		</main>
 	</div>
+	<div th:replace="~{fragments/admin-layout :: admin-sidebar-mobile}"></div>
 
 </body>
 </html>
