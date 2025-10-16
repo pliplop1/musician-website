@@ -9,7 +9,7 @@ const fetchGallery = async () => {
     const response = await fetch('/api/public/gallery')
     photos.value = await response.json()
   } catch (err) {
-    console.error('Error fetching gallery:', err)
+    // Error handling
   } finally {
     loading.value = false
   }
@@ -27,8 +27,8 @@ onMounted(() => {
 
       <div v-if="loading" class="loading">Chargement...</div>
 
-      <div v-else class="gallery-grid">
-        <div v-for="photo in photos" :key="photo.id" class="photo-item">
+      <div v-else class="gallery-grid" role="list" aria-label="Galerie complète">
+        <div v-for="photo in photos" :key="photo.id" class="photo-item" role="listitem" tabindex="0" :aria-label="`Photo : ${photo.caption || 'Sans description'}`">
           <img :src="photo.url" :alt="photo.caption || 'Photo'" loading="lazy" decoding="async" />
           <div v-if="photo.caption" class="photo-caption">
             {{ photo.caption }}

@@ -79,7 +79,6 @@ export function useFeaturedContent({
       const settings = await response.json()
       return settings[autoRotationFieldName] || false
     } catch (err) {
-      console.error('❌ Erreur récupération settings:', err)
       return false // Par défaut, désactivé en cas d'erreur
     }
   }
@@ -89,29 +88,22 @@ export function useFeaturedContent({
    * @returns {Promise<Array>} Items sélectionnés aléatoirement
    */
   const loadAutoRotationContent = async () => {
-    console.log(`🎲 Mode rotation automatique activé pour ${contentType}`)
-
     // 1. Vérifier si un cache valide existe
     const cached = getCachedData()
     if (cached && cached.length > 0) {
-      console.log(`✅ Utilisation du cache pour ${contentType} (${cached.length} items)`)
       return cached
     }
 
     // 2. Pas de cache valide : récupérer tous les items et sélectionner aléatoirement
-    console.log(`🔄 Génération d'une nouvelle sélection aléatoire pour ${contentType}`)
-
     const response = await fetch(allItemsEndpoint)
     if (!response.ok) {
       throw new Error(`Erreur HTTP ${response.status}`)
     }
 
     const allItems = await response.json()
-    console.log(`📦 ${allItems.length} ${contentType} disponibles`)
 
     // 3. Sélectionner 3 items aléatoires
     const selectedItems = selectRandomItems(allItems, 3)
-    console.log(`✨ ${selectedItems.length} ${contentType} sélectionnés aléatoirement`)
 
     // 4. Mettre en cache pour 24h
     setCachedData(selectedItems)
@@ -124,15 +116,12 @@ export function useFeaturedContent({
    * @returns {Promise<Array>} Items featured manuellement
    */
   const loadManualSelectionContent = async () => {
-    console.log(`📌 Mode sélection manuelle activé pour ${contentType}`)
-
     const response = await fetch(featuredEndpoint)
     if (!response.ok) {
       throw new Error(`Erreur HTTP ${response.status}`)
     }
 
     const featuredItems = await response.json()
-    console.log(`✅ ${featuredItems.length} ${contentType} featured chargés`)
 
     return featuredItems
   }
@@ -156,11 +145,8 @@ export function useFeaturedContent({
       } else {
         items.value = await loadManualSelectionContent()
       }
-
-      console.log(`✅ ${items.value.length} ${contentType} featured chargés avec succès`)
     } catch (err) {
       error.value = `Erreur lors du chargement des ${contentType}: ${err.message}`
-      console.error(`❌ ${error.value}`, err)
       items.value = []
     } finally {
       loading.value = false

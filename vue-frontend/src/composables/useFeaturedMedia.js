@@ -58,7 +58,6 @@ export function useFeaturedMedia(mediaType, apiEndpoint, limit = 3) {
       items.value = selectedItems
     } catch (err) {
       error.value = err.message
-      console.error(`Error fetching ${mediaType}:`, err)
     } finally {
       loading.value = false
     }

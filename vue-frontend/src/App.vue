@@ -39,7 +39,6 @@ const checkAuthStatus = async () => {
       }
     }
   } catch (error) {
-    console.error('Error checking auth status:', error)
     authState.value = {
       authenticated: false,
       username: null,

@@ -65,6 +65,52 @@ button:focus-visible {
   text-align: center;
 }
 
+/* Accessibility: Enhanced Focus Indicators */
+*:focus-visible {
+  outline: 3px solid #4a90e2;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* High contrast focus for interactive elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 3px solid #4a90e2;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(74, 144, 226, 0.2);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  * {
+    border-width: 2px !important;
+  }
+
+  *:focus-visible {
+    outline-width: 4px;
+    outline-style: solid;
+  }
+}
+
+/* Ensure text remains visible during webfont load */
+@font-face {
+  font-display: swap;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

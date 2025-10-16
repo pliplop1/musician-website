@@ -9,7 +9,7 @@ const fetchDiscography = async () => {
     const response = await fetch('/api/public/discography')
     albums.value = await response.json()
   } catch (err) {
-    console.error('Error fetching discography:', err)
+    // Error handling
   } finally {
     loading.value = false
   }
@@ -27,8 +27,8 @@ onMounted(() => {
 
       <div v-if="loading" class="loading">Chargement...</div>
 
-      <div v-else class="albums-grid">
-        <div v-for="album in albums" :key="album.id" class="album-card">
+      <div v-else class="albums-grid" role="list" aria-label="Albums de discographie">
+        <div v-for="album in albums" :key="album.id" class="album-card" role="listitem">
           <img :src="album.coverUrl" :alt="album.title" />
           <h3>{{ album.title }}</h3>
           <p class="year">{{ album.year }}</p>

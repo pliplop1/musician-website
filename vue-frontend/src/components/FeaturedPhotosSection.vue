@@ -42,10 +42,9 @@ const incrementView = async (photo) => {
         p.id === photo.id ? { ...p, viewCount: response.data.viewCount } : p
       )
       setCachedData(updatedCache)
-      console.log('💾 Cache mis à jour avec le nouveau viewCount')
     }
   } catch (error) {
-    console.error('Erreur lors de l\'incrémentation des vues:', error)
+    // Error handling
   }
 }
 
@@ -95,10 +94,9 @@ const toggleLike = async (photo, event) => {
         p.id === photo.id ? { ...p, likeCount: response.data.likeCount } : p
       )
       setCachedData(updatedCache)
-      console.log('💾 Cache mis à jour avec le nouveau likeCount')
     }
   } catch (error) {
-    console.error('Erreur lors du like:', error)
+    // Error handling
     if (error.response?.status === 401) {
       isAuthenticated.value = false
       alert('Session expirée, veuillez vous reconnecter')
@@ -120,7 +118,7 @@ const checkAuth = async () => {
             likedPhotos.value.add(photo.id)
           }
         } catch (err) {
-          console.error('Erreur chargement status like:', err)
+          // Error handling
         }
       }
     }
@@ -168,12 +166,17 @@ onUnmounted(() => {
         {{ error }}
       </div>
 
-      <div v-else class="photos-grid">
+      <div v-else class="photos-grid" role="list" aria-label="Liste des photos à la une">
         <div
           v-for="photo in photos"
           :key="photo.id"
           class="photo-card"
-          @click="openPhoto(photo)">
+          role="listitem"
+          tabindex="0"
+          @click="openPhoto(photo)"
+          @keydown.enter="openPhoto(photo)"
+          @keydown.space.prevent="openPhoto(photo)"
+          :aria-label="`Voir ${photo.caption || 'photo'}, ${photo.viewCount || 0} vues, ${photo.likeCount || 0} j'aime`">
           <div class="photo-thumbnail">
             <img :src="photo.url" :alt="photo.caption || 'Photo de galerie'" loading="lazy" decoding="async" />
             <div class="hover-overlay">

@@ -24,7 +24,7 @@ const loadRegistrationSettings = async () => {
       registrationMessage.value = settings.registrationMessage || 'Rejoignez notre communauté !'
     }
   } catch (err) {
-    console.error('Error loading registration settings:', err)
+    // Error handling
   }
 }
 

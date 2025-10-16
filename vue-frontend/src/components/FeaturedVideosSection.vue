@@ -111,10 +111,9 @@ const toggleLike = async (video, event) => {
         v.id === video.id ? { ...v, likeCount: response.data.likeCount } : v
       )
       setCachedData(updatedCache)
-      console.log('💾 Cache mis à jour avec le nouveau likeCount')
     }
   } catch (error) {
-    console.error('Erreur lors du like:', error)
+    // Error handling
     if (error.response?.status === 401) {
       isAuthenticated.value = false
       alert('Session expirée, veuillez vous reconnecter')
@@ -138,10 +137,9 @@ const incrementView = async (video) => {
         v.id === video.id ? { ...v, viewCount: response.data.viewCount } : v
       )
       setCachedData(updatedCache)
-      console.log('💾 Cache mis à jour avec le nouveau viewCount')
     }
   } catch (error) {
-    console.error('Erreur lors de l\'incrémentation des vues:', error)
+    // Error handling
   }
 }
 
@@ -160,7 +158,7 @@ const checkAuth = async () => {
             likedVideos.value.add(video.id)
           }
         } catch (err) {
-          console.error('Erreur chargement status like:', err)
+          // Error handling
         }
       }
     }
@@ -217,12 +215,17 @@ function openConsentSettings() {
         {{ error }}
       </div>
 
-      <div v-else class="videos-grid">
+      <div v-else class="videos-grid" role="list" aria-label="Liste des vidéos à la une">
         <div
           v-for="video in videos"
           :key="video.id"
           class="video-card"
-          @click="openVideoWithView(video)">
+          role="listitem"
+          tabindex="0"
+          @click="openVideoWithView(video)"
+          @keydown.enter="openVideoWithView(video)"
+          @keydown.space.prevent="openVideoWithView(video)"
+          :aria-label="`Regarder ${video.title}, ${video.viewCount || 0} vues, ${video.likeCount || 0} j'aime`">
           <div class="video-thumbnail">
             <img :src="getThumbnailUrl(video)" :alt="video.title" loading="lazy" decoding="async" />
             <div class="play-overlay">

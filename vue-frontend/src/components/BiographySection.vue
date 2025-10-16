@@ -9,7 +9,7 @@ const fetchBiography = async () => {
     const response = await fetch('/api/public/biography')
     biography.value = await response.json()
   } catch (err) {
-    console.error('Error fetching biography:', err)
+    // Error handling
   } finally {
     loading.value = false
   }

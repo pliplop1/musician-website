@@ -154,10 +154,9 @@ const toggleLike = async (track, event) => {
         t.id === track.id ? { ...t, likeCount: response.data.likeCount } : t
       )
       setCachedData(updatedCache)
-      console.log('💾 Cache mis à jour avec le nouveau likeCount')
     }
   } catch (error) {
-    console.error('Erreur lors du like:', error)
+    // Error handling
     if (error.response?.status === 401) {
       isAuthenticated.value = false
       alert('Session expirée, veuillez vous reconnecter')
@@ -181,10 +180,9 @@ const incrementPlay = async (track) => {
         t.id === track.id ? { ...t, playCount: response.data.playCount } : t
       )
       setCachedData(updatedCache)
-      console.log('💾 Cache mis à jour avec le nouveau playCount')
     }
   } catch (error) {
-    console.error('Erreur lors de l\'incrémentation des plays:', error)
+    // Error handling
   }
 }
 
@@ -202,7 +200,7 @@ const checkAuth = async () => {
             likedTracks.value.add(track.id)
           }
         } catch (err) {
-          console.error('Erreur chargement status like:', err)
+          // Error handling
         }
       }
     }
@@ -259,12 +257,17 @@ function openConsentSettings() {
         {{ error }}
       </div>
 
-      <div v-else class="tracks-grid">
+      <div v-else class="tracks-grid" role="list" aria-label="Liste des morceaux à la une">
         <div
           v-for="track in tracks"
           :key="track.id"
           class="track-card"
-          @click="openTrackWithPlay(track)">
+          role="listitem"
+          tabindex="0"
+          @click="openTrackWithPlay(track)"
+          @keydown.enter="openTrackWithPlay(track)"
+          @keydown.space.prevent="openTrackWithPlay(track)"
+          :aria-label="`Écouter ${track.title}, ${track.playCount || 0} écoutes, ${track.likeCount || 0} j'aime`">
           <div class="track-thumbnail">
             <div class="music-icon-overlay">
               <i class="fas fa-music"></i>

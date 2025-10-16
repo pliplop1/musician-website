@@ -10,7 +10,7 @@
  * // Vérifier si des données en cache existent et sont valides
  * const cached = getCachedData()
  * if (cached) {
- *   console.log('Données en cache valides', cached)
+ *   // Données en cache valides
  * }
  *
  * // Stocker de nouvelles données avec timestamp
@@ -31,24 +31,18 @@ export function useRotationCache(cacheKey) {
       const cachedTimestamp = localStorage.getItem(TIMESTAMP_KEY)
 
       if (!cachedData || !cachedTimestamp) {
-        console.log(`📭 Aucun cache trouvé pour ${cacheKey}`)
         return null
       }
 
       const timeDiff = Date.now() - parseInt(cachedTimestamp)
 
       if (timeDiff >= TWENTY_FOUR_HOURS) {
-        console.log(`⏰ Cache expiré pour ${cacheKey} (${Math.round(timeDiff / 1000 / 60 / 60)}h)`)
         clearCache()
         return null
       }
 
-      const remainingHours = Math.round((TWENTY_FOUR_HOURS - timeDiff) / 1000 / 60 / 60)
-      console.log(`✅ Cache valide pour ${cacheKey} (expire dans ${remainingHours}h)`)
-
       return JSON.parse(cachedData)
     } catch (error) {
-      console.error(`❌ Erreur lecture cache ${cacheKey}:`, error)
       clearCache()
       return null
     }
@@ -62,9 +56,8 @@ export function useRotationCache(cacheKey) {
     try {
       localStorage.setItem(DATA_KEY, JSON.stringify(data))
       localStorage.setItem(TIMESTAMP_KEY, Date.now().toString())
-      console.log(`💾 Cache sauvegardé pour ${cacheKey} (expire dans 24h)`)
     } catch (error) {
-      console.error(`❌ Erreur sauvegarde cache ${cacheKey}:`, error)
+      // Silently fail
     }
   }
 
@@ -74,7 +67,6 @@ export function useRotationCache(cacheKey) {
   const clearCache = () => {
     localStorage.removeItem(DATA_KEY)
     localStorage.removeItem(TIMESTAMP_KEY)
-    console.log(`🗑️ Cache supprimé pour ${cacheKey}`)
   }
 
   /**
