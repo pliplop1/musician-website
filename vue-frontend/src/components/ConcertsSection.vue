@@ -12,7 +12,6 @@ const fetchConcerts = async () => {
     }
     concerts.value = await response.json()
   } catch (err) {
-    console.error('Error fetching concerts:', err)
     concerts.value = []
   } finally {
     loading.value = false

@@ -21,7 +21,6 @@ const fetchHeroData = async () => {
     }
   } catch (err) {
     error.value = err.message
-    console.error('Error fetching hero data:', err)
     // Données par défaut en cas d'erreur
     heroData.value = {
       artistName: 'DUO BLACK & WHITE',

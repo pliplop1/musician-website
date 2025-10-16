@@ -13,10 +13,8 @@ const setupAxiosCsrf = async () => {
 
     // Configurer axios pour inclure automatiquement le token CSRF dans les requêtes POST/PUT/DELETE
     axios.defaults.headers.common[csrfHeaderName] = csrfToken
-
-    console.log('✅ CSRF token configuré avec succès')
   } catch (error) {
-    console.error('❌ Erreur lors de la récupération du token CSRF:', error)
+    // Error handling
   }
 }
 
