@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <th:block th:replace="~{fragments/head :: head('Musique - Duo Black & White','Toute notre musique: écoutes et titres phares.', null, null)}"></th:block>
-    <meta name="description" content="Toute notre musique : &eacute;coutes et titres phares.">
+    <th:block th:replace="~{fragments/head :: head('Musique - Duo Black & White','Toute notre musique: ├®coutes et titres phares.', null, null)}"></th:block>
     <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,7 +20,7 @@
         <h1 class="page-title">
             <i class="fas fa-music"></i> Toute notre musique
         </h1>
-        <p class="page-subtitle">Découvrez l'intégralité de nos morceaux</p>
+        <p class="page-subtitle">D├®couvrez l'int├®gralit├® de nos morceaux</p>
 
         <!-- Barre de recherche -->
         <div class="search-container">
@@ -33,7 +32,7 @@
             <i class="fas fa-search search-icon"></i>
         </div>
 
-        <!-- Compteur de résultats -->
+        <!-- Compteur de r├®sultats -->
         <div class="results-count" id="resultsCount"></div>
 
         <!-- Loading -->
@@ -45,11 +44,11 @@
         <!-- Grille de morceaux -->
         <div class="tracks-grid" id="tracksGrid" style="display: none;"></div>
 
-        <!-- Message aucun résultat -->
+        <!-- Message aucun r├®sultat -->
         <div class="no-results" id="noResults" style="display: none;">
             <i class="fas fa-search"></i>
-            <h3>Aucun morceau trouvé</h3>
-            <p>Essayez avec d'autres mots-clés</p>
+            <h3>Aucun morceau trouv├®</h3>
+            <p>Essayez avec d'autres mots-cl├®s</p>
         </div>
 
         <!-- Bouton Charger Plus -->
@@ -69,13 +68,13 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="modal-player-wrapper" id="modalPlayerWrapper">
-                <!-- Le contenu audio sera injecté ici -->
+                <!-- Le contenu audio sera inject├® ici -->
             </div>
             <div class="modal-title">
                 <h2 id="modalTitle"></h2>
             </div>
             <div class="modal-actions" id="modalActions" style="display: none;">
-                <!-- Bouton "Ouvrir dans Spotify/SoundCloud" sera ajouté ici -->
+                <!-- Bouton "Ouvrir dans Spotify/SoundCloud" sera ajout├® ici -->
             </div>
         </div>
     </div>
@@ -91,14 +90,7 @@ const tracksPerPage = 9;
 let isAuthenticated = false;
 let likedTracks = new Set();
 
-// Helpers
-function setPlayBadgeTitle(el, count) {
-    if (el) {
-        el.title = `${count} écoutes`;
-    }
-}
-
-// Déterminer le type de lecteur et l'icône
+// D├®terminer le type de lecteur et l'ic├┤ne
 function getPlayerType(track) {
     if (track.audioUrl) {
         return { icon: 'fas fa-file-audio', label: 'Audio local' };
@@ -156,7 +148,7 @@ function displayTracks(tracks) {
     const endIndex = startIndex + tracksPerPage;
     const tracksToShow = tracks.slice(startIndex, endIndex);
 
-    // Mettre à jour le compteur
+    // Mettre ├á jour le compteur
     resultsCount.innerHTML = `Page <strong>${currentPage}</strong> sur <strong>${totalPages}</strong> - <strong>${tracks.length}</strong> morceau${tracks.length > 1 ? 'x' : ''} au total`;
 
     grid.innerHTML = tracksToShow.map(track => {
@@ -179,7 +171,7 @@ function displayTracks(tracks) {
                                 <i class="${playerType.icon}"></i>
                                 ${playerType.label}
                             </span>
-                            <span class="play-count-badge" data-play-track-id="${track.id}" title="${track.playCount || 0} écoutes">
+                            <span class="play-count-badge" data-play-track-id="${track.id}" title="${track.playCount || 0} ├®coutes">
                                 <i class="fas fa-headphones"></i>
                                 <span>${track.playCount || 0}</span>
                             </span>
@@ -197,7 +189,7 @@ function displayTracks(tracks) {
         `;
     }).join('');
 
-    // Ajouter les événements de clic
+    // Ajouter les ├®v├®nements de clic
     document.querySelectorAll('.track-card').forEach(card => {
         card.addEventListener('click', function() {
             const trackId = parseInt(this.dataset.trackId);
@@ -208,7 +200,7 @@ function displayTracks(tracks) {
         });
     });
 
-    // Ajouter les événements de clic pour les boutons like
+    // Ajouter les ├®v├®nements de clic pour les boutons like
     document.querySelectorAll('.like-button').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -222,16 +214,9 @@ function displayTracks(tracks) {
 
     // Scroll vers le haut
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Harmoniser les tooltips d'écoutes en FR correct
-    document.querySelectorAll('.play-count-badge').forEach(badge => {
-        const id = parseInt(badge.getAttribute('data-play-track-id'));
-        const t = allTracks.find(x => x.id === id);
-        setPlayBadgeTitle(badge, (t && t.playCount) ? t.playCount : 0);
-    });
 }
 
-// Mettre à jour le bouton de pagination
+// Mettre ├á jour le bouton de pagination
 function updatePaginationButton(totalPages) {
     const loadMoreContainer = document.getElementById('loadMoreContainer');
     const btnLoadMore = document.getElementById('btnLoadMore');
@@ -253,7 +238,7 @@ function updatePaginationButton(totalPages) {
     } else {
         btnLoadMore.innerHTML = `
             <i class="fas fa-redo"></i>
-            <span>Retour à la page 1</span>
+            <span>Retour ├á la page 1</span>
             <i class="fas fa-arrow-left"></i>
         `;
         btnLoadMore.disabled = false;
@@ -341,7 +326,7 @@ function openTrackModal(track) {
                 <span>Ouvrir dans ${playerType.label}</span>
                 <i class="fas fa-external-link-alt"></i>
             </a>
-            <p class="help-text">Pour contrôler le volume et la navigation complète</p>
+            <p class="help-text">Pour contr├┤ler le volume et la navigation compl├¿te</p>
         `;
     } else {
         modalActions.style.display = 'none';
@@ -350,11 +335,11 @@ function openTrackModal(track) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Incrémenter le compteur d'écoutes (sans authentification requise)
+    // Incr├®menter le compteur d'├®coutes (sans authentification requise)
     incrementPlayCount(track.id);
 }
 
-// Incrémenter le compteur d'écoutes d'un morceau
+// Incr├®menter le compteur d'├®coutes d'un morceau
 async function incrementPlayCount(trackId) {
     try {
         const response = await fetch(`/api/tracks/${trackId}/play`, {
@@ -363,26 +348,26 @@ async function incrementPlayCount(trackId) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(`🎵 Écoute enregistrée pour le morceau ${trackId}: ${data.playCount} écoutes`);
+            console.log(`­ƒÄÁ ├ëcoute enregistr├®e pour le morceau ${trackId}: ${data.playCount} ├®coutes`);
 
-            // Mettre à jour le compteur local dans allTracks
+            // Mettre ├á jour le compteur local dans allTracks
             const track = allTracks.find(t => t.id === trackId);
             if (track) {
                 track.playCount = data.playCount;
             }
 
-            // Mettre à jour le badge affiché sur la page
+            // Mettre ├á jour le badge affich├® sur la page
             const playBadge = document.querySelector(`[data-play-track-id="${trackId}"]`);
             if (playBadge) {
                 const countSpan = playBadge.querySelector('span');
                 if (countSpan) {
                     countSpan.textContent = data.playCount;
                 }
-                playBadge.title = `${data.playCount} écoutes`;
+                playBadge.title = `${data.playCount} ├®coutes`;
             }
         }
     } catch (error) {
-        console.error('Erreur lors de l\'incrémentation des écoutes:', error);
+        console.error('Erreur lors de l\'incr├®mentation des ├®coutes:', error);
     }
 }
 
@@ -422,7 +407,7 @@ function getCsrfToken() {
 // Toggle like
 async function toggleLike(trackId, button) {
     if (!isAuthenticated) {
-        alert('Vous devez être connecté pour liker un morceau');
+        alert('Vous devez ├¬tre connect├® pour liker un morceau');
         window.location.href = '/login';
         return;
     }
@@ -441,21 +426,21 @@ async function toggleLike(trackId, button) {
         if (!response.ok) {
             if (response.status === 401) {
                 isAuthenticated = false;
-                alert('Session expirée, veuillez vous reconnecter');
+                alert('Session expir├®e, veuillez vous reconnecter');
                 window.location.href = '/login';
                 return;
             }
             throw new Error('Erreur lors du like');
         }
 
-        // Mettre à jour l'état local
+        // Mettre ├á jour l'├®tat local
         if (isLiked) {
             likedTracks.delete(trackId);
         } else {
             likedTracks.add(trackId);
         }
 
-        // Récupérer le nombre de likes mis à jour
+        // R├®cup├®rer le nombre de likes mis ├á jour
         const trackResponse = await fetch(`/api/public/tracks/${trackId}`);
         if (trackResponse.ok) {
             const trackData = await trackResponse.json();
@@ -464,7 +449,7 @@ async function toggleLike(trackId, button) {
                 track.likeCount = trackData.likeCount;
             }
 
-            // Mettre à jour l'affichage du bouton
+            // Mettre ├á jour l'affichage du bouton
             const icon = button.querySelector('i');
             const count = button.querySelector('span');
 
@@ -483,13 +468,13 @@ async function toggleLike(trackId, button) {
     }
 }
 
-// Vérifier l'authentification
+// V├®rifier l'authentification
 async function checkAuth() {
     try {
         const response = await fetch('/api/user/current');
         isAuthenticated = response.ok && (await response.json());
     } catch (error) {
-        console.error('Erreur vérification auth:', error);
+        console.error('Erreur v├®rification auth:', error);
         isAuthenticated = false;
     }
 }
@@ -515,23 +500,18 @@ async function loadLikeStatuses() {
 
 // Charger les morceaux
 document.addEventListener('DOMContentLoaded', function() {
-    // Corriger le sous-titre FR au rendu
-    const subtitleEl = document.querySelector('.page-subtitle');
-    if (subtitleEl) {
-        subtitleEl.textContent = "Découvrez l'intégralité de nos morceaux";
-    }
     const loadingMessage = document.getElementById('loadingMessage');
     const searchInput = document.getElementById('searchInput');
     const modalClose = document.getElementById('modalClose');
     const modal = document.getElementById('trackModal');
     const btnLoadMore = document.getElementById('btnLoadMore');
 
-    // Événement de recherche
+    // ├ëv├®nement de recherche
     searchInput.addEventListener('input', function() {
         searchTracks(this.value);
     });
 
-    // Événement du bouton Charger Plus
+    // ├ëv├®nement du bouton Charger Plus
     btnLoadMore.addEventListener('click', loadNextPage);
 
     // Fermer le modal
@@ -542,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Échapper pour fermer le modal
+    // ├ëchapper pour fermer le modal
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
             closeTrackModal();
@@ -562,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
             filteredTracks = tracks;
             loadingMessage.style.display = 'none';
 
-            // Vérifier l'authentification et charger les likes
+            // V├®rifier l'authentification et charger les likes
             await checkAuth();
             await loadLikeStatuses();
 
@@ -579,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// Lecteur audio personnalisé (accessibilité et performances)
+// Lecteur audio personnalis├® (accessibilit├® et performances)
 function initCustomAudioPlayer(container) {
     const audio = container.querySelector('#audioElement');
     const btnPlay = container.querySelector('#apPlay');
@@ -597,7 +577,7 @@ function initCustomAudioPlayer(container) {
         return `${m}:${s.toString().padStart(2, '0')}`;
     };
 
-    // Evénements
+    // Ev├®nements
     btnPlay.addEventListener('click', () => {
         if (audio.paused) {
             audio.play();
@@ -650,7 +630,7 @@ function initCustomAudioPlayer(container) {
         lblDuration.textContent = fmt(audio.duration || 0);
         lblCurrent.textContent = fmt(0);
         rngSeek.value = 0;
-        // Définir la vitesse par défaut (sans démarrage automatique)
+        // D├®finir la vitesse par d├®faut (sans d├®marrage automatique)
         if (selRate) {
             const initial = parseFloat(selRate.value || '1');
             if (isFinite(initial) && initial > 0) {
@@ -661,7 +641,7 @@ function initCustomAudioPlayer(container) {
         } else {
             audio.playbackRate = 1;
         }
-        // Attendre l'action explicite de l'utilisateur pour démarrer la lecture
+        // Attendre l'action explicite de l'utilisateur pour d├®marrer la lecture
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -671,7 +651,7 @@ function initCustomAudioPlayer(container) {
         }
     });
 
-    // Accessibilité clavier
+    // Accessibilit├® clavier
     container.addEventListener('keydown', (e) => {
         if (e.key === ' ') { e.preventDefault(); btnPlay.click(); }
         if (e.key === 'ArrowRight') { audio.currentTime = Math.min((audio.currentTime || 0) + 5, audio.duration || 0); }
