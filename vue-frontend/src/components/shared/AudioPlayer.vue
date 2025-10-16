@@ -14,6 +14,7 @@ const current = ref(0)
 const duration = ref(0)
 const seek = ref(0)
 const volume = ref(1)
+const rate = ref(1)
 
 const fmt = (sec) => {
   if (!isFinite(sec)) return '0:00'
@@ -61,11 +62,22 @@ const onVolInput = (e) => {
   }
 }
 
+const onRateChange = (e) => {
+  const a = audioRef.value
+  if (!a) return
+  const val = parseFloat(e.target.value)
+  if (isFinite(val) && val > 0) {
+    rate.value = val
+    a.playbackRate = val
+  }
+}
+
 onMounted(() => {
   const a = audioRef.value
   if (!a) return
   a.preload = props.preload
   a.autoplay = props.autoplay
+  a.playbackRate = rate.value
   a.addEventListener('loadedmetadata', () => {
     duration.value = a.duration || 0
     current.value = 0
@@ -100,16 +112,29 @@ onMounted(() => {
       <span class="ap-label">{{ muted ? 'Muet' : 'Son' }}</span>
     </button>
     <input class="ap-volume" type="range" min="0" max="1" step="0.01" :value="volume" @input="onVolInput" aria-label="Volume" />
+    <label class="sr-only" for="apRate">Vitesse de lecture</label>
+    <select id="apRate" class="ap-rate" :value="rate" @change="onRateChange" aria-label="Vitesse de lecture" title="Vitesse de lecture">
+      <option value="0.75">x0.75</option>
+      <option value="1">x1</option>
+      <option value="1.25">x1.25</option>
+      <option value="1.5">x1.5</option>
+      <option value="2">x2</option>
+    </select>
   </div>
 </template>
 
 <style scoped>
-.ap { display: grid; grid-template-columns: auto auto 1fr auto auto; gap: .75rem; align-items: center; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: .75rem 1rem; }
+.ap { display: grid; grid-template-columns: auto auto 1fr auto auto auto; gap: .75rem; align-items: center; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: .75rem 1rem; }
 .ap-btn { background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.35); color: #4ade80; padding: .5rem .75rem; border-radius: 8px; cursor: pointer; }
 .ap-btn:hover { filter: brightness(1.1); }
 .ap-btn .ap-label { margin-left: .4rem; }
 .ap-time { color: #9ca3af; font-variant-numeric: tabular-nums; }
 .ap-seek { width: 100%; accent-color: #22c55e; }
 .ap-volume { width: 100px; accent-color: #22c55e; }
+/* Vitesse de lecture */
+.ap-rate { width: 90px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); color: #e5e7eb; border-radius: 8px; padding: .45rem .5rem; }
+.ap-rate:focus { outline: none; border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.25); }
 audio { display: none; }
+/* Utilitaire accessibilité (label masqué visuellement) */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 </style>

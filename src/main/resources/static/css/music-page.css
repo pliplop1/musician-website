@@ -209,6 +209,10 @@
 .custom-audio-player .ap-time { color: #9ca3af; font-variant-numeric: tabular-nums; }
 .custom-audio-player .ap-seek { width: 100%; accent-color: #22c55e; }
 .custom-audio-player .ap-volume { width: 100px; accent-color: #22c55e; }
+.custom-audio-player .ap-rate { width: 90px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); color: #e5e7eb; border-radius: 8px; padding: .45rem .5rem; }
+.custom-audio-player .ap-rate:focus { outline: none; border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.25); }
+/* Utilitaire accessibilité (label masqué visuellement) */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 .track-meta {
     display: flex;
