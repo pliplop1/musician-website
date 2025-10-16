@@ -75,39 +75,39 @@
 					<table class="min-w-full divide-y divide-gray-200">
 						<thead class="bg-gray-50">
 							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								<th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 									<span class="sr-only">Sélection</span>
 								</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y divide-gray-200">
 							<tr th:if="${#lists.isEmpty(messages)}">
-								<td colspan="6" class="px-6 py-4 text-center text-gray-500">Aucun
+								<td colspan="6" class="px-3 sm:px-6 py-4 text-center text-gray-500">Aucun
 									message reçu.</td>
 							</tr>
 							<tr th:each="message : ${messages}">
-								<td class="px-6 py-4">
+								<td class="px-3 sm:px-6 py-4">
 									<input type="checkbox" name="messageIds" th:value="${message.id}"
 										class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
 								</td>
-								<td class="px-6 py-4 whitespace-nowrap"
+								<td class="px-3 sm:px-6 py-4 whitespace-nowrap"
 									th:text="${#temporals.format(message.timestamp, 'dd/MM/yyyy HH:mm')}"></td>
-								<td class="px-6 py-4 whitespace-nowrap" th:text="${message.name}"></td>
-								<td class="px-6 py-4 whitespace-nowrap"
+								<td class="px-3 sm:px-6 py-4 whitespace-nowrap" th:text="${message.name}"></td>
+								<td class="px-3 sm:px-6 py-4 whitespace-nowrap"
 									th:text="${message.email}"></td>
-								<td class="px-6 py-4"
+								<td class="px-3 sm:px-6 py-4"
 									th:text="${#strings.abbreviate(message.content, 50)}"></td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+								<td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
 									<button type="button"
 										class="text-blue-600 hover:text-blue-900 view-message-btn"
 										th:data-name="${message.name}" th:data-email="${message.email}"

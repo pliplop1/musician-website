@@ -60,21 +60,21 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr th:if="${#lists.isEmpty(concerts)}">
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Aucun concert programmé.</td>
+                        <td colspan="4" class="px-3 sm:px-6 py-4 text-center text-gray-500">Aucun concert programmé.</td>
                     </tr>
                     <tr th:each="c : ${concerts}">
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${#temporals.format(c.date, 'dd/MM/yyyy')}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${c.location}"></td>
-                        <td class="px-6 py-4" th:text="${#strings.abbreviate(c.description, 50)}"></td>
-                        <td class="px-6 py-4 text-sm font-medium flex space-x-4">
+                        <td class="px-3 sm:px-6 py-4 whitespace-nowrap" th:text="${#temporals.format(c.date, 'dd/MM/yyyy')}"></td>
+                        <td class="px-3 sm:px-6 py-4 whitespace-nowrap" th:text="${c.location}"></td>
+                        <td class="px-3 sm:px-6 py-4" th:text="${#strings.abbreviate(c.description, 50)}"></td>
+                        <td class="px-3 sm:px-6 py-4 text-sm font-medium flex space-x-4">
                             <a th:href="@{/admin/concerts/edit/{id}(id=${c.id})}" class="text-indigo-600 hover:text-indigo-900">Modifier</a>
                             <form th:action="@{/admin/concerts/delete/{id}(id=${c.id})}" method="post" class="inline">
                                 <button type="submit" class="text-red-600 hover:text-red-900 bg-transparent border-none p-0 cursor-pointer"
