@@ -15,6 +15,7 @@
 
 <div class="flex min-h-screen">
 	<!-- AJOUT : Inclusion de la sidebar -->
+	<div th:replace="~{fragments/admin-layout :: mobile-menu-toggle}"></div>
 	<div th:replace="~{fragments/admin-layout :: sidebar}"></div>
 
 	<main class="flex-grow p-8">
@@ -62,7 +63,8 @@
 		</div>
 	</main>
 </div>
-	
+<div th:replace="~{fragments/admin-layout :: admin-sidebar-mobile}"></div>
+
 <!-- Fenêtre Modale pour la confirmation de changement de rôle ADMIN -->
 <div id="roleChangeConfirmModal" class="modal fixed z-20 inset-0 overflow-y-auto" aria-labelledby="modal-title-role-change" role="dialog" aria-modal="true">
   <div class="flex items-center justify-center min-h-screen">
