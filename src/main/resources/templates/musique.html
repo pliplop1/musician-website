@@ -90,6 +90,13 @@ const tracksPerPage = 9;
 let isAuthenticated = false;
 let likedTracks = new Set();
 
+// Helpers
+function setPlayBadgeTitle(el, count) {
+    if (el) {
+        el.title = `${count} écoutes`;
+    }
+}
+
 // Déterminer le type de lecteur et l'icône
 function getPlayerType(track) {
     if (track.audioUrl) {
@@ -214,6 +221,13 @@ function displayTracks(tracks) {
 
     // Scroll vers le haut
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Harmoniser les tooltips d'écoutes en FR correct
+    document.querySelectorAll('.play-count-badge').forEach(badge => {
+        const id = parseInt(badge.getAttribute('data-play-track-id'));
+        const t = allTracks.find(x => x.id === id);
+        setPlayBadgeTitle(badge, (t && t.playCount) ? t.playCount : 0);
+    });
 }
 
 // Mettre à jour le bouton de pagination
@@ -500,6 +514,11 @@ async function loadLikeStatuses() {
 
 // Charger les morceaux
 document.addEventListener('DOMContentLoaded', function() {
+    // Corriger le sous-titre FR au rendu
+    const subtitleEl = document.querySelector('.page-subtitle');
+    if (subtitleEl) {
+        subtitleEl.textContent = "Découvrez l'intégralité de nos morceaux";
+    }
     const loadingMessage = document.getElementById('loadingMessage');
     const searchInput = document.getElementById('searchInput');
     const modalClose = document.getElementById('modalClose');
