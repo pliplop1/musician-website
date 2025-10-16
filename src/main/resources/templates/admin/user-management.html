@@ -72,34 +72,34 @@
 					<table class="min-w-full divide-y divide-gray-200">
 						<thead class="bg-gray-50">
 							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								<th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 									<span class="sr-only">Sélection</span>
 								</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom
 									d'utilisateur</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
 								<th
-									class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+									class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y divide-gray-200">
 							<tr th:if="${userPage.empty}">
-								<td colspan="6" class="px-6 py-4 text-center text-gray-500">Aucun
+								<td colspan="6" class="px-3 sm:px-6 py-4 text-center text-gray-500">Aucun
 									utilisateur trouvé.</td>
 							</tr>
 							<tr th:each="user : ${userPage.content}">
-								<td class="px-6 py-4">
+								<td class="px-3 sm:px-6 py-4">
 									<input type="checkbox" name="userIds" th:value="${user.id}"
 										class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
 								</td>
-								<td class="px-6 py-4" th:text="${user.id}"></td>
-								<td class="px-6 py-4 flex items-center">
+								<td class="px-3 sm:px-6 py-4" th:text="${user.id}"></td>
+								<td class="px-3 sm:px-6 py-4 flex items-center">
 									<!-- Avatar miniature -->
 									<div th:if="${user.avatarFilename != null}" class="mr-3">
 										<img
@@ -115,8 +115,8 @@
 										<div class="text-sm text-gray-500" th:text="${user.fullName}"></div>
 									</div>
 								</td>
-								<td class="px-6 py-4" th:text="${user.email}"></td>
-								<td class="px-6 py-4"><span th:each="role : ${user.roles}"
+								<td class="px-3 sm:px-6 py-4" th:text="${user.email}"></td>
+								<td class="px-3 sm:px-6 py-4"><span th:each="role : ${user.roles}"
 									th:text="${role.name.replace('ROLE_', '')}"
 									class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
 									th:classappend="${role.name == 'ROLE_ADMIN'} ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'">
