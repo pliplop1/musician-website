@@ -22,7 +22,7 @@
 			<span th:text="${successMessage}"></span>
 		</div>
 
-        <div class="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md mb-8 max-w-2xl">
+        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-8 max-w-2xl">
             <h3 class="text-xl font-semibold mb-4">Ajouter une nouvelle actualité</h3>
             <form th:action="@{/admin/articles/add}" th:object="${article}" method="post" class="space-y-6">
                 <div>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-            <h3 class="text-xl font-semibold p-6">Toutes les actualités publiées</h3>
+            <h3 class="text-xl font-semibold p-4 sm:p-6">Toutes les actualités publiées</h3>
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
