@@ -51,7 +51,7 @@
 			</div>
 
 			<!-- Bulk actions toolbar -->
-			<div th:if="${!#lists.isEmpty(messages)}" class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center gap-4">
+			<div th:if="${!#lists.isEmpty(messages)}" class="bg-white rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
 				<label class="flex items-center gap-2">
 					<input type="checkbox" onclick="toggleAll(this)" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
 					<span class="text-sm font-medium">Tout sélectionner</span>
@@ -59,12 +59,12 @@
 				<div class="flex-1"></div>
 				<form th:action="@{/admin/messages/mark-all-read}" method="post" style="display: inline;">
 					<button type="submit"
-						class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+						class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors whitespace-nowrap">
 						✓ Marquer tout comme lu
 					</button>
 				</form>
 				<button type="button" onclick="handleBulkDelete()"
-					class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+					class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors whitespace-nowrap">
 					🗑 Supprimer la sélection
 				</button>
 			</div>
