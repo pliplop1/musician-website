@@ -453,7 +453,9 @@
             const headerNav = document.getElementById('headerNav');
 
             if (menuToggle && headerNav) {
-                menuToggle.addEventListener('click', function() {
+                // Toggle du menu
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     const isExpanded = this.getAttribute('aria-expanded') === 'true';
                     this.setAttribute('aria-expanded', !isExpanded);
                     headerNav.classList.toggle('active');
@@ -461,7 +463,7 @@
                 });
 
                 // Fermer le menu en cliquant sur un lien
-                const navLinks = headerNav.querySelectorAll('a');
+                const navLinks = headerNav.querySelectorAll('a, button');
                 navLinks.forEach(link => {
                     link.addEventListener('click', function() {
                         headerNav.classList.remove('active');
@@ -473,6 +475,17 @@
                 // Fermer le menu avec Escape
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape' && headerNav.classList.contains('active')) {
+                        headerNav.classList.remove('active');
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                        document.body.style.overflow = '';
+                    }
+                });
+
+                // Fermer en cliquant à l'extérieur
+                document.addEventListener('click', function(e) {
+                    if (headerNav.classList.contains('active') &&
+                        !headerNav.contains(e.target) &&
+                        !menuToggle.contains(e.target)) {
                         headerNav.classList.remove('active');
                         menuToggle.setAttribute('aria-expanded', 'false');
                         document.body.style.overflow = '';
