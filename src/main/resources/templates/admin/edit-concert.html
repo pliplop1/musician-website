@@ -16,7 +16,7 @@
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
         <h1 class="text-2xl sm:text-3xl font-bold mb-6">Modifier un Concert</h1>
 
-        <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl">
+        <div class="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md max-w-2xl">
             <form th:action="@{/admin/concerts/update/{id}(id=${concert.id})}"
                 th:object="${concert}" method="post" class="space-y-6">
                 <div>
