@@ -36,7 +36,7 @@ const isHtmlEmbed = (embedCode) => {
 
 // Déterminer le type de lecteur
 const getPlayerType = (track) => {
-  if (track.audioUrl) return { icon: 'fas fa-file-audio', label: 'Audio Local' }
+  if (track.audioUrl) return { icon: 'fas fa-file-audio', label: 'Audio local' }
   if (track.spotifyUrl) {
     if (track.spotifyUrl.includes('soundcloud.com')) {
       return { icon: 'fab fa-soundcloud', label: 'SoundCloud' }

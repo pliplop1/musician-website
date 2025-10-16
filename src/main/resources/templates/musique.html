@@ -18,7 +18,7 @@
 <main class="music-page">
     <div class="music-container">
         <h1 class="page-title">
-            <i class="fas fa-music"></i> Toute notre Musique
+            <i class="fas fa-music"></i> Toute notre musique
         </h1>
         <p class="page-subtitle">Découvrez l'intégralité de nos morceaux</p>
 
@@ -93,7 +93,7 @@ let likedTracks = new Set();
 // Déterminer le type de lecteur et l'icône
 function getPlayerType(track) {
     if (track.audioUrl) {
-        return { icon: 'fas fa-file-audio', label: 'Audio Local' };
+        return { icon: 'fas fa-file-audio', label: 'Audio local' };
     }
     if (track.spotifyUrl) {
         if (track.spotifyUrl.includes('soundcloud.com')) {
@@ -300,6 +300,14 @@ function openTrackModal(track) {
                     <i class="fas fa-volume-up"></i><span class="ap-label">Son</span>
                 </button>
                 <input id="apVolume" class="ap-volume" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+                <label class="sr-only" for="apRate">Vitesse de lecture</label>
+                <select id="apRate" class="ap-rate" aria-label="Vitesse de lecture" title="Vitesse de lecture">
+                    <option value="0.75">x0.75</option>
+                    <option value="1" selected>x1</option>
+                    <option value="1.25">x1.25</option>
+                    <option value="1.5">x1.5</option>
+                    <option value="2">x2</option>
+                </select>
             </div>`;
     }
 
@@ -558,6 +566,7 @@ function initCustomAudioPlayer(container) {
     const btnMute = container.querySelector('#apMute');
     const rngSeek = container.querySelector('#apSeek');
     const rngVol = container.querySelector('#apVolume');
+    const selRate = container.querySelector('#apRate');
     const lblCurrent = container.querySelector('#apCurrent');
     const lblDuration = container.querySelector('#apDuration');
 
@@ -608,10 +617,30 @@ function initCustomAudioPlayer(container) {
         }
     });
 
+    if (selRate) {
+        selRate.addEventListener('change', () => {
+            const val = parseFloat(selRate.value);
+            if (isFinite(val) && val > 0) {
+                audio.playbackRate = val;
+            }
+        });
+    }
+
     audio.addEventListener('loadedmetadata', () => {
         lblDuration.textContent = fmt(audio.duration || 0);
         lblCurrent.textContent = fmt(0);
         rngSeek.value = 0;
+        // Définir la vitesse par défaut (sans démarrage automatique)
+        if (selRate) {
+            const initial = parseFloat(selRate.value || '1');
+            if (isFinite(initial) && initial > 0) {
+                audio.playbackRate = initial;
+            } else {
+                audio.playbackRate = 1;
+            }
+        } else {
+            audio.playbackRate = 1;
+        }
         // Attendre l'action explicite de l'utilisateur pour démarrer la lecture
     });
 
