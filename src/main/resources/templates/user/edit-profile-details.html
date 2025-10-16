@@ -9,53 +9,53 @@
 <body class="bg-gray-100 text-gray-800">
 
 	<header class="bg-white shadow-md">
-		<div class="container mx-auto px-6 py-4 flex justify-between items-center">
-			<h1 class="text-2xl font-bold text-gray-800">Mon Espace</h1>
-			<div>
-				<a th:href="@{/user/profile}" class="px-4 text-gray-600 hover:text-indigo-600">Retour au profil</a>
+		<div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
+			<h1 class="text-xl sm:text-2xl font-bold text-gray-800">Mon Espace</h1>
+			<div class="flex flex-wrap items-center gap-2 sm:gap-0">
+				<a th:href="@{/user/profile}" class="px-3 sm:px-4 text-sm sm:text-base text-gray-600 hover:text-indigo-600">Retour au profil</a>
 				<form th:action="@{/logout}" method="post" class="inline">
-					<button type="submit" class="px-4 text-gray-600 hover:text-indigo-600">Déconnexion</button>
+					<button type="submit" class="px-3 sm:px-4 text-sm sm:text-base text-gray-600 hover:text-indigo-600">Déconnexion</button>
 				</form>
 			</div>
 		</div>
 	</header>
 
-	<main class="container mx-auto px-6 py-8">
-		<div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
-			<h2 class="text-2xl font-bold mb-6 text-center">Mes informations personnelles</h2>
-			
-			<div th:if="${errorMessage}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
-				<p th:text="${errorMessage}"></p>
+	<main class="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+		<div class="max-w-lg mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md">
+			<h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Mes informations personnelles</h2>
+
+			<div th:if="${errorMessage}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 sm:p-4 mb-4 sm:mb-6">
+				<p class="text-sm sm:text-base" th:text="${errorMessage}"></p>
 			</div>
-			
-			<form th:action="@{/user/profile/details}" method="post" class="space-y-6">
+
+			<form th:action="@{/user/profile/details}" method="post" class="space-y-4 sm:space-y-6">
 				<div>
-					<label for="firstName" class="block text-sm font-medium text-gray-700">Prénom</label>
+					<label for="firstName" class="block text-xs sm:text-sm font-medium text-gray-700">Prénom</label>
 					<input type="text" id="firstName" name="firstName" th:value="${user.firstName}"
-						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
 						placeholder="Votre prénom">
 				</div>
-				
+
 				<div>
-					<label for="lastName" class="block text-sm font-medium text-gray-700">Nom de famille</label>
+					<label for="lastName" class="block text-xs sm:text-sm font-medium text-gray-700">Nom de famille</label>
 					<input type="text" id="lastName" name="lastName" th:value="${user.lastName}"
-						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
 						placeholder="Votre nom">
 				</div>
-				
+
 				<div>
-					<label for="bio" class="block text-sm font-medium text-gray-700">Biographie</label>
+					<label for="bio" class="block text-xs sm:text-sm font-medium text-gray-700">Biographie</label>
 					<textarea id="bio" name="bio" rows="4" maxlength="500"
-						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
 						placeholder="Parlez un peu de vous... (max 500 caractères)"
 						th:text="${user.bio}"></textarea>
-					<p class="mt-1 text-sm text-gray-500">
+					<p class="mt-1 text-xs sm:text-sm text-gray-500">
 						<span id="charCount">0</span>/500 caractères
 					</p>
 				</div>
-				
+
 				<div>
-					<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition duration-300">
+					<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 rounded-md text-sm sm:text-base transition duration-300">
 						Enregistrer les modifications
 					</button>
 				</div>

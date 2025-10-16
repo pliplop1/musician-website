@@ -4,24 +4,31 @@
 </head>
 <body>
 
-    <nav th:fragment="sidebar" class="w-64 bg-gray-800 text-white p-4 flex-shrink-0">
+    <!-- Bouton burger pour mobile (uniquement visible sur petits écrans) -->
+    <button th:fragment="mobile-menu-toggle" id="adminMobileMenuToggle" class="lg:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-3 rounded-md shadow-lg">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </button>
+
+    <nav th:fragment="sidebar" class="fixed lg:relative lg:w-64 w-64 bg-gray-800 text-white p-4 flex-shrink-0 h-full lg:h-auto overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 z-40" id="adminSidebar">
         <!-- En-tête avec avatar -->
-        <div class="text-center mb-8 pb-4 border-b border-gray-600">
+        <div class="text-center mb-6 sm:mb-8 pb-4 border-b border-gray-600">
             <!-- Avatar de l'admin -->
             <div class="flex justify-center mb-3">
                 <div th:if="${currentUser != null && currentUser.avatarFilename != null}">
                     <img th:src="@{/uploaded-avatars/{filename}(filename=${currentUser.avatarFilename})}"
-                         alt="Avatar" 
-                         class="w-20 h-20 rounded-full border-4 border-indigo-500 object-cover" loading="lazy" decoding="async" width="32" height="32">
+                         alt="Avatar"
+                         class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-3 sm:border-4 border-indigo-500 object-cover" loading="lazy" decoding="async">
                 </div>
-                <div th:if="${currentUser == null || currentUser.avatarFilename == null}" 
-                     class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-indigo-500">
+                <div th:if="${currentUser == null || currentUser.avatarFilename == null}"
+                     class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl sm:text-2xl border-3 sm:border-4 border-indigo-500">
                     <span th:text="${currentUser != null ? currentUser.initials : 'A'}"></span>
                 </div>
             </div>
-            
-            <h2 class="text-xl font-bold">Administration</h2>
-            <p class="text-sm text-gray-400 mt-1" th:text="${currentUser != null ? currentUser.fullName : 'Administrateur'}"></p>
+
+            <h2 class="text-lg sm:text-xl font-bold">Administration</h2>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1" th:text="${currentUser != null ? currentUser.fullName : 'Administrateur'}"></p>
 
             <!-- Icône de notifications avec badge -->
             <div class="relative inline-block mt-4">
@@ -162,6 +169,37 @@
         <!-- Script de notifications -->
         <script th:src="@{/js/admin-notifications.js}"></script>
     </nav>
+
+    <!-- Script pour sidebar mobile -->
+    <script th:fragment="mobile-sidebar-script">
+        (function() {
+            const toggleBtn = document.getElementById('adminMobileMenuToggle');
+            const sidebar = document.getElementById('adminSidebar');
+
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('-translate-x-full');
+                });
+
+                // Fermer la sidebar en cliquant sur un lien (mobile seulement)
+                const sidebarLinks = sidebar.querySelectorAll('a');
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth < 1024) {
+                            sidebar.classList.add('-translate-x-full');
+                        }
+                    });
+                });
+
+                // Fermer avec Escape
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.innerWidth < 1024 && !sidebar.classList.contains('-translate-x-full')) {
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            }
+        })();
+    </script>
 
 </body>
 </html>
