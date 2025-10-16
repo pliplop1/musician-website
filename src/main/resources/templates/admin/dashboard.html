@@ -9,113 +9,117 @@
 <body class="bg-gray-100 text-gray-800">
 
 <div class="flex min-h-screen">
+    <div th:replace="~{fragments/admin-layout :: mobile-menu-toggle}"></div>
     <div th:replace="~{fragments/admin-layout :: sidebar}"></div>
 
-    <main class="flex-grow p-8">
-        <h1 class="text-3xl font-bold mb-6">Tableau de Bord</h1>
+    <main class="flex-grow p-4 sm:p-6 lg:p-8 w-full lg:w-auto">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 mt-14 lg:mt-0">Tableau de Bord</h1>
 
-        <section class="mb-8">
-            <h2 class="text-2xl font-bold mb-4">Statistiques</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <p class="text-gray-500 text-sm font-medium">Utilisateurs inscrits</p>
-                    <p class="text-3xl font-bold" th:text="${userCount}">0</p>
+        <section class="mb-6 sm:mb-8">
+            <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Statistiques</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Utilisateurs inscrits</p>
+                    <p class="text-2xl sm:text-3xl font-bold" th:text="${userCount}">0</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <p class="text-gray-500 text-sm font-medium">Concerts programmés</p>
-                    <p class="text-3xl font-bold" th:text="${concertCount}">0</p>
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Concerts programmés</p>
+                    <p class="text-2xl sm:text-3xl font-bold" th:text="${concertCount}">0</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <p class="text-gray-500 text-sm font-medium">Actualités publiées</p>
-                    <p class="text-3xl font-bold" th:text="${articleCount}">0</p>
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Actualités publiées</p>
+                    <p class="text-2xl sm:text-3xl font-bold" th:text="${articleCount}">0</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <p class="text-gray-500 text-sm font-medium">Messages reçus</p>
-                    <p class="text-3xl font-bold" th:text="${messageCount}">0</p>
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Messages reçus</p>
+                    <p class="text-2xl sm:text-3xl font-bold" th:text="${messageCount}">0</p>
                 </div>
             </div>
         </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+
             <section>
-                <h2 class="text-2xl font-bold mb-4">Derniers Concerts</h2>
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Derniers Concerts</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
                     <ul class="space-y-2">
-                        <li th:each="c : ${concerts.subList(0, T(java.lang.Math).min(concerts.size(), 5))}" class="flex justify-between items-center">
-                            <span th:text="${c.location} + ' - ' + ${#temporals.format(c.date, 'dd/MM/yyyy')}"></span>
-                            <a th:href="@{/admin/concerts/edit/{id}(id=${c.id})}" class="text-sm text-indigo-600">Modifier</a>
+                        <li th:each="c : ${concerts.subList(0, T(java.lang.Math).min(concerts.size(), 5))}" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+                            <span class="text-sm sm:text-base" th:text="${c.location} + ' - ' + ${#temporals.format(c.date, 'dd/MM/yyyy')}"></span>
+                            <a th:href="@{/admin/concerts/edit/{id}(id=${c.id})}" class="text-xs sm:text-sm text-indigo-600">Modifier</a>
                         </li>
                     </ul>
-                    <a th:href="@{/admin/concerts}" class="text-indigo-600 hover:underline mt-4 inline-block">→ Gérer tous les concerts</a>
+                    <a th:href="@{/admin/concerts}" class="text-sm sm:text-base text-indigo-600 hover:underline mt-3 sm:mt-4 inline-block">→ Gérer tous les concerts</a>
                 </div>
             </section>
-            
+
             <section>
-                <h2 class="text-2xl font-bold mb-4">Dernières Actualités</h2>
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Dernières Actualités</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
                     <ul class="space-y-2">
-                        <li th:each="a : ${articles.subList(0, T(java.lang.Math).min(articles.size(), 5))}" class="flex justify-between items-center">
-                            <span th:text="${#strings.abbreviate(a.titre, 40)}"></span>
-                            <a th:href="@{/admin/articles/edit/{id}(id=${a.id})}" class="text-sm text-indigo-600">Modifier</a>
+                        <li th:each="a : ${articles.subList(0, T(java.lang.Math).min(articles.size(), 5))}" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+                            <span class="text-sm sm:text-base" th:text="${#strings.abbreviate(a.titre, 40)}"></span>
+                            <a th:href="@{/admin/articles/edit/{id}(id=${a.id})}" class="text-xs sm:text-sm text-indigo-600">Modifier</a>
                         </li>
                     </ul>
-                    <a th:href="@{/admin/articles}" class="text-indigo-600 hover:underline mt-4 inline-block">→ Gérer toutes les actualités</a>
+                    <a th:href="@{/admin/articles}" class="text-sm sm:text-base text-indigo-600 hover:underline mt-3 sm:mt-4 inline-block">→ Gérer toutes les actualités</a>
                 </div>
             </section>
-            
+
              <section>
-                <h2 class="text-2xl font-bold mb-4">Aperçu Galerie</h2>
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="grid grid-cols-3 gap-2">
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Aperçu Galerie</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         <div th:each="p : ${photos.subList(0, T(java.lang.Math).min(photos.size(), 6))}">
                             <img th:src="@{/uploaded-photos/{filename}(filename=${p.filename})}"
                                  th:alt="'Photo de galerie - ' + ${p.filename}"
-                                 class="rounded object-cover h-24 w-full">
+                                 class="rounded object-cover h-20 sm:h-24 w-full"
+                                 loading="lazy" decoding="async">
                         </div>
                     </div>
-                    <a th:href="@{/admin/photos}" class="text-indigo-600 hover:underline mt-4 inline-block">→ Gérer la galerie</a>
+                    <a th:href="@{/admin/photos}" class="text-sm sm:text-base text-indigo-600 hover:underline mt-3 sm:mt-4 inline-block">→ Gérer la galerie</a>
                 </div>
             </section>
             
             <section>
-                <h2 class="text-2xl font-bold mb-4">Dernières Pistes</h2>
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Dernières Pistes</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
                     <ul class="space-y-2">
                         <li th:each="t : ${tracks.subList(0, T(java.lang.Math).min(tracks.size(), 5))}" class="flex justify-between items-center">
-                            <span th:text="${t.title}"></span>
+                            <span class="text-sm sm:text-base" th:text="${t.title}"></span>
                             <span th:text="${t.trackType.name()}"
                                   class="px-2 text-xs font-semibold rounded-full capitalize"
                                   th:classappend="${t.trackType.name() == 'EMBED' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}"></span>
                         </li>
                     </ul>
-                    <a th:href="@{/admin/musique}" class="text-indigo-600 hover:underline mt-4 inline-block">→ Gérer la musique</a>
+                    <a th:href="@{/admin/musique}" class="text-sm sm:text-base text-indigo-600 hover:underline mt-3 sm:mt-4 inline-block">→ Gérer la musique</a>
                 </div>
             </section>
 
              <section>
-                <h2 class="text-2xl font-bold mb-4">Derniers Messages</h2>
-                <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Derniers Messages</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
                     <ul class="space-y-2">
                         <li th:each="msg : ${messages.subList(0, T(java.lang.Math).min(messages.size(), 5))}" class="border-b pb-2">
-                            <p class="font-semibold" th:text="${msg.name}"></p>
-                            <p class="text-sm text-gray-600" th:text="${#strings.abbreviate(msg.content, 70)}"></p>
+                            <p class="text-sm sm:text-base font-semibold" th:text="${msg.name}"></p>
+                            <p class="text-xs sm:text-sm text-gray-600" th:text="${#strings.abbreviate(msg.content, 70)}"></p>
                         </li>
                     </ul>
-                    <a th:href="@{/admin/messages}" class="text-indigo-600 hover:underline mt-4 inline-block">→ Voir tous les messages</a>
+                    <a th:href="@{/admin/messages}" class="text-sm sm:text-base text-indigo-600 hover:underline mt-3 sm:mt-4 inline-block">→ Voir tous les messages</a>
                 </div>
             </section>
-            
+
             <section>
-                <h2 class="text-2xl font-bold mb-4">Biographie</h2>
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <p class="text-gray-600 h-24 overflow-hidden" th:text="${#strings.abbreviate(biography.content, 150)}"></p>
-                    <a th:href="@{/admin/biographie}" class="text-indigo-600 hover:underline mt-4 inline-block">→ Modifier la biographie</a>
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Biographie</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <p class="text-sm sm:text-base text-gray-600 h-20 sm:h-24 overflow-hidden" th:text="${#strings.abbreviate(biography.content, 150)}"></p>
+                    <a th:href="@{/admin/biographie}" class="text-sm sm:text-base text-indigo-600 hover:underline mt-3 sm:mt-4 inline-block">→ Modifier la biographie</a>
                 </div>
             </section>
         </div>
     </main>
 </div>
+
+<div th:replace="~{fragments/admin-layout :: mobile-sidebar-script}"></div>
 
 </body>
 </html>

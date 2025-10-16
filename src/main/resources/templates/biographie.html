@@ -16,11 +16,11 @@
 
 <header th:replace="~{fragments/layout :: header}"></header>
 
-<main class="container mx-auto px-6 py-12">
+<main class="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12">
     <section id="biographie-content">
-        <h2 class="text-4xl font-bold text-center mb-10">Biographie</h2>
-        <div class="max-w-4xl mx-auto bg-gray-800 rounded-lg p-8 shadow-lg">
-            <p class="text-gray-300 whitespace-pre-wrap leading-relaxed" th:text="${biography.content}"></p>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-10 px-2">Biographie</h2>
+        <div class="max-w-4xl mx-auto bg-gray-800 rounded-lg p-4 sm:p-6 md:p-8 shadow-lg">
+            <p class="text-sm sm:text-base text-gray-300 whitespace-pre-wrap leading-relaxed" th:text="${biography.content}"></p>
         </div>
     </section>
 </main>

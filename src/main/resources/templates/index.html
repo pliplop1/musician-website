@@ -20,33 +20,33 @@
 
 <header th:replace="~{fragments/layout :: header}"></header>
 
-<main class="container mx-auto px-6 py-12">
-    <section class="text-center my-16">
-        <h2 class="text-5xl font-black mb-4">LA MUSIQUE QUI VOUS TRANSPORTE</h2>
-        <p class="text-xl text-gray-400">Découvrez les dernières actualités et dates de tournée.</p>
+<main class="container mx-auto px-4 sm:px-6 py-8 md:py-12" id="main-content">
+    <section class="text-center my-8 md:my-16">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-4 px-2">LA MUSIQUE QUI VOUS TRANSPORTE</h2>
+        <p class="text-base sm:text-lg md:text-xl text-gray-400 px-2">Découvrez les dernières actualités et dates de tournée.</p>
     </section>
     <div th:if="${successMessage}" class="bg-green-500 text-white p-4 rounded-md mb-12 text-center shadow-lg">
         <p th:text="${successMessage}"></p>
     </div>
-    <section id="concerts" class="mb-20 scroll-mt-20">
-        <h3 class="text-4xl font-bold text-center mb-10">Prochaines Dates</h3>
-        <div class="max-w-4xl mx-auto space-y-6">
-            <div th:if="${#lists.isEmpty(concerts)}" class="bg-gray-800 rounded-lg p-8 text-center shadow-lg">
-                <p class="text-gray-400 text-lg">Aucun concert n'est prévu pour le moment. Revenez bientôt !</p>
+    <section id="concerts" class="mb-12 md:mb-20 scroll-mt-20">
+        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 px-2">Prochaines Dates</h3>
+        <div class="max-w-4xl mx-auto space-y-4 md:space-y-6">
+            <div th:if="${#lists.isEmpty(concerts)}" class="bg-gray-800 rounded-lg p-6 md:p-8 text-center shadow-lg">
+                <p class="text-gray-400 text-sm sm:text-base md:text-lg">Aucun concert n'est prévu pour le moment. Revenez bientôt !</p>
             </div>
-            <div th:each="concert : ${concerts}" class="bg-gray-800 rounded-lg p-6 shadow-lg">
-                <div class="flex flex-col md:flex-row items-center justify-between mb-4">
-                    <div class="text-center md:text-left mb-4 md:mb-0">
-                        <p class="text-2xl font-bold text-indigo-400" th:text="${#temporals.format(concert.date, 'dd MMMM yyyy')}"></p>
-                        <p class="text-xl font-bold" th:text="${concert.location}"></p>
-                        <p class="text-gray-400 mt-2" th:text="${concert.description}"></p>
+            <div th:each="concert : ${concerts}" class="bg-gray-800 rounded-lg p-4 sm:p-5 md:p-6 shadow-lg">
+                <div class="flex flex-col items-center justify-between mb-4 gap-3 md:gap-4">
+                    <div class="text-center w-full">
+                        <p class="text-lg sm:text-xl md:text-2xl font-bold text-indigo-400" th:text="${#temporals.format(concert.date, 'dd MMMM yyyy')}"></p>
+                        <p class="text-base sm:text-lg md:text-xl font-bold mt-1" th:text="${concert.location}"></p>
+                        <p class="text-gray-400 text-sm sm:text-base mt-2" th:text="${concert.description}"></p>
                     </div>
-                    <div sec:authorize="isAuthenticated()" class="flex-shrink-0">
+                    <div sec:authorize="isAuthenticated()" class="w-full sm:w-auto">
                         <form th:action="@{/user/favorites/add/{id}(id=${concert.id})}" method="post" th:if="${!favoriteConcertIds.contains(concert.id)}">
-                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition-colors">Ça m'intéresse</button>
+                            <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 sm:px-6 rounded-md transition-colors text-sm sm:text-base">Ça m'intéresse</button>
                         </form>
                         <form th:action="@{/user/favorites/remove/{id}(id=${concert.id})}" method="post" th:if="${favoriteConcertIds.contains(concert.id)}">
-                            <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-md transition-colors">Ne m'intéresse plus</button>
+                            <button type="submit" class="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 sm:px-6 rounded-md transition-colors text-sm sm:text-base">Ne m'intéresse plus</button>
                         </form>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
                 <!-- Section des commentaires -->
                 <div class="mt-6 pt-6 border-t border-gray-700">
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-semibold text-gray-300">
+                        <h4 class="text-base sm:text-lg font-semibold text-gray-300">
                             💬 Commentaires (<span th:text="${#ctx.getVariable('commentCount_' + concert.id) ?: 0}">0</span>)
                         </h4>
                     </div>
@@ -65,7 +65,7 @@
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <textarea name="content" rows="3" maxlength="1000" required
                                       placeholder="Ajouter un commentaire..."
-                                      class="w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white text-sm resize-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"></textarea>
+                                      class="w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white text-xs sm:text-sm resize-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"></textarea>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs text-gray-400">Max 1000 caractères</span>
                                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-4 rounded-md text-sm transition-colors">
@@ -113,32 +113,32 @@
         </div>
     </section>
     <section id="contact" class="max-w-2xl mx-auto scroll-mt-20">
-        <h3 class="text-4xl font-bold text-center mb-10">Contactez-moi</h3>
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg">
-            <form th:action="@{/contact}" th:object="${message}" method="post" class="space-y-6">
+        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 px-2">Contactez-moi</h3>
+        <div class="bg-gray-800 p-4 sm:p-6 md:p-8 rounded-lg shadow-lg">
+            <form th:action="@{/contact}" th:object="${message}" method="post" class="space-y-4 md:space-y-6">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-300">Nom</label>
+                    <label for="name" class="block text-xs sm:text-sm font-medium text-gray-300">Nom</label>
                     <input type="text" id="name" th:field="*{name}" required
                         th:classappend="${#fields.hasErrors('name')} ? 'border-red-500' : ''"
-                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white">
-                    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="mt-1 text-sm text-red-500"></p>
+                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white text-sm sm:text-base">
+                    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="mt-1 text-xs sm:text-sm text-red-500"></p>
                 </div>
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+                    <label for="email" class="block text-xs sm:text-sm font-medium text-gray-300">Email</label>
                     <input type="email" id="email" th:field="*{email}" required
                         th:classappend="${#fields.hasErrors('email')} ? 'border-red-500' : ''"
-                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white">
-                    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="mt-1 text-sm text-red-500"></p>
+                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white text-sm sm:text-base">
+                    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="mt-1 text-xs sm:text-sm text-red-500"></p>
                 </div>
                 <div>
-                    <label for="content" class="block text-sm font-medium text-gray-300">Message</label>
+                    <label for="content" class="block text-xs sm:text-sm font-medium text-gray-300">Message</label>
                     <textarea id="content" th:field="*{content}" rows="4" required
                         th:classappend="${#fields.hasErrors('content')} ? 'border-red-500' : ''"
-                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white"></textarea>
-                    <p th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="mt-1 text-sm text-red-500"></p>
+                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white text-sm sm:text-base"></textarea>
+                    <p th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="mt-1 text-xs sm:text-sm text-red-500"></p>
                 </div>
                 <div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md">Envoyer</button>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 rounded-md text-sm sm:text-base transition-colors">Envoyer</button>
                 </div>
             </form>
         </div>
