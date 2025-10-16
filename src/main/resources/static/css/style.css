@@ -1009,6 +1009,10 @@ video {
   align-items: center;
 }
 
+.items-stretch {
+  align-items: stretch;
+}
+
 .justify-center {
   justify-content: center;
 }
@@ -1035,10 +1039,6 @@ video {
 
 .gap-6 {
   gap: 1.5rem;
-}
-
-.gap-8 {
-  gap: 2rem;
 }
 
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
@@ -2352,6 +2352,10 @@ body {
     max-width: 32rem;
   }
 
+  .sm\:flex-1 {
+    flex: 1 1 0%;
+  }
+
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2708,3 +2712,12 @@ body {
     padding: 2rem;
   }
 }
+
+/* === Global responsive fixes === */
+html, body { max-width: 100%; overflow-x: hidden; }
+img, video, iframe { max-width: 100%; height: auto; }
+/* Wrap long content to avoid overflow */
+*, td, th { overflow-wrap: anywhere; word-break: break-word; }
+/* Ensure tables fit container */
+table { width: 100%; }
+
