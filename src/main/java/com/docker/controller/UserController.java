@@ -29,6 +29,9 @@ import com.docker.service.UserService;
 import com.docker.service.BadgeService;
 import com.docker.service.DataExportService;
 import com.docker.service.LoginAttemptService;
+import com.docker.repository.TrackRepository;
+import com.docker.repository.VideoRepository;
+import com.docker.repository.PhotoRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,12 +47,20 @@ public class UserController {
     private final BadgeService badgeService;
     private final DataExportService dataExportService;
     private final LoginAttemptService loginAttemptService;
+    private final TrackRepository trackRepository;
+    private final VideoRepository videoRepository;
+    private final PhotoRepository photoRepository;
 
-    public UserController(UserService userService, BadgeService badgeService, DataExportService dataExportService, LoginAttemptService loginAttemptService) {
+    public UserController(UserService userService, BadgeService badgeService, DataExportService dataExportService,
+                         LoginAttemptService loginAttemptService, TrackRepository trackRepository,
+                         VideoRepository videoRepository, PhotoRepository photoRepository) {
         this.userService = userService;
         this.badgeService = badgeService;
         this.dataExportService = dataExportService;
         this.loginAttemptService = loginAttemptService;
+        this.trackRepository = trackRepository;
+        this.videoRepository = videoRepository;
+        this.photoRepository = photoRepository;
     }
 
     @GetMapping("/profile")
@@ -73,6 +84,14 @@ public class UserController {
         // Récupérer les informations de dernière connexion
         LoginAttempt lastLogin = loginAttemptService.getLastSuccessfulLogin(username);
 
+        // Récupérer les contenus likés par l'utilisateur
+        var likedTracks = trackRepository.findLikedByUser(user);
+        var likedVideos = videoRepository.findLikedByUser(user);
+        var likedPhotos = photoRepository.findLikedByUser(user);
+
+        // Calcul du pourcentage de complétion du profil
+        int profileCompletion = calculateProfileCompletion(user);
+
         model.addAttribute("username", username);
         model.addAttribute("user", user);
         model.addAttribute("favoriteConcerts", user.getFavoriteConcerts());
@@ -80,8 +99,29 @@ public class UserController {
         model.addAttribute("userBadges", userBadges);
         model.addAttribute("badgeCount", badgeCount);
         model.addAttribute("lastLogin", lastLogin);
+        model.addAttribute("likedTracks", likedTracks);
+        model.addAttribute("likedVideos", likedVideos);
+        model.addAttribute("likedPhotos", likedPhotos);
+        model.addAttribute("profileCompletion", profileCompletion);
 
         return "user/profile";
+    }
+
+    /**
+     * Calcule le pourcentage de complétion du profil utilisateur
+     */
+    private int calculateProfileCompletion(User user) {
+        int score = 0;
+        int total = 6;
+
+        if (user.getFirstName() != null && !user.getFirstName().isEmpty()) score++;
+        if (user.getLastName() != null && !user.getLastName().isEmpty()) score++;
+        if (user.getBio() != null && !user.getBio().isEmpty()) score++;
+        if (user.getAvatarFilename() != null) score++;
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) score++; // Toujours vrai normalement
+        if (user.getUsername() != null && !user.getUsername().isEmpty()) score++; // Toujours vrai normalement
+
+        return (score * 100) / total;
     }
 
     @GetMapping("/login-history")
