@@ -37,8 +37,8 @@
 		<div th:replace="~{fragments/admin-layout :: mobile-menu-toggle}"></div>
 		<div th:replace="~{fragments/admin-layout :: sidebar}"></div>
 
-		<main class="flex-grow p-8">
-			<h1 class="text-3xl font-bold mb-6">Gestion des Utilisateurs</h1>
+		<main class="flex-grow p-4 sm:p-6 lg:p-8">
+			<h1 class="text-2xl sm:text-3xl font-bold mb-6">Gestion des Utilisateurs</h1>
 
 			<form th:action="@{/admin/users}" method="get"
 				class="flex items-center gap-4 mb-6">
