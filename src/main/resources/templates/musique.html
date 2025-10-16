@@ -62,9 +62,9 @@
     </div>
 
     <!-- Modal lecteur -->
-    <div class="track-modal" id="trackModal">
+    <div class="track-modal" id="trackModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
-            <button class="modal-close" id="modalClose">
+            <button class="modal-close" id="modalClose" aria-label="Fermer le lecteur audio">
                 <i class="fas fa-times"></i>
             </button>
             <div class="modal-player-wrapper" id="modalPlayerWrapper">
@@ -278,8 +278,8 @@ function openTrackModal(track) {
             // HTML complet (SoundCloud)
             playerContent = `<div class="embed-container">${embedCode}</div>`;
         } else if (embedCode.includes('spotify.com')) {
-            // URL Spotify
-            playerContent = `<iframe src="${embedCode}" width="100%" height="352" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+            // URL Spotify (lazy + referrer policy)
+            playerContent = `<iframe src="${embedCode}" width="100%" height="352" frameborder="0" allowtransparency="true" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media"></iframe>`;
         } else {
             playerContent = `<div class="embed-container">${embedCode}</div>`;
         }
