@@ -37,8 +37,9 @@ const getYouTubeId = (embedCode) => {
 const getThumbnailUrl = (video) => {
   if (video.videoType === 'EMBED' && video.embedCode) {
     const videoId = getYouTubeId(video.embedCode)
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+    if (videoId &&  videoId.length === 11) {
+      // Utiliser hqdefault.jpg qui existe toujours (au lieu de maxresdefault.jpg)
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
     }
   }
   return '/images/video-placeholder.jpg'
@@ -227,7 +228,12 @@ function openConsentSettings() {
           @keydown.space.prevent="openVideoWithView(video)"
           :aria-label="`Regarder ${video.title}, ${video.viewCount || 0} vues, ${video.likeCount || 0} j'aime`">
           <div class="video-thumbnail">
-            <img :src="getThumbnailUrl(video)" :alt="video.title" loading="lazy" decoding="async" />
+            <img
+              :src="getThumbnailUrl(video)"
+              :alt="video.title"
+              loading="lazy"
+              decoding="async"
+              @error="(e) => e.target.src = '/images/video-placeholder.jpg'" />
             <div class="play-overlay">
               <i class="fas fa-play-circle"></i>
             </div>
@@ -393,6 +399,7 @@ function openConsentSettings() {
   aspect-ratio: 16/9;
   overflow: hidden;
   background: #000;
+  min-height: 200px; /* Prévenir CLS */
 }
 
 .video-thumbnail img {
@@ -739,34 +746,7 @@ function openConsentSettings() {
   display: block;
 }
 
-/* Animations */
-.video-card {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Animation en cascade pour les cartes */
-.video-card:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.video-card:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.video-card:nth-child(3) {
-  animation-delay: 0.3s;
-}
+/* Animations désactivées pour performance - les cartes s'affichent immédiatement */
 
 /* Responsive */
 @media (max-width: 768px) {
