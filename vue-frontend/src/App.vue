@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, provide } from 'vue'
 import HeroSection from './components/HeroSection.vue'
 import FeaturedVideosSection from './components/FeaturedVideosSection.vue'
 import FeaturedTracksSection from './components/FeaturedTracksSection.vue'
@@ -12,7 +12,7 @@ import CookieConsent from './components/CookieConsent.vue'
 const isScrolled = ref(false)
 const mobileMenuOpen = ref(false)
 
-// Authentication state
+// Authentication state - partagé avec tous les composants via provide/inject
 const authState = ref({
   authenticated: false,
   username: null,
@@ -20,17 +20,21 @@ const authState = ref({
   roles: []
 })
 
+// Fournir l'état d'auth à tous les composants enfants pour éviter les appels API redondants
+provide('authState', authState)
+
 // Check authentication status
 const checkAuthStatus = async () => {
   try {
     const response = await fetch('/api/user/current', {
-      credentials: 'include' // Important pour envoyer les cookies de session
+      credentials: 'include', // Important pour envoyer les cookies de session
+      cache: 'no-store'
     })
     if (response.ok) {
       const data = await response.json()
       authState.value = data
     } else {
-      // Si 404 ou autre erreur, l'utilisateur n'est pas connecté
+      // Si 404 ou autre erreur, l'utilisateur n'est pas connecté (erreur silencieuse)
       authState.value = {
         authenticated: false,
         username: null,
@@ -39,6 +43,7 @@ const checkAuthStatus = async () => {
       }
     }
   } catch (error) {
+    // Erreur silencieuse - l'utilisateur n'est simplement pas authentifié
     authState.value = {
       authenticated: false,
       username: null,
@@ -85,12 +90,12 @@ onMounted(() => {
 
         <!-- Desktop Menu -->
         <ul class="nav-menu desktop-only">
-          <li><a @click="scrollToSection('hero')">Accueil</a></li>
-          <li><a @click="scrollToSection('videos')">Vidéos</a></li>
+          <li><a href="#hero" @click.prevent="scrollToSection('hero')">Accueil</a></li>
+          <li><a href="#videos" @click.prevent="scrollToSection('videos')">Vidéos</a></li>
           <li><a href="http://localhost:8106/musique">Musique</a></li>
-          <li><a @click="scrollToSection('biography')">Le Duo</a></li>
-          <li><a @click="scrollToSection('gallery')">Galerie</a></li>
-          <li><a @click="scrollToSection('concerts')">Événements</a></li>
+          <li><a href="#biography" @click.prevent="scrollToSection('biography')">Le Duo</a></li>
+          <li><a href="#gallery" @click.prevent="scrollToSection('gallery')">Galerie</a></li>
+          <li><a href="#concerts" @click.prevent="scrollToSection('concerts')">Événements</a></li>
           <li><a href="http://localhost:8106/login">Contact</a></li>
 
           <!-- Auth Buttons -->
@@ -117,12 +122,12 @@ onMounted(() => {
       <transition name="slide-fade">
         <div v-if="mobileMenuOpen" class="mobile-menu">
           <ul>
-            <li><a @click="scrollToSection('hero')">Accueil</a></li>
-            <li><a @click="scrollToSection('videos')">Vidéos</a></li>
+            <li><a href="#hero" @click.prevent="scrollToSection('hero')">Accueil</a></li>
+            <li><a href="#videos" @click.prevent="scrollToSection('videos')">Vidéos</a></li>
             <li><a href="http://localhost:8106/musique">Musique</a></li>
-            <li><a @click="scrollToSection('biography')">Le Duo</a></li>
-            <li><a @click="scrollToSection('gallery')">Galerie</a></li>
-            <li><a @click="scrollToSection('concerts')">Événements</a></li>
+            <li><a href="#biography" @click.prevent="scrollToSection('biography')">Le Duo</a></li>
+            <li><a href="#gallery" @click.prevent="scrollToSection('gallery')">Galerie</a></li>
+            <li><a href="#concerts" @click.prevent="scrollToSection('concerts')">Événements</a></li>
             <li><a href="http://localhost:8106/login">Contact</a></li>
 
             <!-- Auth Buttons Mobile -->
@@ -251,6 +256,7 @@ body {
 /* Main Content */
 main {
   padding-top: 0;
+  min-height: 100vh; /* Prévenir CLS */
 }
 
 /* Footer */
@@ -436,12 +442,20 @@ main {
 
 @media (max-width: 480px) {
   .nav-logo {
-    font-size: 1rem;
+    font-size: 0.9rem;
     letter-spacing: 1px;
   }
 
   .mobile-menu a {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .navbar {
+    padding: 1rem 0;
+  }
+
+  .nav-container {
+    padding: 0 1rem;
   }
 }
 
@@ -455,13 +469,14 @@ html {
   position: absolute;
   top: -40px;
   left: 0;
-  background: #4a90e2;
-  color: white;
-  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  padding: 12px 24px;
   text-decoration: none;
   z-index: 10000;
   border-radius: 0 0 8px 0;
   font-weight: bold;
+  border: 2px solid #fff;
 }
 
 .skip-link:focus {

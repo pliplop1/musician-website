@@ -25,8 +25,18 @@
 
     <!-- Performance: preconnect to CDN for icons -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-    <!-- Font Awesome pour les icônes (coeurs, étoiles, etc.) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+
+    <!-- Performance: preconnect to API -->
+    <link rel="preconnect" href="http://localhost:8106" crossorigin />
+
+    <!-- Inline critical CSS for icons to prevent FOIT (Flash of Invisible Text) -->
+    <style>
+      /* Fallback pour les icônes avant chargement de Font Awesome */
+      .fa, .fas, .far, .fab {
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+    </style>
 
     <!-- JSON-LD: Organization & Website (SEO) -->
     <script type="application/ld+json">
@@ -77,5 +87,9 @@
     <noscript>Veuillez activer JavaScript pour profiter pleinement du site Duo Black & White.</noscript>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+
+    <!-- Font Awesome chargé en dernier pour ne pas bloquer le rendu initial -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
   </body>
 </html>

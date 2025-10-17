@@ -36,8 +36,8 @@ onMounted(() => {
         <p>Aucun concert prévu pour le moment. Revenez bientôt!</p>
       </div>
 
-      <div v-else class="concerts-list" role="list">
-        <article v-for="concert in concerts" :key="concert.id" class="concert-card" role="listitem">
+      <div v-else class="concerts-list">
+        <article v-for="concert in concerts" :key="concert.id" class="concert-card">
           <div class="concert-date" aria-label="Date du concert">
             <div class="date-day" aria-label="Jour">{{ new Date(concert.date).getDate() }}</div>
             <div class="date-month" aria-label="Mois">{{ new Date(concert.date).toLocaleDateString('fr-FR', { month: 'short' }) }}</div>

@@ -7,27 +7,29 @@ const error = ref(null)
 
 // Fetch hero data from homepage settings API
 const fetchHeroData = async () => {
+  // Données par défaut affichées immédiatement (évite CLS)
+  heroData.value = {
+    artistName: 'DUO BLACK & WHITE',
+    tagline: 'La musique qui vous transporte • France & Belgique'
+  }
+  loading.value = false
+
   try {
     const response = await fetch('/api/public/homepage-settings')
     if (!response.ok) throw new Error('Failed to fetch hero data')
     const settings = await response.json()
 
-    // Mapper les données de settings vers heroData
-    heroData.value = {
-      artistName: settings.heroTitle || 'DUO BLACK & WHITE',
-      tagline: settings.heroSubtitle || 'La musique qui vous transporte',
-      backgroundVideoUrl: settings.heroBackgroundVideoUrl,
-      welcomeMessage: settings.welcomeMessage
+    // Mettre à jour avec les données serveur si disponibles
+    if (settings.heroTitle || settings.heroSubtitle) {
+      heroData.value = {
+        artistName: settings.heroTitle || heroData.value.artistName,
+        tagline: settings.heroSubtitle || heroData.value.tagline,
+        backgroundVideoUrl: settings.heroBackgroundVideoUrl,
+        welcomeMessage: settings.welcomeMessage
+      }
     }
   } catch (err) {
-    error.value = err.message
-    // Données par défaut en cas d'erreur
-    heroData.value = {
-      artistName: 'DUO BLACK & WHITE',
-      tagline: 'La musique qui vous transporte • France & Belgique'
-    }
-  } finally {
-    loading.value = false
+    error.value = null // Erreur silencieuse, on garde les valeurs par défaut
   }
 }
 
@@ -40,14 +42,14 @@ onMounted(() => {
   <section class="hero-section">
     <!-- Video Background -->
     <div class="hero-background">
-      <!-- Vidéo de fond si définie par l'admin -->
+      <!-- Vidéo de fond si définie par l'admin (désactivée sur mobile pour performance) -->
       <video
         v-if="heroData && heroData.backgroundVideoUrl"
         autoplay
         muted
         loop
         playsinline
-        preload="metadata"
+        preload="none"
         aria-label="Vidéo d'ambiance montrant une performance du Duo Black & White"
         class="hero-video">
         <source :src="heroData.backgroundVideoUrl" type="video/mp4">
@@ -143,6 +145,11 @@ onMounted(() => {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 400px; /* Prévenir CLS en fixant la hauteur */
+  height: 400px; /* Hauteur fixe pour éviter tout layout shift */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .welcome-message {
@@ -168,6 +175,7 @@ onMounted(() => {
   justify-content: center;
   margin-top: 2rem;
   flex-wrap: wrap;
+  min-height: 60px; /* Réserver l'espace pour les boutons pour éviter CLS */
 }
 
 .btn {
@@ -176,12 +184,13 @@ onMounted(() => {
   text-decoration: none;
   font-weight: 600;
   font-size: 1rem;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   border: none;
   cursor: pointer;
+  will-change: transform; /* GPU acceleration pour hover */
 }
 
 .btn i {
@@ -195,7 +204,7 @@ onMounted(() => {
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px);
+  transform: translate3d(0, -3px, 0);
   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
 }
 
@@ -209,11 +218,14 @@ onMounted(() => {
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-3px);
+  transform: translate3d(0, -3px, 0);
 }
 
 .hero-text {
-  animation: fadeInUp 1s ease-out;
+  /* Affichage immédiat sans animation pour éviter CLS */
+  opacity: 1;
+  width: 100%; /* Largeur fixe pour éviter layout shift */
+  transform: translate3d(0, 0, 0); /* Force GPU layer pour stabilité */
 }
 
 .hero-title {
@@ -222,6 +234,7 @@ onMounted(() => {
   margin-bottom: 1rem;
   letter-spacing: 10px;
   text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.5);
+  min-height: 6rem; /* Réserver l'espace pour éviter CLS */
 }
 
 .hero-tagline {
@@ -229,6 +242,7 @@ onMounted(() => {
   margin-bottom: 3rem;
   opacity: 0.9;
   letter-spacing: 2px;
+  min-height: 2rem; /* Réserver l'espace pour éviter CLS */
 }
 
 /* Latest Release */
@@ -290,12 +304,14 @@ onMounted(() => {
 
 /* Scroll Indicator */
 .scroll-indicator {
-  position: absolute;
+  position: fixed; /* Changé de absolute à fixed pour ne pas affecter le layout */
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
   animation: bounce 2s infinite;
+  will-change: transform; /* Accélération GPU pour animation continue */
+  z-index: 5; /* En-dessous du hero-content mais visible */
 }
 
 .scroll-indicator span {
@@ -324,43 +340,69 @@ onMounted(() => {
   color: #ff6b6b;
 }
 
-/* Animations */
+/* Animations - Optimisées pour GPU avec will-change et transform3d */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translate3d(0, 30px, 0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes bounce {
   0%, 20%, 50%, 80%, 100% {
-    transform: translateX(-50%) translateY(0);
+    transform: translate3d(-50%, 0, 0);
   }
   40% {
-    transform: translateX(-50%) translateY(-10px);
+    transform: translate3d(-50%, -10px, 0);
   }
   60% {
-    transform: translateX(-50%) translateY(-5px);
+    transform: translate3d(-50%, -5px, 0);
   }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .hero-title {
-    font-size: 3rem;
-    letter-spacing: 5px;
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+    min-height: 3rem; /* Ajusté pour mobile */
   }
 
   .hero-tagline {
-    font-size: 1.2rem;
+    font-size: 1rem;
+  }
+
+  .hero-content {
+    min-height: 300px; /* Réduit pour mobile */
+    height: 300px; /* Hauteur fixe pour mobile aussi */
+    padding: 1rem;
   }
 
   .release-card {
     padding: 1rem;
+  }
+
+  /* Désactiver la vidéo sur mobile pour performance */
+  .hero-video {
+    display: none;
+  }
+
+  .hero-section {
+    height: 100vh;
+    min-height: 600px;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .hero-actions {
+    gap: 0.75rem;
   }
 }
 </style>
