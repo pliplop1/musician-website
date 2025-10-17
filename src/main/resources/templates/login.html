@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - Duo Black & White</title>
+    <meta name="description" content="Connectez-vous à votre espace personnel Duo Black & White">
+    <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <style>
         * {
             margin: 0;
@@ -15,12 +18,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #fff;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         /* Animated background */
@@ -39,9 +39,17 @@
             to { transform: rotate(360deg); }
         }
 
-        .login-container {
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 140px);
+            padding: 2rem 1rem;
             position: relative;
             z-index: 1;
+        }
+
+        .login-container {
             width: 100%;
             max-width: 450px;
             padding: 3rem 2.5rem;
@@ -279,6 +287,9 @@
 </head>
 <body>
 
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="login-wrapper">
     <div class="login-container">
         <div class="logo">
             <h1>DUO BLACK & WHITE</h1>
@@ -319,16 +330,16 @@
         <form th:action="@{/login}" method="post">
             <div class="form-group">
                 <label for="username">Nom d'utilisateur</label>
-                <input id="username" name="username" type="text" autocomplete="username" required placeholder="Votre nom d'utilisateur">
+                <input id="username" name="username" type="text" autocomplete="username" required placeholder="Votre nom d'utilisateur" aria-label="Nom d'utilisateur">
             </div>
 
             <div class="form-group">
                 <label for="password">Mot de passe</label>
-                <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Votre mot de passe">
+                <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Votre mot de passe" aria-label="Mot de passe">
             </div>
 
             <div class="checkbox-group">
-                <input id="showPassword" type="checkbox">
+                <input id="showPassword" type="checkbox" aria-label="Afficher le mot de passe">
                 <label for="showPassword">Afficher le mot de passe</label>
             </div>
 
@@ -350,17 +361,26 @@
             </p>
         </div>
     </div>
+</main>
 
-    <script>
-        document.getElementById('showPassword').addEventListener('change', function(event) {
-            const passwordInput = document.getElementById('password');
-            if (event.target.checked) {
-                passwordInput.type = 'text';
-            } else {
-                passwordInput.type = 'password';
-            }
-        });
-    </script>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script>
+(function() {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const showPasswordCheckbox = document.getElementById('showPassword');
+        const passwordInput = document.getElementById('password');
+
+        if (showPasswordCheckbox && passwordInput) {
+            showPasswordCheckbox.addEventListener('change', function() {
+                passwordInput.type = this.checked ? 'text' : 'password';
+            });
+        }
+    });
+})();
+</script>
 
 </body>
 </html>

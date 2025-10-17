@@ -11,8 +11,6 @@
             <!-- Bouton burger pour mobile -->
             <button class="mobile-menu-toggle" aria-label="Menu" aria-expanded="false" id="mobileMenuToggle">
                 <span class="burger-line"></span>
-                <span class="burger-line"></span>
-                <span class="burger-line"></span>
             </button>
 
             <nav class="header-nav" id="headerNav">
@@ -50,6 +48,74 @@
                 </div>
             </nav>
         </div>
+
+        <!-- Script menu burger mobile -->
+        <script>
+            (function() {
+                'use strict';
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    const menuToggle = document.getElementById('mobileMenuToggle');
+                    const headerNav = document.getElementById('headerNav');
+
+                    if (!menuToggle || !headerNav) return;
+
+                    function closeMenu() {
+                        headerNav.classList.remove('active');
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                        document.body.style.overflow = '';
+                    }
+
+                    function openMenu() {
+                        headerNav.classList.add('active');
+                        menuToggle.setAttribute('aria-expanded', 'true');
+                        document.body.style.overflow = 'hidden';
+                    }
+
+                    // Toggle du menu
+                    menuToggle.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        const isOpen = headerNav.classList.contains('active');
+                        isOpen ? closeMenu() : openMenu();
+                    });
+
+                    // Fermer le menu en cliquant sur un lien
+                    const navLinks = headerNav.querySelectorAll('a, button');
+                    navLinks.forEach(function(link) {
+                        link.addEventListener('click', closeMenu);
+                    });
+
+                    // Fermer le menu avec Escape (seulement si ouvert)
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape' && headerNav.classList.contains('active')) {
+                            closeMenu();
+                        }
+                    });
+
+                    // Fermer en cliquant à l'extérieur
+                    document.addEventListener('click', function(e) {
+                        if (headerNav.classList.contains('active') &&
+                            !headerNav.contains(e.target) &&
+                            !menuToggle.contains(e.target)) {
+                            closeMenu();
+                        }
+                    });
+
+                    // Gestion du lien de réinitialisation des cookies
+                    const cookieResetLink = document.getElementById('cookieResetLink');
+                    if (cookieResetLink) {
+                        cookieResetLink.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            if (typeof window.resetCookieConsent === 'function') {
+                                window.resetCookieConsent();
+                            }
+                        });
+                    }
+                });
+            })();
+        </script>
 
         <style>
             .skip-link {
@@ -103,35 +169,52 @@
             /* Bouton burger (caché par défaut sur desktop) */
             .mobile-menu-toggle {
                 display: none;
-                flex-direction: column;
-                justify-content: space-around;
-                width: 2rem;
-                height: 2rem;
                 background: transparent;
                 border: none;
                 cursor: pointer;
-                padding: 0;
+                padding: 0.5rem;
                 z-index: 1001;
             }
 
             .burger-line {
-                width: 2rem;
-                height: 0.25rem;
+                display: block;
+                width: 30px;
+                height: 3px;
                 background: #fff;
-                border-radius: 10px;
+                position: relative;
                 transition: all 0.3s ease;
             }
 
-            .mobile-menu-toggle[aria-expanded="true"] .burger-line:nth-child(1) {
-                transform: rotate(45deg) translate(0.5rem, 0.5rem);
+            .burger-line::before,
+            .burger-line::after {
+                content: '';
+                position: absolute;
+                width: 30px;
+                height: 3px;
+                background: #fff;
+                transition: all 0.3s ease;
             }
 
-            .mobile-menu-toggle[aria-expanded="true"] .burger-line:nth-child(2) {
-                opacity: 0;
+            .burger-line::before {
+                top: -10px;
             }
 
-            .mobile-menu-toggle[aria-expanded="true"] .burger-line:nth-child(3) {
-                transform: rotate(-45deg) translate(0.5rem, -0.5rem);
+            .burger-line::after {
+                bottom: -10px;
+            }
+
+            .mobile-menu-toggle[aria-expanded="true"] .burger-line {
+                background: transparent;
+            }
+
+            .mobile-menu-toggle[aria-expanded="true"] .burger-line::before {
+                top: 0;
+                transform: rotate(45deg);
+            }
+
+            .mobile-menu-toggle[aria-expanded="true"] .burger-line::after {
+                bottom: 0;
+                transform: rotate(-45deg);
             }
 
             .header-nav {
@@ -307,46 +390,51 @@
             @media (max-width: 900px) {
                 /* Afficher le bouton burger */
                 .mobile-menu-toggle {
-                    display: flex;
+                    display: block;
                 }
 
-                /* Menu mobile en fullscreen overlay */
+                /* Menu mobile dropdown en dessous du header */
                 .header-nav {
                     position: fixed;
-                    top: 0;
-                    right: -100%;
-                    width: 80%;
-                    max-width: 400px;
-                    height: 100vh;
+                    top: 80px; /* En dessous du header */
+                    left: 0;
+                    right: 0;
+                    width: 100%;
+                    height: 0; /* Caché par défaut */
+                    max-height: 0;
+                    overflow: hidden;
                     background: rgba(0, 0, 0, 0.98);
                     backdrop-filter: blur(10px);
                     flex-direction: column;
-                    justify-content: center;
+                    justify-content: flex-start;
                     align-items: center;
-                    gap: 2rem;
-                    transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
-                    padding: 2rem;
-                    overflow-y: auto;
+                    gap: 0;
+                    transition: max-height 0.3s ease, padding 0.3s ease;
+                    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+                    padding: 0;
+                    z-index: 999;
                 }
 
                 .header-nav.active {
-                    right: 0;
+                    max-height: calc(100vh - 80px); /* S'ouvre en dessous */
+                    height: auto;
+                    padding: 2rem 0;
+                    overflow-y: auto;
                 }
 
                 .header-nav > a {
                     font-size: 1.2rem;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 10px;
+                    padding: 1rem 2rem;
                     width: 100%;
                     text-align: center;
                     transition: all 0.3s ease;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 }
 
                 .header-nav > a:hover,
                 .header-nav > a.active {
-                    background: rgba(74, 144, 226, 0.1);
-                    transform: scale(1.05);
+                    color: #4a90e2;
+                    transform: translateX(10px);
                 }
 
                 .auth-section {
@@ -441,60 +529,10 @@
                 <span class="hidden sm:inline text-gray-600" aria-hidden="true">|</span>
                 <a th:href="@{/cookies}" class="text-gray-500 hover:text-gray-300 transition-colors px-2 py-1">Cookies</a>
                 <span class="hidden sm:inline text-gray-600" aria-hidden="true">|</span>
-                <a href="#" onclick="window.resetCookieConsent(); return false;" class="text-gray-500 hover:text-gray-300 transition-colors px-2 py-1">Gérer les cookies</a>
+                <a href="#" id="cookieResetLink" class="text-gray-500 hover:text-gray-300 transition-colors px-2 py-1">Gérer les cookies</a>
 </nav>
         </div>
     </footer>
 
-    <!-- Script menu burger mobile -->
-    <script>
-        (function() {
-            const menuToggle = document.getElementById('mobileMenuToggle');
-            const headerNav = document.getElementById('headerNav');
-
-            if (menuToggle && headerNav) {
-                // Toggle du menu
-                menuToggle.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
-                    this.setAttribute('aria-expanded', !isExpanded);
-                    headerNav.classList.toggle('active');
-                    document.body.style.overflow = !isExpanded ? 'hidden' : '';
-                });
-
-                // Fermer le menu en cliquant sur un lien
-                const navLinks = headerNav.querySelectorAll('a, button');
-                navLinks.forEach(link => {
-                    link.addEventListener('click', function() {
-                        headerNav.classList.remove('active');
-                        menuToggle.setAttribute('aria-expanded', 'false');
-                        document.body.style.overflow = '';
-                    });
-                });
-
-                // Fermer le menu avec Escape
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && headerNav.classList.contains('active')) {
-                        headerNav.classList.remove('active');
-                        menuToggle.setAttribute('aria-expanded', 'false');
-                        document.body.style.overflow = '';
-                    }
-                });
-
-                // Fermer en cliquant à l'extérieur
-                document.addEventListener('click', function(e) {
-                    if (headerNav.classList.contains('active') &&
-                        !headerNav.contains(e.target) &&
-                        !menuToggle.contains(e.target)) {
-                        headerNav.classList.remove('active');
-                        menuToggle.setAttribute('aria-expanded', 'false');
-                        document.body.style.overflow = '';
-                    }
-                });
-            }
-        })();
-    </script>
-
 </body>
 </html>
-

@@ -3,78 +3,202 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Modifier mes informations</title>
-<link rel="stylesheet" th:href="@{/css/style.css}">
+<title>Modifier mes informations - Duo Black & White</title>
+<meta name="description" content="Modifiez vos informations personnelles sur Duo Black & White">
+<link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
+<style>
+body {
+	background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+	min-height: 100vh;
+	color: #fff;
+	position: relative;
+	overflow-x: hidden;
+}
+
+.details-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: calc(100vh - 140px);
+	padding: 2rem 1rem;
+	position: relative;
+	z-index: 1;
+}
+
+.details-container {
+	max-width: 600px;
+	width: 100%;
+	background: rgba(255, 255, 255, 0.97);
+	backdrop-filter: blur(10px);
+	border-radius: 20px;
+	padding: 3rem 2.5rem;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	color: #1f2937;
+}
+
+h1 {
+	text-align: center;
+	font-size: 2rem;
+	margin-bottom: 2rem;
+	color: #1f2937;
+}
+
+.alert-error {
+	background: rgba(239, 68, 68, 0.1);
+	border-left: 4px solid #ef4444;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1.5rem;
+	color: #ef4444;
+}
+
+.form-group {
+	margin-bottom: 1.5rem;
+}
+
+label {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: #374151;
+	font-size: 0.95rem;
+	font-weight: 500;
+}
+
+input[type="text"],
+textarea {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	background: rgba(255, 255, 255, 1);
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	color: #1f2937;
+	font-size: 1rem;
+	transition: all 0.3s ease;
+	font-family: inherit;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+	outline: none;
+	border-color: #4a90e2;
+	box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.char-count {
+	font-size: 0.85rem;
+	color: #6b7280;
+	margin-top: 0.5rem;
+}
+
+.btn-submit {
+	width: 100%;
+	padding: 1rem;
+	background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-size: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.btn-submit:hover {
+	background: linear-gradient(135deg, #357abd 0%, #2868a8 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+}
+
+@media (max-width: 480px) {
+	.details-container {
+		padding: 2rem 1.5rem;
+		margin: 1rem;
+	}
+
+	h1 {
+		font-size: 1.5rem;
+	}
+}
+</style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body>
 
-	<header class="bg-white shadow-md">
-		<div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
-			<h1 class="text-xl sm:text-2xl font-bold text-gray-800">Mon Espace</h1>
-			<div class="flex flex-wrap items-center gap-2 sm:gap-0">
-				<a th:href="@{/user/profile}" class="px-3 sm:px-4 text-sm sm:text-base text-gray-600 hover:text-indigo-600">Retour au profil</a>
-				<form th:action="@{/logout}" method="post" class="inline">
-					<button type="submit" class="px-3 sm:px-4 text-sm sm:text-base text-gray-600 hover:text-indigo-600">Déconnexion</button>
-				</form>
-			</div>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="details-wrapper">
+	<div class="details-container">
+		<h1>Mes informations personnelles</h1>
+
+		<div th:if="${errorMessage}" class="alert-error" role="alert">
+			<p style="margin:0;" th:text="${errorMessage}"></p>
 		</div>
-	</header>
 
-	<main class="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-		<div class="max-w-lg mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md">
-			<h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Mes informations personnelles</h2>
-
-			<div th:if="${errorMessage}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 sm:p-4 mb-4 sm:mb-6">
-				<p class="text-sm sm:text-base" th:text="${errorMessage}"></p>
+		<form th:action="@{/user/profile/details}" method="post">
+			<div class="form-group">
+				<label for="firstName">Prénom</label>
+				<input type="text" id="firstName" name="firstName" th:value="${user.firstName}"
+					placeholder="Votre prénom"
+					aria-label="Prénom"
+					autocomplete="given-name">
 			</div>
 
-			<form th:action="@{/user/profile/details}" method="post" class="space-y-4 sm:space-y-6">
-				<div>
-					<label for="firstName" class="block text-xs sm:text-sm font-medium text-gray-700">Prénom</label>
-					<input type="text" id="firstName" name="firstName" th:value="${user.firstName}"
-						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
-						placeholder="Votre prénom">
-				</div>
+			<div class="form-group">
+				<label for="lastName">Nom de famille</label>
+				<input type="text" id="lastName" name="lastName" th:value="${user.lastName}"
+					placeholder="Votre nom"
+					aria-label="Nom de famille"
+					autocomplete="family-name">
+			</div>
 
-				<div>
-					<label for="lastName" class="block text-xs sm:text-sm font-medium text-gray-700">Nom de famille</label>
-					<input type="text" id="lastName" name="lastName" th:value="${user.lastName}"
-						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
-						placeholder="Votre nom">
-				</div>
+			<div class="form-group">
+				<label for="bio">Biographie</label>
+				<textarea id="bio" name="bio" rows="4" maxlength="500"
+					placeholder="Parlez un peu de vous... (max 500 caractères)"
+					aria-label="Biographie"
+					aria-describedby="charCount"
+					th:text="${user.bio}"></textarea>
+				<p id="charCount" class="char-count">
+					<span id="charCountValue">0</span>/500 caractères
+				</p>
+			</div>
 
-				<div>
-					<label for="bio" class="block text-xs sm:text-sm font-medium text-gray-700">Biographie</label>
-					<textarea id="bio" name="bio" rows="4" maxlength="500"
-						class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
-						placeholder="Parlez un peu de vous... (max 500 caractères)"
-						th:text="${user.bio}"></textarea>
-					<p class="mt-1 text-xs sm:text-sm text-gray-500">
-						<span id="charCount">0</span>/500 caractères
-					</p>
-				</div>
+			<div>
+				<button type="submit" class="btn-submit">
+					Enregistrer les modifications
+				</button>
+			</div>
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+		</form>
+	</div>
+</main>
 
-				<div>
-					<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 rounded-md text-sm sm:text-base transition duration-300">
-						Enregistrer les modifications
-					</button>
-				</div>
-			</form>
-		</div>
-	</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-	<script>
-		// Compteur de caractères pour la bio
+<script>
+(function() {
+	'use strict';
+
+	document.addEventListener('DOMContentLoaded', function() {
 		const bioTextarea = document.getElementById('bio');
-		const charCount = document.getElementById('charCount');
-		
+		const charCountValue = document.getElementById('charCountValue');
+
 		function updateCharCount() {
-			charCount.textContent = bioTextarea.value.length;
+			if (bioTextarea && charCountValue) {
+				charCountValue.textContent = bioTextarea.value.length;
+			}
 		}
-		
-		bioTextarea.addEventListener('input', updateCharCount);
-		updateCharCount(); // Initialisation
-	</script>
+
+		if (bioTextarea) {
+			bioTextarea.addEventListener('input', updateCharCount);
+			updateCharCount();
+		}
+	});
+})();
+</script>
 
 </body>
 </html>

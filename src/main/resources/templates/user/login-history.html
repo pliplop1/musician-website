@@ -3,180 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historique de connexion</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Historique de connexion - Duo Black & White</title>
+    <meta name="description" content="Consultez l'historique de vos connexions sur Duo Black & White">
+    <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <style>
-        .status-success { color: #10b981; }
-        .status-failure { color: #ef4444; }
+body {
+	background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+	min-height: 100vh;
+	color: #fff;
+	position: relative;
+	overflow-x: hidden;
+}
+
+.history-wrapper {
+	min-height: calc(100vh - 140px);
+	padding: 2rem 1rem;
+	position: relative;
+	z-index: 1;
+}
+
+.white-card {
+	background: rgba(255, 255, 255, 0.97);
+	border-radius: 15px;
+	padding: 1.5rem;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+	margin-bottom: 1.5rem;
+	color: #1f2937;
+}
+
+@media (min-width: 640px) {
+	.white-card { padding: 2rem; }
+}
+
+.avatar-circle {
+	width: 4rem;
+	height: 4rem;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid #4f46e5;
+}
+
+@media (min-width: 640px) {
+	.avatar-circle { width: 5rem; height: 5rem; }
+}
+
+.avatar-initials {
+	width: 4rem;
+	height: 4rem;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #6366f1 0%, #9333ea 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-weight: bold;
+	font-size: 1.25rem;
+	border: 2px solid #4f46e5;
+}
+
+@media (min-width: 640px) {
+	.avatar-initials { width: 5rem; height: 5rem; font-size: 1.5rem; }
+}
+
+.info-box {
+	background: rgba(219, 234, 254, 1);
+	border-left: 4px solid #3b82f6;
+	padding: 1rem;
+	border-radius: 8px;
+	color: #1e40af;
+}
+
+.btn-primary {
+	background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+	color: #fff;
+	padding: 0.75rem 1.5rem;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: 600;
+	display: inline-block;
+	transition: all 0.3s ease;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+}
+
+.btn-primary:hover {
+	background: linear-gradient(135deg, #357abd 0%, #2868a8 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+}
+
+.btn-secondary {
+	background: rgba(107, 114, 128, 0.9);
+	color: #fff;
+	padding: 0.75rem 1.5rem;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: 600;
+	display: inline-block;
+	transition: all 0.3s ease;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+}
+
+.btn-secondary:hover {
+	background: rgba(75, 85, 99, 1);
+	transform: translateY(-2px);
+}
+
+.warning-box {
+	background: rgba(254, 243, 199, 1);
+	border-left: 4px solid #f59e0b;
+	padding: 1.5rem;
+	border-radius: 8px;
+	color: #78350f;
+}
+
+.stat-card {
+	background: rgba(255, 255, 255, 0.97);
+	border-radius: 12px;
+	padding: 1.5rem;
+	text-align: center;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body>
 
-    <header class="bg-white shadow-md">
-        <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
-            <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">Historique de Connexion</h1>
-            <div class="flex flex-wrap items-center gap-2 sm:gap-0">
-                <a th:href="@{/user/profile}" class="px-3 sm:px-4 text-sm sm:text-base text-gray-600 hover:text-indigo-600">
-                    Retour au profil
-                </a>
-                <form th:action="@{/logout}" method="post" class="inline">
-                    <button type="submit" class="px-3 sm:px-4 text-sm sm:text-base text-gray-600 hover:text-indigo-600">
-                        Déconnexion
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
+<header th:replace="~{fragments/layout :: header}"></header>
 
-    <main class="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+<main class="history-wrapper">
+	<div class="container mx-auto px-4 sm:px-6" style="max-width: 1200px;">
 
-        <!-- Informations utilisateur -->
-        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6 sm:mb-8">
-            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 mb-4">
-                <div th:if="${user.avatarFilename != null}" class="flex-shrink-0">
-                    <img th:src="@{/uploaded-avatars/{filename}(filename=${user.avatarFilename})}"
-                         alt="Avatar"
-                         class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-indigo-500 object-cover">
-                </div>
-                <div th:if="${user.avatarFilename == null}"
-                     class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg sm:text-xl border-2 border-indigo-500 flex-shrink-0">
-                    <span th:text="${user.initials}">AB</span>
-                </div>
-                <div class="text-center sm:text-left">
-                    <h2 class="text-xl sm:text-2xl font-bold" th:text="${user.fullName}">Nom complet</h2>
-                    <p class="text-sm sm:text-base text-gray-600">@<span th:text="${user.username}">username</span></p>
-                </div>
-            </div>
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 sm:p-4 rounded">
-                <p class="text-xs sm:text-sm text-blue-800">
-                    <strong>Sécurité:</strong> Vérifiez régulièrement votre historique de connexion
-                    pour détecter toute activité suspecte. Si vous ne reconnaissez pas une connexion,
-                    changez immédiatement votre mot de passe.
-                </p>
-            </div>
-        </div>
+		<!-- Informations utilisateur -->
+		<div class="white-card">
+			<div style="display:flex;flex-direction:column;align-items:center;gap:1rem;margin-bottom:1rem;">
+				<div th:if="${user.avatarFilename != null}">
+					<img th:src="@{/uploaded-avatars/{filename}(filename=${user.avatarFilename})}"
+						 alt="Avatar"
+						 class="avatar-circle">
+				</div>
+				<div th:if="${user.avatarFilename == null}" class="avatar-initials">
+					<span th:text="${user.initials}">AB</span>
+				</div>
+				<div style="text-align:center;">
+					<h1 style="font-size:1.5rem;font-weight:bold;margin:0 0 0.25rem 0;color:#1f2937;" th:text="${user.fullName}">Nom complet</h1>
+					<p style="font-size:1rem;color:#6b7280;margin:0;">@<span th:text="${user.username}">username</span></p>
+				</div>
+			</div>
+			<div class="info-box">
+				<p style="font-size:0.875rem;margin:0;line-height:1.6;">
+					<strong>Sécurité:</strong> Vérifiez régulièrement votre historique de connexion
+					pour détecter toute activité suspecte. Si vous ne reconnaissez pas une connexion,
+					changez immédiatement votre mot de passe.
+				</p>
+			</div>
+		</div>
 
-        <!-- Historique des connexions -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 border-b bg-gray-50">
-                <h3 class="text-lg sm:text-xl font-bold">Dernières Connexions (30 jours)</h3>
-                <p class="text-xs sm:text-sm text-gray-600">
-                    Total: <span class="font-semibold" th:text="${#lists.size(loginHistory)}">0</span> tentatives
-                </p>
-            </div>
+		<!-- Historique des connexions -->
+		<div class="white-card">
+			<div style="padding-bottom:1rem;border-bottom:1px solid #e5e7eb;margin-bottom:1rem;">
+				<h2 style="font-size:1.25rem;font-weight:bold;margin:0 0 0.5rem 0;color:#1f2937;">Dernières Connexions (30 jours)</h2>
+				<p style="font-size:0.875rem;color:#6b7280;margin:0;">
+					Total: <span style="font-weight:600;" th:text="${#lists.size(loginHistory)}">0</span> tentatives
+				</p>
+			</div>
 
-            <div th:if="${#lists.isEmpty(loginHistory)}" class="p-6 sm:p-8 text-center text-sm sm:text-base text-gray-500">
-                Aucune tentative de connexion enregistrée dans les 30 derniers jours.
-            </div>
+			<div th:if="${#lists.isEmpty(loginHistory)}" style="padding:2rem;text-align:center;color:#6b7280;">
+				Aucune tentative de connexion enregistrée dans les 30 derniers jours.
+			</div>
 
-            <div th:unless="${#lists.isEmpty(loginHistory)}" class="overflow-x-auto">
-                <table class="w-full min-w-[640px]">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="text-left p-2 sm:p-4 text-xs sm:text-sm font-medium text-gray-700">Date & Heure</th>
-                            <th class="text-left p-2 sm:p-4 text-xs sm:text-sm font-medium text-gray-700">Adresse IP</th>
-                            <th class="text-center p-2 sm:p-4 text-xs sm:text-sm font-medium text-gray-700">Statut</th>
-                            <th class="text-left p-2 sm:p-4 text-xs sm:text-sm font-medium text-gray-700">Détails</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="attempt : ${loginHistory}"
-                            class="border-b hover:bg-gray-50 transition-colors"
-                            th:classappend="${attempt.success} ? 'bg-green-50' : 'bg-red-50'">
-                            <td class="p-2 sm:p-4">
-                                <div class="font-semibold text-xs sm:text-sm"
-                                     th:text="${#temporals.format(attempt.attemptTime, 'dd/MM/yyyy')}">
-                                    01/01/2024
-                                </div>
-                                <div class="text-xs text-gray-600"
-                                     th:text="${#temporals.format(attempt.attemptTime, 'HH:mm:ss')}">
-                                    12:00:00
-                                </div>
-                            </td>
-                            <td class="p-2 sm:p-4">
-                                <code class="bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-mono break-all"
-                                      th:text="${attempt.ipAddress}">
-                                    192.168.1.1
-                                </code>
-                            </td>
-                            <td class="p-2 sm:p-4 text-center">
-                                <span th:if="${attempt.success}"
-                                      class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-semibold bg-green-100 text-green-800">
-                                    ✅ <span class="hidden sm:inline ml-1">Succès</span>
-                                </span>
-                                <span th:unless="${attempt.success}"
-                                      class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-semibold bg-red-100 text-red-800">
-                                    ❌ <span class="hidden sm:inline ml-1">Échec</span>
-                                </span>
-                            </td>
-                            <td class="p-2 sm:p-4">
-                                <div th:if="${attempt.success}" class="text-xs sm:text-sm text-gray-600">
-                                    Connexion réussie
-                                </div>
-                                <div th:unless="${attempt.success}" class="text-xs sm:text-sm text-gray-600">
-                                    <strong>Raison:</strong>
-                                    <span th:text="${attempt.failureReason != null ? attempt.failureReason : 'Non spécifiée'}">
-                                        Non spécifiée
-                                    </span>
-                                </div>
-                                <div th:if="${attempt.userAgent != null}" class="text-xs text-gray-400 mt-1 hidden md:block">
-                                    <span th:text="${#strings.abbreviate(attempt.userAgent, 60)}">User Agent</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+			<div th:unless="${#lists.isEmpty(loginHistory)}" style="overflow-x:auto;">
+				<table style="width:100%;min-width:640px;border-collapse:collapse;">
+					<thead style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+						<tr>
+							<th style="text-align:left;padding:1rem;font-size:0.875rem;font-weight:500;color:#374151;">Date & Heure</th>
+							<th style="text-align:left;padding:1rem;font-size:0.875rem;font-weight:500;color:#374151;">Adresse IP</th>
+							<th style="text-align:center;padding:1rem;font-size:0.875rem;font-weight:500;color:#374151;">Statut</th>
+							<th style="text-align:left;padding:1rem;font-size:0.875rem;font-weight:500;color:#374151;">Détails</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="attempt : ${loginHistory}"
+							style="border-bottom:1px solid #e5e7eb;transition:background 0.3s;"
+							th:style="${attempt.success} ? 'background:rgba(240,253,244,0.5);' : 'background:rgba(254,242,242,0.5);'">
+							<td style="padding:1rem;">
+								<div style="font-weight:600;font-size:0.875rem;color:#1f2937;"
+									 th:text="${#temporals.format(attempt.attemptTime, 'dd/MM/yyyy')}">
+									01/01/2024
+								</div>
+								<div style="font-size:0.75rem;color:#6b7280;"
+									 th:text="${#temporals.format(attempt.attemptTime, 'HH:mm:ss')}">
+									12:00:00
+								</div>
+							</td>
+							<td style="padding:1rem;">
+								<code style="background:#f3f4f6;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.75rem;font-family:monospace;color:#1f2937;word-break:break-all;"
+									  th:text="${attempt.ipAddress}">
+									192.168.1.1
+								</code>
+							</td>
+							<td style="padding:1rem;text-align:center;">
+								<span th:if="${attempt.success}"
+									  style="display:inline-flex;align-items:center;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.875rem;font-weight:600;background:#d1fae5;color:#065f46;">
+									✅ <span style="margin-left:0.25rem;">Succès</span>
+								</span>
+								<span th:unless="${attempt.success}"
+									  style="display:inline-flex;align-items:center;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.875rem;font-weight:600;background:#fee2e2;color:#991b1b;">
+									❌ <span style="margin-left:0.25rem;">Échec</span>
+								</span>
+							</td>
+							<td style="padding:1rem;">
+								<div th:if="${attempt.success}" style="font-size:0.875rem;color:#6b7280;">
+									Connexion réussie
+								</div>
+								<div th:unless="${attempt.success}" style="font-size:0.875rem;color:#6b7280;">
+									<strong>Raison:</strong>
+									<span th:text="${attempt.failureReason != null ? attempt.failureReason : 'Non spécifiée'}">
+										Non spécifiée
+									</span>
+								</div>
+								<div th:if="${attempt.userAgent != null}" style="font-size:0.75rem;color:#9ca3af;margin-top:0.25rem;">
+									<span th:text="${#strings.abbreviate(attempt.userAgent, 60)}">User Agent</span>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 
-        <!-- Statistiques -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8">
-            <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 text-center">
-                <div class="text-2xl sm:text-3xl font-bold text-indigo-600"
-                     th:text="${#lists.size(loginHistory)}">0</div>
-                <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Total tentatives</p>
-            </div>
+		<!-- Statistiques -->
+		<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1.5rem;margin-bottom:1.5rem;">
+			<div class="stat-card">
+				<div style="font-size:2rem;font-weight:bold;color:#4f46e5;"
+					 th:text="${#lists.size(loginHistory)}">0</div>
+				<p style="font-size:1rem;color:#6b7280;margin:0.5rem 0 0 0;">Total tentatives</p>
+			</div>
 
-            <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 text-center">
-                <div class="text-2xl sm:text-3xl font-bold text-green-600"
-                     th:with="successCount=${#lists.size(loginHistory.?[success])}"
-                     th:text="${successCount}">0</div>
-                <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Connexions réussies</p>
-            </div>
+			<div class="stat-card">
+				<div style="font-size:2rem;font-weight:bold;color:#059669;"
+					 th:with="successCount=${#lists.size(loginHistory.?[success])}"
+					 th:text="${successCount}">0</div>
+				<p style="font-size:1rem;color:#6b7280;margin:0.5rem 0 0 0;">Connexions réussies</p>
+			</div>
 
-            <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 text-center">
-                <div class="text-2xl sm:text-3xl font-bold text-red-600"
-                     th:with="failedCount=${#lists.size(loginHistory.?[!success])}"
-                     th:text="${failedCount}">0</div>
-                <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Tentatives échouées</p>
-            </div>
-        </div>
+			<div class="stat-card">
+				<div style="font-size:2rem;font-weight:bold;color:#dc2626;"
+					 th:with="failedCount=${#lists.size(loginHistory.?[!success])}"
+					 th:text="${failedCount}">0</div>
+				<p style="font-size:1rem;color:#6b7280;margin:0.5rem 0 0 0;">Tentatives échouées</p>
+			</div>
+		</div>
 
-        <!-- Conseils de sécurité -->
-        <div class="mt-6 sm:mt-8 bg-yellow-50 border-l-4 border-yellow-500 p-4 sm:p-6 rounded">
-            <h4 class="font-bold text-sm sm:text-base text-yellow-900 mb-2">Conseils de Sécurité</h4>
-            <ul class="text-xs sm:text-sm text-yellow-800 space-y-1 sm:space-y-2">
-                <li>• Utilisez un mot de passe fort et unique</li>
-                <li>• Ne partagez jamais votre mot de passe</li>
-                <li>• Changez votre mot de passe régulièrement</li>
-                <li>• Vérifiez que les connexions proviennent de vos appareils</li>
-                <li>• Contactez l'administrateur si vous détectez une activité suspecte</li>
-            </ul>
-        </div>
+		<!-- Conseils de sécurité -->
+		<div class="warning-box">
+			<h3 style="font-weight:bold;font-size:1rem;margin:0 0 0.5rem 0;">Conseils de Sécurité</h3>
+			<ul style="font-size:0.875rem;line-height:1.8;margin:0;padding-left:1.25rem;">
+				<li>Utilisez un mot de passe fort et unique</li>
+				<li>Ne partagez jamais votre mot de passe</li>
+				<li>Changez votre mot de passe régulièrement</li>
+				<li>Vérifiez que les connexions proviennent de vos appareils</li>
+				<li>Contactez l'administrateur si vous détectez une activité suspecte</li>
+			</ul>
+		</div>
 
-        <!-- Boutons d'action -->
-        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-            <a th:href="@{/user/profile/change-password}"
-               class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-md text-sm sm:text-base text-center transition-colors">
-                🔐 Changer mon mot de passe
-            </a>
-            <a th:href="@{/user/profile}"
-               class="inline-block bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-md text-sm sm:text-base text-center transition-colors">
-                ← Retour au profil
-            </a>
-        </div>
+		<!-- Boutons d'action -->
+		<div style="display:flex;flex-wrap:wrap;gap:1rem;">
+			<a th:href="@{/user/profile/change-password}" class="btn-primary" style="font-size:0.875rem;">
+				🔐 Changer mon mot de passe
+			</a>
+			<a th:href="@{/user/profile}" class="btn-secondary" style="font-size:0.875rem;">
+				← Retour au profil
+			</a>
+		</div>
 
-    </main>
+	</div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
 </body>
 </html>

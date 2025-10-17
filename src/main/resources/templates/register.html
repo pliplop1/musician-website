@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription - Duo Black & White</title>
+    <meta name="description" content="Créez votre compte Duo Black & White et rejoignez notre communauté">
+    <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <style>
         * {
             margin: 0;
@@ -15,13 +18,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #fff;
             position: relative;
-            overflow: hidden;
-            padding: 2rem 0;
+            overflow-x: hidden;
         }
 
         /* Animated background */
@@ -40,9 +39,17 @@
             to { transform: rotate(360deg); }
         }
 
-        .register-container {
+        .register-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 140px);
+            padding: 2rem 1rem;
             position: relative;
             z-index: 1;
+        }
+
+        .register-container {
             width: 100%;
             max-width: 500px;
             padding: 3rem 2.5rem;
@@ -155,7 +162,7 @@
 
         .checkbox-group {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 1.5rem;
         }
 
@@ -163,13 +170,16 @@
             width: 18px;
             height: 18px;
             margin-right: 0.5rem;
+            margin-top: 0.2rem;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .checkbox-group label {
             margin: 0;
             cursor: pointer;
             color: #bbb;
+            line-height: 1.5;
         }
 
         .btn-submit {
@@ -233,6 +243,9 @@
 </head>
 <body>
 
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="register-wrapper">
     <div class="register-container">
         <div class="logo">
             <h1>DUO BLACK & WHITE</h1>
@@ -258,10 +271,12 @@
                        type="text"
                        required
                        th:classappend="${#fields.hasErrors('username')} ? 'error' : ''"
-                       placeholder="Choisissez un nom d'utilisateur">
-                <p th:if="${#fields.hasErrors('username')}"
+                       placeholder="Choisissez un nom d'utilisateur"
+                       aria-label="Nom d'utilisateur"
+                       aria-describedby="username-error">
+                <p id="username-error" th:if="${#fields.hasErrors('username')}"
                    th:errors="*{username}"
-                   class="field-error"></p>
+                   class="field-error" role="alert"></p>
             </div>
 
             <div class="form-group">
@@ -271,10 +286,12 @@
                        type="email"
                        required
                        th:classappend="${#fields.hasErrors('email')} ? 'error' : ''"
-                       placeholder="votre@email.com">
-                <p th:if="${#fields.hasErrors('email')}"
+                       placeholder="votre@email.com"
+                       aria-label="Adresse email"
+                       aria-describedby="email-error">
+                <p id="email-error" th:if="${#fields.hasErrors('email')}"
                    th:errors="*{email}"
-                   class="field-error"></p>
+                   class="field-error" role="alert"></p>
             </div>
 
             <div class="form-group">
@@ -284,24 +301,26 @@
                        type="password"
                        required
                        th:classappend="${#fields.hasErrors('password')} ? 'error' : ''"
-                       placeholder="Choisissez un mot de passe sécurisé">
-                <p th:if="${#fields.hasErrors('password')}"
+                       placeholder="Choisissez un mot de passe sécurisé"
+                       aria-label="Mot de passe"
+                       aria-describedby="password-error password-hint">
+                <p id="password-error" th:if="${#fields.hasErrors('password')}"
                    th:errors="*{password}"
-                   class="field-error"></p>
-                <div class="password-hint">
+                   class="field-error" role="alert"></p>
+                <div id="password-hint" class="password-hint">
                     Doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&).
                 </div>
             </div>
 
             <div class="checkbox-group">
-                <input id="showPassword" type="checkbox">
+                <input id="showPassword" type="checkbox" aria-label="Afficher le mot de passe">
                 <label for="showPassword">Afficher le mot de passe</label>
             </div>
 
             <div class="checkbox-group">
-                <input id="privacyConsent" name="privacyConsent" type="checkbox" required>
+                <input id="privacyConsent" name="privacyConsent" type="checkbox" required aria-label="Accepter la politique de confidentialité">
                 <label for="privacyConsent">
-                    J'accepte la <a th:href="@{/privacy-policy}" target="_blank" style="color: #4a90e2;">Politique de Confidentialité</a> et le traitement de mes données personnelles *
+                    J'accepte la <a th:href="@{/privacy-policy}" target="_blank" rel="noopener noreferrer" style="color: #4a90e2;">Politique de Confidentialité</a> et le traitement de mes données personnelles *
                 </label>
             </div>
 
@@ -314,44 +333,48 @@
             </p>
         </div>
     </div>
+</main>
 
-    <script>
-        document.getElementById('showPassword').addEventListener('change', function(event) {
-            const passwordInput = document.getElementById('password');
-            if (event.target.checked) {
-                passwordInput.type = 'text';
-            } else {
-                passwordInput.type = 'password';
-            }
-        });
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-        const registerForm = document.getElementById('registerForm');
+<script>
+(function() {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const showPasswordCheckbox = document.getElementById('showPassword');
         const passwordInput = document.getElementById('password');
+        const registerForm = document.getElementById('registerForm');
         const clientErrorDiv = document.getElementById('client-error-message');
         const clientErrorText = document.getElementById('client-error-text');
 
-        registerForm.addEventListener('submit', function(event) {
-            const password = passwordInput.value;
-            // La même regex que dans votre UserService
-            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        // Toggle password visibility
+        if (showPasswordCheckbox && passwordInput) {
+            showPasswordCheckbox.addEventListener('change', function() {
+                passwordInput.type = this.checked ? 'text' : 'password';
+            });
+        }
 
-            if (!passwordPattern.test(password)) {
-                // Empêche l'envoi du formulaire
-                event.preventDefault();
+        // Client-side password validation
+        if (registerForm && passwordInput) {
+            registerForm.addEventListener('submit', function(event) {
+                const password = passwordInput.value;
+                const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-                // Affiche le message d'erreur
-                clientErrorText.textContent = 'Le mot de passe ne respecte pas les critères de sécurité.';
-                clientErrorDiv.style.display = 'block';
-
-                // Scroll vers le haut pour voir l'erreur
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                // Cache le message d'erreur s'il était affiché
-                clientErrorDiv.style.display = 'none';
-            }
-        });
-    </script>
+                if (!passwordPattern.test(password)) {
+                    event.preventDefault();
+                    clientErrorText.textContent = 'Le mot de passe ne respecte pas les critères de sécurité.';
+                    clientErrorDiv.style.display = 'block';
+                    clientErrorDiv.setAttribute('role', 'alert');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    clientErrorDiv.style.display = 'none';
+                }
+            });
+        }
+    });
+})();
+</script>
 
 </body>
 </html>
-

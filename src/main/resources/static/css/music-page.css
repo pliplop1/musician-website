@@ -115,12 +115,6 @@
     }
 }
 
-@media (max-width: 640px) {
-    .tracks-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .track-card {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(10px);
