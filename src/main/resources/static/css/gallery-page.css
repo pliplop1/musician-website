@@ -115,12 +115,6 @@
     }
 }
 
-@media (max-width: 640px) {
-    .photos-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .photo-card {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(10px);
