@@ -26,6 +26,7 @@ import com.docker.service.VideoService;
 import com.docker.service.CommentService;
 import com.docker.entity.CommentType;
 import jakarta.validation.Valid;
+import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 public class MainController {
@@ -53,6 +54,7 @@ public class MainController {
 	}
 
 	@GetMapping("/")
+	@Transactional
 	public String home(Model model, Principal principal) {
 		var concerts = concertService.findAllConcerts();
 		model.addAttribute("concerts", concerts);
@@ -72,6 +74,8 @@ public class MainController {
 
 		if (principal != null) {
 			User user = userService.findByUsername(principal.getName());
+			// Forcer l'initialisation de la collection lazy
+			user.getFavoriteConcerts().size();
 			Set<Long> favoriteConcertIds = user.getFavoriteConcerts().stream().map(Concert::getId)
 					.collect(Collectors.toSet());
 			model.addAttribute("favoriteConcertIds", favoriteConcertIds);
@@ -89,6 +93,7 @@ public class MainController {
 	}
 
 	@PostMapping("/contact")
+	@Transactional
 	public String submitContactForm(@Valid @ModelAttribute("message") Message message, BindingResult result, Model model, RedirectAttributes redirectAttributes, Principal principal) {
 		if (result.hasErrors()) {
 			// Recharger les données nécessaires pour afficher la page d'accueil
@@ -104,6 +109,8 @@ public class MainController {
 
 			if (principal != null) {
 				User user = userService.findByUsername(principal.getName());
+				// Forcer l'initialisation de la collection lazy
+				user.getFavoriteConcerts().size();
 				Set<Long> favoriteConcertIds = user.getFavoriteConcerts().stream().map(Concert::getId)
 						.collect(Collectors.toSet());
 				model.addAttribute("favoriteConcertIds", favoriteConcertIds);
