@@ -28,6 +28,9 @@ RUN cd vue-frontend && npm ci
 COPY frontend/ ./frontend/
 COPY vue-frontend/ ./vue-frontend/
 
+# Copier les templates pour que Tailwind puisse scanner les classes utilisées
+COPY src/main/resources/templates/ ./src/main/resources/templates/
+
 # Builder Tailwind CSS
 RUN cd frontend && npm run build:css
 
