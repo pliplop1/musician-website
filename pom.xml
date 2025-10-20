@@ -147,6 +147,7 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
+							<skip>${frontend.skip}</skip>
 							<workingDirectory>frontend</workingDirectory>
 							<nodeVersion>v22.17.0</nodeVersion>
 							<npmVersion>10.8.2</npmVersion>
@@ -158,6 +159,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
+							<skip>${frontend.skip}</skip>
 							<workingDirectory>frontend</workingDirectory>
 							<arguments>install</arguments>
 						</configuration>
@@ -168,6 +170,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
+							<skip>${frontend.skip}</skip>
 							<workingDirectory>frontend</workingDirectory>
 							<arguments>run build:css</arguments>
 						</configuration>
@@ -180,6 +183,7 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
+							<skip>${frontend.skip}</skip>
 							<workingDirectory>vue-frontend</workingDirectory>
 							<nodeVersion>v22.17.0</nodeVersion>
 							<npmVersion>10.8.2</npmVersion>
@@ -191,6 +195,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
+							<skip>${frontend.skip}</skip>
 							<workingDirectory>vue-frontend</workingDirectory>
 							<arguments>install</arguments>
 						</configuration>
@@ -202,6 +207,7 @@
 						</goals>
 						<phase>generate-resources</phase>
 						<configuration>
+							<skip>${frontend.skip}</skip>
 							<workingDirectory>vue-frontend</workingDirectory>
 							<arguments>run build</arguments>
 						</configuration>
