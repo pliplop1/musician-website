@@ -38,6 +38,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 @RequestMapping("/user")
@@ -64,6 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
+    @Transactional
     public String showProfile(Model model, Authentication authentication) {
         String username = authentication.getName();
         User user = userService.findByUsername(username);
@@ -91,6 +93,9 @@ public class UserController {
 
         // Calcul du pourcentage de complétion du profil
         int profileCompletion = calculateProfileCompletion(user);
+
+        // Forcer l'initialisation de la collection lazy favoriteConcerts
+        user.getFavoriteConcerts().size(); // Cela force Hibernate à charger les données
 
         model.addAttribute("username", username);
         model.addAttribute("user", user);
