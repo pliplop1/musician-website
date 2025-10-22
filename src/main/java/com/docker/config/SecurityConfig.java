@@ -163,6 +163,7 @@ public class SecurityConfig {
 
 		// Désactiver CSRF pour les fichiers statiques et l'API publique
 		http.csrf(csrf -> csrf
+			.csrfTokenRequestHandler(new org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler())
 			.ignoringRequestMatchers(
 				"/uploaded-music/**",
 				"/uploaded-photos/**",
