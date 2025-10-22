@@ -77,6 +77,33 @@ const closeUserDropdown = (event) => {
   }
 }
 
+// Handle logout
+const handleLogout = async () => {
+  try {
+    const response = await fetch('/api/user/logout', {
+      method: 'POST',
+      credentials: 'include' // Important pour envoyer les cookies de session
+    })
+
+    if (response.ok) {
+      // Mettre à jour l'état local immédiatement
+      currentUser.value = null
+
+      // Recharger la page pour réinitialiser l'état de l'application
+      // La SPA détectera automatiquement que l'utilisateur n'est plus connecté
+      window.location.reload()
+    } else {
+      console.error('Erreur lors de la déconnexion:', response.status)
+      // En cas d'erreur, recharger quand même la page
+      window.location.reload()
+    }
+  } catch (error) {
+    console.error('Erreur lors de la déconnexion:', error)
+    // En cas d'erreur, recharger quand même la page
+    window.location.reload()
+  }
+}
+
 // Smooth scroll to section
 const scrollToSection = (sectionId) => {
   const element = document.getElementById(sectionId)
@@ -165,7 +192,7 @@ onMounted(() => {
                 Administration
               </a>
               <div class="dropdown-divider"></div>
-              <a href="/logout" class="dropdown-item logout-item" role="menuitem">
+              <a href="#" @click.prevent="handleLogout" class="dropdown-item logout-item" role="menuitem">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                   <path d="M10 12.5a.5.5 0 01-.5.5h-6a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h6a.5.5 0 01.5.5V5a.5.5 0 001 0V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v9A1.5 1.5 0 003.5 14h6a1.5 1.5 0 001.5-1.5V11a.5.5 0 00-1 0v1.5zm3.854-8.354a.5.5 0 00-.708 0L11 6.293V.5a.5.5 0 00-1 0v5.793L7.854 4.146a.5.5 0 10-.708.708l3 3a.5.5 0 00.708 0l3-3a.5.5 0 000-.708z"/>
                 </svg>
@@ -206,7 +233,7 @@ onMounted(() => {
               <a href="/admin/dashboard">Admin</a>
             </li>
             <li v-if="authState.authenticated" class="mobile-auth mobile-logout">
-              <a href="/logout">Déconnexion</a>
+              <a href="#" @click.prevent="handleLogout">Déconnexion</a>
             </li>
           </ul>
         </div>

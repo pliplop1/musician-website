@@ -59,6 +59,7 @@ public class SecurityConfig {
 	/**
 	 * NOTE: Utilisation de web.ignoring() pour les fichiers statiques
 	 * car .permitAll() cause des problèmes avec CORS
+	 * IMPORTANT: /vue/** est inclus car c'est une SPA qui gère sa propre auth via API
 	 */
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -169,7 +170,7 @@ public class SecurityConfig {
 				"/uploaded-photos/**",
 				"/uploaded-videos/**",
 				"/uploaded-avatars/**",
-				"/api/**"
+				"/api/**" // Désactive CSRF pour toute l'API (y compris /api/logout)
 			)
 		);
 
@@ -224,6 +225,20 @@ public class SecurityConfig {
 						.failureHandler(failureHandler)
 						.permitAll())
 				.logout(logout -> logout.logoutSuccessUrl("/login?logout").permitAll());
+
+		// ========================================
+		// GESTION DES SESSIONS
+		// ========================================
+		http.sessionManagement(session -> session
+			// IF_REQUIRED: créer une session si nécessaire (défaut)
+			.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
+			// Invalider la session lors du changement d'ID de session
+			.sessionFixation().migrateSession()
+			// Maximum 1 session simultanée par utilisateur
+			.maximumSessions(1)
+			.maxSessionsPreventsLogin(false) // La nouvelle session remplace l'ancienne
+			.expiredUrl("/login?expired")
+		);
 
 		// Ajouter le filtre anti-brute force AVANT le filtre d'authentification
 		http.addFilterBefore(loginAttemptFilter, UsernamePasswordAuthenticationFilter.class);
