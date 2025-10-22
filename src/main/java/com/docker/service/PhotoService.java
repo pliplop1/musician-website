@@ -4,6 +4,7 @@ package com.docker.service;
 
 import com.docker.entity.Photo;
 import com.docker.repository.PhotoRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,10 +23,18 @@ public class PhotoService {
 	private static final List<String> ALLOWED_IMAGE_TYPES = List.of("image/jpeg", "image/png", "image/gif",
 			"image/webp");
 	private final PhotoRepository photoRepository;
-	private final Path rootLocation = Paths.get("uploaded-photos");
+	private final Path rootLocation;
 
-	public PhotoService(PhotoRepository photoRepository) {
+	public PhotoService(PhotoRepository photoRepository,
+			@Value("${musician.upload.photos-dir}") String photosDir) {
 		this.photoRepository = photoRepository;
+		this.rootLocation = Paths.get(photosDir);
+		// Créer le dossier s'il n'existe pas au démarrage
+		try {
+			Files.createDirectories(rootLocation);
+		} catch (IOException e) {
+			throw new RuntimeException("Ne peut pas initialiser le dossier de stockage des photos", e);
+		}
 	}
 
 	public List<Photo> getAllPhotos() {

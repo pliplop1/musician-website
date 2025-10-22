@@ -72,6 +72,7 @@ services:
       UPLOAD_PHOTOS_DIR: /app/uploads/photos
       UPLOAD_MUSIC_DIR: /app/uploads/music
       UPLOAD_VIDEOS_DIR: /app/uploads/videos
+      UPLOAD_AVATARS_DIR: /app/uploads/avatars
 
       # Logs
       LOG_FILE: /app/logs/application.log

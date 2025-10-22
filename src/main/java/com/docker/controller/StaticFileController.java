@@ -2,6 +2,7 @@ package com.docker.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -27,14 +28,25 @@ import java.nio.file.Paths;
 public class StaticFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(StaticFileController.class);
-    private final String baseDir = System.getProperty("user.dir");
+
+    @Value("${musician.upload.photos-dir}")
+    private String photosDir;
+
+    @Value("${musician.upload.music-dir}")
+    private String musicDir;
+
+    @Value("${musician.upload.videos-dir}")
+    private String videosDir;
+
+    @Value("${musician.upload.avatars-dir}")
+    private String avatarsDir;
 
     /**
      * Servir les fichiers MP3
      */
     @GetMapping("/uploaded-music/{filename:.+}")
     public ResponseEntity<Resource> serveMusic(@PathVariable String filename) {
-        return serveFile("uploaded-music", filename, "audio/mpeg");
+        return serveFile(musicDir, filename, "audio/mpeg");
     }
 
     /**
@@ -42,7 +54,7 @@ public class StaticFileController {
      */
     @GetMapping("/uploaded-photos/{filename:.+}")
     public ResponseEntity<Resource> servePhoto(@PathVariable String filename) {
-        return serveFile("uploaded-photos", filename, "image/jpeg");
+        return serveFile(photosDir, filename, "image/jpeg");
     }
 
     /**
@@ -50,7 +62,7 @@ public class StaticFileController {
      */
     @GetMapping("/uploaded-videos/{filename:.+}")
     public ResponseEntity<Resource> serveVideo(@PathVariable String filename) {
-        return serveFile("uploaded-videos", filename, "video/mp4");
+        return serveFile(videosDir, filename, "video/mp4");
     }
 
     /**
@@ -58,7 +70,7 @@ public class StaticFileController {
      */
     @GetMapping("/uploaded-avatars/{filename:.+}")
     public ResponseEntity<Resource> serveAvatar(@PathVariable String filename) {
-        ResponseEntity<Resource> response = serveFile("uploaded-avatars", filename, "image/png");
+        ResponseEntity<Resource> response = serveFile(avatarsDir, filename, "image/png");
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }
@@ -84,7 +96,7 @@ public class StaticFileController {
     private ResponseEntity<Resource> serveFile(String directory, String filename, String defaultContentType) {
         try {
             // Construire le chemin du fichier
-            Path filePath = Paths.get(baseDir, directory, filename);
+            Path filePath = Paths.get(directory, filename);
             File file = filePath.toFile();
 
             logger.info("📂 Tentative de lecture du fichier: {}", filePath);
@@ -97,7 +109,7 @@ public class StaticFileController {
 
             // Vérifier que le fichier est bien dans le répertoire autorisé (sécurité)
             String canonicalPath = file.getCanonicalPath();
-            String allowedPath = Paths.get(baseDir, directory).toFile().getCanonicalPath();
+            String allowedPath = Paths.get(directory).toFile().getCanonicalPath();
             if (!canonicalPath.startsWith(allowedPath)) {
                 logger.error("🚨 Tentative d'accès non autorisé: {}", canonicalPath);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
