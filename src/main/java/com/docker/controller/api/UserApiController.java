@@ -4,12 +4,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.docker.entity.User;
 import com.docker.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,5 +81,28 @@ public class UserApiController {
         response.put("authenticated", true);
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Endpoint de déconnexion pour la SPA Vue.js
+     * Permet de se déconnecter via POST (sans CSRF car /api/** est exclu)
+     *
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @return Message de confirmation
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "Déconnexion réussie");
+        return ResponseEntity.ok(result);
     }
 }
