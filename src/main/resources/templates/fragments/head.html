@@ -1,6 +1,10 @@
 <th:block th:fragment="head(title, description, canonicalUrl, ogImageUrl)">
     <title th:text="${title} ?: 'Duo Black & White - Site officiel'"></title>
     <meta name="description" th:content="${description} ?: 'Site officiel du Duo Black & White. Biographie, concerts, galerie, musique et actualités.'" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="language" content="French" />
+    <meta name="author" content="Duo Black & White" />
 
     <link rel="canonical" th:if="${canonicalUrl}" th:href="${canonicalUrl}">
 
@@ -10,6 +14,8 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" th:if="${canonicalUrl}" th:content="${canonicalUrl}" />
     <meta property="og:image" th:if="${ogImageUrl}" th:content="${ogImageUrl}" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Duo Black & White" />
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />

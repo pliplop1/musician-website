@@ -11,6 +11,7 @@ import CookieConsent from './components/CookieConsent.vue'
 // Navigation state
 const isScrolled = ref(false)
 const mobileMenuOpen = ref(false)
+const userDropdownOpen = ref(false)
 
 // Authentication state - partagé avec tous les composants via provide/inject
 const authState = ref({
@@ -63,6 +64,19 @@ const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
 
+// Toggle user dropdown
+const toggleUserDropdown = () => {
+  userDropdownOpen.value = !userDropdownOpen.value
+}
+
+// Close dropdown when clicking outside
+const closeUserDropdown = (event) => {
+  const dropdown = document.querySelector('.user-menu-wrapper')
+  if (dropdown && !dropdown.contains(event.target)) {
+    userDropdownOpen.value = false
+  }
+}
+
 // Smooth scroll to section
 const scrollToSection = (sectionId) => {
   const element = document.getElementById(sectionId)
@@ -75,6 +89,16 @@ const scrollToSection = (sectionId) => {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   checkAuthStatus() // Vérifier l'authentification au chargement
+
+  // Add click outside listener for dropdown
+  document.addEventListener('click', closeUserDropdown)
+
+  // Handle Escape key to close dropdown
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && userDropdownOpen.value) {
+      userDropdownOpen.value = false
+    }
+  })
 })
 </script>
 
@@ -98,22 +122,61 @@ onMounted(() => {
           <li><a href="#concerts" @click.prevent="scrollToSection('concerts')">Événements</a></li>
           <li><a href="/login">Contact</a></li>
 
-          <!-- Auth Buttons -->
-          <li v-if="!authState.authenticated">
-            <a href="/login" class="auth-btn login-btn">Connexion</a>
-          </li>
-          <li v-if="authState.authenticated">
-            <a href="/user/profile" class="auth-btn profile-btn">
-              <span class="user-icon">👤</span> {{ authState.username }}
-            </a>
-          </li>
-          <li v-if="authState.isAdmin">
-            <a href="/admin/dashboard" class="auth-btn admin-btn">Admin</a>
-          </li>
         </ul>
 
+        <!-- Auth Section - Menu déroulant utilisateur -->
+        <div class="auth-section desktop-only">
+          <!-- Bouton Connexion si non authentifié -->
+          <a v-if="!authState.authenticated" href="/login" class="auth-btn login-btn" aria-label="Se connecter">
+            Connexion
+          </a>
+
+          <!-- Menu utilisateur si authentifié -->
+          <div v-if="authState.authenticated" class="user-menu-wrapper">
+            <button
+              class="user-menu-button"
+              @click.stop="toggleUserDropdown"
+              :aria-expanded="userDropdownOpen"
+              aria-haspopup="true"
+              aria-label="Menu utilisateur">
+              <!-- Avatar -->
+              <img v-if="authState.avatarUrl" :src="authState.avatarUrl" :alt="`Avatar de ${authState.username}`" class="user-avatar-img" />
+              <span v-else class="user-avatar-initials" aria-hidden="true">
+                {{ authState.username ? authState.username.substring(0, 2).toUpperCase() : '?' }}
+              </span>
+              <span class="username">{{ authState.username }}</span>
+              <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+                <path d="M6 9L1 4h10L6 9z"/>
+              </svg>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div :class="['user-dropdown', { 'active': userDropdownOpen }]" role="menu" aria-labelledby="userMenuButton">
+              <a href="/user/profile" class="dropdown-item" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1.5c-2.3 0-7 1.15-7 3.5v1.5h14V13c0-2.35-4.7-3.5-7-3.5z"/>
+                </svg>
+                Mon Profil
+              </a>
+              <a v-if="authState.isAdmin" href="/admin/dashboard" class="dropdown-item admin-item" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <path d="M13.5 1h-11A1.5 1.5 0 001 2.5v11A1.5 1.5 0 002.5 15h11a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0013.5 1zm-10 12a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h9a.5.5 0 01.5.5v9a.5.5 0 01-.5.5h-9z"/>
+                </svg>
+                Administration
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="/logout" class="dropdown-item logout-item" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <path d="M10 12.5a.5.5 0 01-.5.5h-6a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h6a.5.5 0 01.5.5V5a.5.5 0 001 0V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v9A1.5 1.5 0 003.5 14h6a1.5 1.5 0 001.5-1.5V11a.5.5 0 00-1 0v1.5zm3.854-8.354a.5.5 0 00-.708 0L11 6.293V.5a.5.5 0 00-1 0v5.793L7.854 4.146a.5.5 0 10-.708.708l3 3a.5.5 0 00.708 0l3-3a.5.5 0 000-.708z"/>
+                </svg>
+                Déconnexion
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- Mobile Menu Button -->
-        <button class="mobile-menu-btn" @click="toggleMobileMenu" aria-label="Toggle menu">
+        <button class="mobile-menu-btn" @click="toggleMobileMenu" aria-label="Menu" :aria-expanded="mobileMenuOpen">
           <span :class="['burger', { 'open': mobileMenuOpen }]"></span>
         </button>
       </div>
@@ -141,6 +204,9 @@ onMounted(() => {
             </li>
             <li v-if="authState.isAdmin" class="mobile-auth">
               <a href="/admin/dashboard">Admin</a>
+            </li>
+            <li v-if="authState.authenticated" class="mobile-auth mobile-logout">
+              <a href="/logout">Déconnexion</a>
             </li>
           </ul>
         </div>
@@ -253,6 +319,12 @@ body {
   color: #4a90e2;
 }
 
+.nav-menu a:focus {
+  outline: 3px solid #4a90e2;
+  outline-offset: 4px;
+  color: #4a90e2;
+}
+
 /* Main Content */
 main {
   padding-top: 0;
@@ -312,6 +384,11 @@ main {
   cursor: pointer;
   padding: 0.5rem;
   z-index: 1001;
+}
+
+.mobile-menu-btn:focus {
+  outline: 3px solid #4a90e2;
+  outline-offset: 4px;
 }
 
 .burger {
@@ -483,19 +560,25 @@ html {
   top: 0;
 }
 
-/* Auth Buttons Styling */
-.auth-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-  display: inline-flex;
+/* Auth Section Layout */
+.auth-section {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
+  margin-left: 2rem;
 }
 
+/* Bouton Connexion */
 .login-btn {
+  padding: 0.5rem 1.25rem;
   background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
   color: #fff !important;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
 }
 
 .login-btn:hover {
@@ -504,32 +587,161 @@ html {
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
 }
 
-.profile-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff !important;
+.login-btn:focus {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
 }
 
-.profile-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
+/* Menu utilisateur déroulant */
+.user-menu-wrapper {
+  position: relative;
 }
 
-.admin-btn {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: #fff !important;
+.user-menu-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-radius: 30px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.user-menu-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(74, 144, 226, 0.5);
+}
+
+.user-menu-button:focus {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.user-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4a90e2;
+}
+
+.user-avatar-initials {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   font-weight: bold;
+  font-size: 0.9rem;
 }
 
-.admin-btn:hover {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+.username {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
-.user-icon {
-  font-size: 1rem;
+.dropdown-icon {
+  transition: transform 0.3s ease;
+}
+
+.user-menu-button[aria-expanded="true"] .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1002;
+}
+
+.user-dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #ddd;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.dropdown-item:hover {
+  background: rgba(74, 144, 226, 0.15);
+  color: #4a90e2;
+}
+
+.dropdown-item:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: -2px;
+  background: rgba(74, 144, 226, 0.15);
+  color: #4a90e2;
+}
+
+.dropdown-item.admin-item:hover {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.dropdown-item.admin-item:focus {
+  outline-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.dropdown-item.logout-item:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.dropdown-item.logout-item:focus {
+  outline-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.25rem 0;
 }
 
 /* Mobile auth buttons */
@@ -550,5 +762,55 @@ html {
 
 .mobile-auth a:hover {
   background: rgba(74, 144, 226, 0.2);
+}
+
+.mobile-logout a {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.mobile-logout a:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Responsive adjustments for auth section */
+@media (max-width: 1024px) {
+  .auth-section {
+    margin-left: 1rem;
+  }
+
+  .login-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .user-menu-button {
+    padding: 0.4rem 0.8rem;
+    gap: 0.5rem;
+  }
+
+  .username {
+    display: none; /* Cache le nom sur tablette */
+  }
+
+  .user-avatar-img,
+  .user-avatar-initials {
+    width: 28px;
+    height: 28px;
+  }
+
+  .user-dropdown {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-section {
+    position: absolute;
+    top: 1rem;
+    right: 4rem;
+    margin-left: 0;
+  }
 }
 </style>

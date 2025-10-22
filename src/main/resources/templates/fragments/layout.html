@@ -13,40 +13,66 @@
                 <span class="burger-line"></span>
             </button>
 
-            <nav class="header-nav" id="headerNav">
-                <a th:href="@{/}" th:classappend="${currentUri == '/'} ? 'active' : ''">Accueil</a>
-                <a th:href="@{/biographie}" th:classappend="${currentUri == '/biographie'} ? 'active' : ''">Biographie</a>
-                <a th:href="@{/galerie}" th:classappend="${currentUri == '/galerie'} ? 'active' : ''">Galerie</a>
-                <a th:href="@{/musique}" th:classappend="${currentUri == '/musique'} ? 'active' : ''">Musique</a>
-                <a th:href="@{/videos}" th:classappend="${currentUri == '/videos'} ? 'active' : ''">Vidéos</a>
-                <a th:href="@{/actualites}" th:classappend="${currentUri == '/actualites'} ? 'active' : ''">Actualités</a>
+            <nav class="header-nav" id="headerNav" aria-label="Navigation principale">
+                <a th:href="@{/}" th:classappend="${currentUri == '/'} ? 'active' : ''" aria-current="${currentUri == '/'} ? 'page' : 'false'">Accueil</a>
+                <a th:href="@{/biographie}" th:classappend="${currentUri == '/biographie'} ? 'active' : ''" aria-current="${currentUri == '/biographie'} ? 'page' : 'false'">Biographie</a>
+                <a th:href="@{/galerie}" th:classappend="${currentUri == '/galerie'} ? 'active' : ''" aria-current="${currentUri == '/galerie'} ? 'page' : 'false'">Galerie</a>
+                <a th:href="@{/musique}" th:classappend="${currentUri == '/musique'} ? 'active' : ''" aria-current="${currentUri == '/musique'} ? 'page' : 'false'">Musique</a>
+                <a th:href="@{/videos}" th:classappend="${currentUri == '/videos'} ? 'active' : ''" aria-current="${currentUri == '/videos'} ? 'page' : 'false'">Vidéos</a>
+                <a th:href="@{/actualites}" th:classappend="${currentUri == '/actualites'} ? 'active' : ''" aria-current="${currentUri == '/actualites'} ? 'page' : 'false'">Actualités</a>
+            </nav>
 
-                <div sec:authorize="!isAuthenticated()" class="auth-section">
-                    <a th:href="@{/login}" class="btn-login">Connexion</a>
+            <!-- Section Auth séparée à droite -->
+            <div class="header-auth">
+                <!-- Bouton Connexion si non authentifié -->
+                <div sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="btn-login" aria-label="Se connecter">Connexion</a>
                 </div>
 
-                <div sec:authorize="isAuthenticated()" class="auth-section authenticated">
-                    <a th:href="@{/user/profile}" class="user-profile-link">
-                        <!-- Avatar avec image si disponible -->
+                <!-- Menu utilisateur si authentifié -->
+                <div sec:authorize="isAuthenticated()" class="user-menu-wrapper">
+                    <button class="user-menu-button" id="userMenuButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu utilisateur">
+                        <!-- Avatar -->
                         <div th:if="${currentUser != null && currentUser.avatarFilename != null}" class="user-avatar-img">
                             <img th:src="@{/uploaded-avatars/{filename}(filename=${currentUser.avatarFilename})}"
-                                 th:alt="'Avatar de ' + ${currentUser.username}" loading="lazy" decoding="async" width="32" height="32">
+                                 th:alt="'Avatar de ' + ${currentUser.username}" loading="lazy" decoding="async" width="40" height="40">
                         </div>
-
-                        <!-- Avatar avec initiales sinon -->
                         <div th:if="${currentUser == null || currentUser.avatarFilename == null}"
-                             class="user-avatar-initials">
+                             class="user-avatar-initials" aria-hidden="true">
                             <span th:text="${currentUser != null ? currentUser.initials : '?'}"></span>
                         </div>
-
                         <span sec:authentication="name" class="username"></span>
-                    </a>
-                    <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')" class="btn-admin">Admin</a>
-                    <form th:action="@{/logout}" method="post" class="logout-form">
-                        <button type="submit" class="btn-logout">Déconnexion</button>
-                    </form>
+                        <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+                            <path d="M6 9L1 4h10L6 9z"/>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown menu -->
+                    <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
+                        <a th:href="@{/user/profile}" class="dropdown-item" role="menuitem">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                                <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1.5c-2.3 0-7 1.15-7 3.5v1.5h14V13c0-2.35-4.7-3.5-7-3.5z"/>
+                            </svg>
+                            Mon Profil
+                        </a>
+                        <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')" class="dropdown-item admin-item" role="menuitem">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                                <path d="M13.5 1h-11A1.5 1.5 0 001 2.5v11A1.5 1.5 0 002.5 15h11a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0013.5 1zm-10 12a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h9a.5.5 0 01.5.5v9a.5.5 0 01-.5.5h-9z"/>
+                            </svg>
+                            Administration
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="dropdown-item logout-item" role="menuitem">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                                    <path d="M10 12.5a.5.5 0 01-.5.5h-6a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h6a.5.5 0 01.5.5V5a.5.5 0 001 0V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v9A1.5 1.5 0 003.5 14h6a1.5 1.5 0 001.5-1.5V11a.5.5 0 00-1 0v1.5zm3.854-8.354a.5.5 0 00-.708 0L11 6.293V.5a.5.5 0 00-1 0v5.793L7.854 4.146a.5.5 0 10-.708.708l3 3a.5.5 0 00.708 0l3-3a.5.5 0 000-.708z"/>
+                                </svg>
+                                Déconnexion
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </nav>
+            </div>
         </div>
 
         <!-- Script menu burger mobile -->
@@ -113,6 +139,46 @@
                             }
                         });
                     }
+
+                    // Gestion du menu déroulant utilisateur
+                    const userMenuButton = document.getElementById('userMenuButton');
+                    const userDropdown = document.getElementById('userDropdown');
+
+                    if (userMenuButton && userDropdown) {
+                        function closeDropdown() {
+                            userDropdown.classList.remove('active');
+                            userMenuButton.setAttribute('aria-expanded', 'false');
+                        }
+
+                        function openDropdown() {
+                            userDropdown.classList.add('active');
+                            userMenuButton.setAttribute('aria-expanded', 'true');
+                        }
+
+                        function toggleDropdown(e) {
+                            e.stopPropagation();
+                            const isOpen = userDropdown.classList.contains('active');
+                            isOpen ? closeDropdown() : openDropdown();
+                        }
+
+                        // Toggle au clic sur le bouton
+                        userMenuButton.addEventListener('click', toggleDropdown);
+
+                        // Fermer au clic à l'extérieur
+                        document.addEventListener('click', function(e) {
+                            if (!userMenuButton.contains(e.target) && !userDropdown.contains(e.target)) {
+                                closeDropdown();
+                            }
+                        });
+
+                        // Fermer avec Escape
+                        document.addEventListener('keydown', function(e) {
+                            if (e.key === 'Escape' && userDropdown.classList.contains('active')) {
+                                closeDropdown();
+                                userMenuButton.focus();
+                            }
+                        });
+                    }
                 });
             })();
         </script>
@@ -176,6 +242,11 @@
                 z-index: 1001;
             }
 
+            .mobile-menu-toggle:focus {
+                outline: 3px solid #4a90e2;
+                outline-offset: 4px;
+            }
+
             .burger-line {
                 display: block;
                 width: 30px;
@@ -220,16 +291,18 @@
             .header-nav {
                 display: flex;
                 align-items: center;
-                gap: 1.5rem;
+                gap: 2rem;
             }
 
             .header-nav > a {
                 color: #ddd;
                 text-decoration: none;
-                font-size: 0.95rem;
+                font-size: 1rem;
                 transition: color 0.3s ease;
                 text-transform: uppercase;
                 letter-spacing: 1px;
+                white-space: nowrap;
+                position: relative;
             }
 
             .header-nav > a:hover,
@@ -237,11 +310,17 @@
                 color: #4a90e2;
             }
 
-            .auth-section {
+            .header-nav > a:focus {
+                outline: 3px solid #4a90e2;
+                outline-offset: 4px;
+                color: #4a90e2;
+            }
+
+            /* Section Auth (bouton login ou menu utilisateur) */
+            .header-auth {
                 display: flex;
                 align-items: center;
-                gap: 0.75rem;
-                margin-left: 1rem;
+                margin-left: 2rem;
             }
 
             .btn-login {
@@ -254,6 +333,7 @@
                 transition: all 0.3s ease;
                 text-transform: uppercase;
                 letter-spacing: 1px;
+                white-space: nowrap;
             }
 
             .btn-login:hover {
@@ -262,21 +342,38 @@
                 box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
             }
 
-            .user-profile-link {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.5rem 1rem;
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 25px;
-                text-decoration: none;
-                transition: all 0.3s ease;
+            .btn-login:focus {
+                outline: 3px solid #fff;
+                outline-offset: 2px;
             }
 
-            .user-profile-link:hover {
-                background: rgba(255, 255, 255, 0.1);
+            /* Menu utilisateur déroulant */
+            .user-menu-wrapper {
+                position: relative;
+            }
+
+            .user-menu-button {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.5rem 1rem;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(74, 144, 226, 0.3);
+                border-radius: 30px;
+                color: #fff;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+
+            .user-menu-button:hover {
+                background: rgba(255, 255, 255, 0.12);
                 border-color: rgba(74, 144, 226, 0.5);
+            }
+
+            .user-menu-button:focus {
+                outline: 3px solid #fff;
+                outline-offset: 2px;
             }
 
             .user-avatar-img img {
@@ -285,11 +382,6 @@
                 border-radius: 50%;
                 object-fit: cover;
                 border: 2px solid #4a90e2;
-                transition: transform 0.3s ease;
-            }
-
-            .user-profile-link:hover .user-avatar-img img {
-                transform: scale(1.1);
             }
 
             .user-avatar-initials {
@@ -302,60 +394,109 @@
                 justify-content: center;
                 color: #fff;
                 font-weight: bold;
-                font-size: 0.85rem;
-                transition: transform 0.3s ease;
-            }
-
-            .user-profile-link:hover .user-avatar-initials {
-                transform: scale(1.1);
+                font-size: 0.9rem;
             }
 
             .username {
-                color: #4a90e2;
+                color: #fff;
                 font-weight: 600;
-                font-size: 0.9rem;
+                font-size: 0.95rem;
             }
 
-            .btn-admin {
-                padding: 0.5rem 1rem;
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                color: #fff !important;
-                border-radius: 5px;
-                text-decoration: none;
-                font-size: 0.9rem;
-                font-weight: 600;
+            .dropdown-icon {
+                transition: transform 0.3s ease;
+            }
+
+            .user-menu-button[aria-expanded="true"] .dropdown-icon {
+                transform: rotate(180deg);
+            }
+
+            /* Dropdown menu */
+            .user-dropdown {
+                position: absolute;
+                top: calc(100% + 0.5rem);
+                right: 0;
+                min-width: 200px;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(74, 144, 226, 0.3);
+                border-radius: 8px;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
                 transition: all 0.3s ease;
-                text-transform: uppercase;
-                letter-spacing: 1px;
+                z-index: 1002;
             }
 
-            .btn-admin:hover {
-                background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            .user-dropdown.active {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
             }
 
-            .logout-form {
-                display: inline;
-            }
-
-            .btn-logout {
-                padding: 0.5rem 1rem;
-                background: transparent;
-                border: 1px solid rgba(255, 255, 255, 0.2);
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
                 color: #ddd;
-                border-radius: 5px;
+                text-decoration: none;
+                font-size: 0.95rem;
+                transition: all 0.2s ease;
+                border: none;
+                background: transparent;
+                width: 100%;
+                text-align: left;
                 cursor: pointer;
-                font-size: 0.9rem;
-                transition: all 0.3s ease;
-                text-transform: uppercase;
-                letter-spacing: 1px;
             }
 
-            .btn-logout:hover {
-                background: rgba(239, 68, 68, 0.1);
-                border-color: #ef4444;
+            .dropdown-item:first-child {
+                border-radius: 8px 8px 0 0;
+            }
+
+            .dropdown-item:last-child {
+                border-radius: 0 0 8px 8px;
+            }
+
+            .dropdown-item:hover {
+                background: rgba(74, 144, 226, 0.15);
+                color: #4a90e2;
+            }
+
+            .dropdown-item:focus {
+                outline: 2px solid #4a90e2;
+                outline-offset: -2px;
+                background: rgba(74, 144, 226, 0.15);
+                color: #4a90e2;
+            }
+
+            .dropdown-item.admin-item:hover {
+                background: rgba(245, 158, 11, 0.15);
+                color: #f59e0b;
+            }
+
+            .dropdown-item.admin-item:focus {
+                outline-color: #f59e0b;
+                background: rgba(245, 158, 11, 0.15);
+                color: #f59e0b;
+            }
+
+            .dropdown-item.logout-item:hover {
+                background: rgba(239, 68, 68, 0.15);
                 color: #ef4444;
+            }
+
+            .dropdown-item.logout-item:focus {
+                outline-color: #ef4444;
+                background: rgba(239, 68, 68, 0.15);
+                color: #ef4444;
+            }
+
+            .dropdown-divider {
+                height: 1px;
+                background: rgba(255, 255, 255, 0.1);
+                margin: 0.25rem 0;
             }
 
             /* ============================================ */
@@ -437,35 +578,32 @@
                     transform: translateX(10px);
                 }
 
-                .auth-section {
-                    flex-direction: column;
-                    width: 100%;
+                /* Auth section sur mobile */
+                .header-auth {
+                    position: absolute;
+                    top: 1rem;
+                    right: 4rem;
                     margin-left: 0;
-                    gap: 1rem;
                 }
 
-                .btn-login,
-                .btn-admin {
-                    width: 100%;
-                    text-align: center;
-                    padding: 0.75rem 1.5rem;
-                    font-size: 1rem;
+                .btn-login {
+                    padding: 0.5rem 1rem;
+                    font-size: 0.85rem;
                 }
 
-                .user-profile-link {
-                    width: 100%;
-                    justify-content: center;
-                    padding: 0.75rem 1.5rem;
+                /* Dropdown utilisateur adapté au mobile */
+                .user-menu-button {
+                    padding: 0.4rem 0.8rem;
+                    gap: 0.5rem;
                 }
 
-                .logout-form {
-                    width: 100%;
+                .username {
+                    display: none; /* Cache le nom sur mobile */
                 }
 
-                .btn-logout {
-                    width: 100%;
-                    padding: 0.75rem 1.5rem;
-                    font-size: 1rem;
+                .user-dropdown {
+                    right: 0;
+                    min-width: 180px;
                 }
             }
 

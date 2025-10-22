@@ -34,8 +34,9 @@
                 type="text"
                 id="searchInput"
                 class="search-input"
-                placeholder="Rechercher une photo...">
-            <i class="fas fa-search search-icon"></i>
+                placeholder="Rechercher une photo..."
+                aria-label="Rechercher une photo">
+            <i class="fas fa-search search-icon" aria-hidden="true"></i>
         </div>
 
         <!-- Compteur de résultats -->
@@ -59,19 +60,19 @@
 
         <!-- Bouton Charger Plus -->
         <div class="load-more-container" id="loadMoreContainer" style="display: none;">
-            <button class="btn-load-more" id="btnLoadMore">
-                <i class="fas fa-plus-circle"></i>
+            <button class="btn-load-more" id="btnLoadMore" aria-label="Charger plus de photos">
+                <i class="fas fa-plus-circle" aria-hidden="true"></i>
                 <span>Charger plus de photos</span>
-                <i class="fas fa-arrow-down"></i>
+                <i class="fas fa-arrow-down" aria-hidden="true"></i>
             </button>
         </div>
     </div>
 
     <!-- Modal lightbox -->
-    <div class="photo-modal" id="photoModal">
+    <div class="photo-modal" id="photoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
-            <button class="modal-close" id="modalClose">
-                <i class="fas fa-times"></i>
+            <button class="modal-close" id="modalClose" aria-label="Fermer la photo">
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
             <div class="modal-image-wrapper" id="modalImageWrapper">
                 <!-- L'image sera injectée ici -->
