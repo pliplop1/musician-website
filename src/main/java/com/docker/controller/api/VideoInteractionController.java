@@ -34,6 +34,7 @@ public class VideoInteractionController {
      * Ajouter un like à une vidéo
      * POST /api/videos/{id}/like
      */
+    @Transactional
     @PostMapping("/{id}/like")
     public ResponseEntity<Map<String, Object>> likeVideo(@PathVariable Long id, Authentication authentication) {
         if (authentication == null) {
@@ -43,6 +44,12 @@ public class VideoInteractionController {
         try {
             String username = authentication.getName();
             User user = userService.findByUsername(username);
+
+            if (user == null) {
+                return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Utilisateur non trouvé en base de données"));
+            }
+
             Video video = videoService.findById(id);
 
             if (video == null) {
@@ -71,6 +78,7 @@ public class VideoInteractionController {
      * Retirer un like d'une vidéo
      * DELETE /api/videos/{id}/like
      */
+    @Transactional
     @DeleteMapping("/{id}/like")
     public ResponseEntity<Map<String, Object>> unlikeVideo(@PathVariable Long id, Authentication authentication) {
         if (authentication == null) {
@@ -80,6 +88,12 @@ public class VideoInteractionController {
         try {
             String username = authentication.getName();
             User user = userService.findByUsername(username);
+
+            if (user == null) {
+                return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Utilisateur non trouvé en base de données"));
+            }
+
             Video video = videoService.findById(id);
 
             if (video == null) {
