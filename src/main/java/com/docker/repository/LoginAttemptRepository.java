@@ -81,6 +81,14 @@ public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, Long
      */
     void deleteByAttemptTimeBefore(LocalDateTime before);
 
+    /**
+     * Supprime toutes les tentatives échouées pour un utilisateur
+     * Utilisé pour réinitialiser le compteur après une connexion réussie
+     *
+     * @param username Nom d'utilisateur
+     */
+    void deleteByUsernameAndSuccessFalse(String username);
+
     // ========================================
     // MÉTHODES POUR LE DASHBOARD ADMIN
     // ========================================
