@@ -47,17 +47,22 @@ public class LoginAttemptService {
 
     /**
      * Enregistre une tentative de connexion réussie
+     * Réinitialise le compteur de tentatives échouées pour cet utilisateur
      *
      * @param username Nom d'utilisateur
      * @param ipAddress Adresse IP
      * @param userAgent User-Agent du navigateur
      */
     public void recordSuccessfulLogin(String username, String ipAddress, String userAgent) {
+        // Supprimer toutes les tentatives échouées précédentes pour réinitialiser le compteur
+        loginAttemptRepository.deleteByUsernameAndSuccessFalse(username);
+
+        // Enregistrer la connexion réussie
         LoginAttempt attempt = new LoginAttempt(username, ipAddress, true);
         attempt.setUserAgent(userAgent);
         loginAttemptRepository.save(attempt);
 
-        logger.info("Connexion réussie - Username: {}, IP: {}", username, ipAddress);
+        logger.info("✅ Connexion réussie - Username: {}, IP: {} (compteur réinitialisé)", username, ipAddress);
     }
 
     /**
