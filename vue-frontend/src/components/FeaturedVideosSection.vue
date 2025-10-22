@@ -114,9 +114,22 @@ const toggleLike = async (video, event) => {
 
     // Recharger les données depuis le serveur pour avoir le compteur à jour
     const response = await axios.get(`/api/public/videos/${video.id}`)
-    video.likeCount = response.data.likeCount
 
-    // Mettre à jour le cache avec le nouveau likeCount (sans supprimer le cache)
+    // Forcer la réactivité Vue en trouvant l'index et mettant à jour via le tableau
+    const index = videos.value.findIndex(v => v.id === video.id)
+    if (index !== -1) {
+      videos.value[index] = { ...videos.value[index], likeCount: response.data.likeCount }
+    }
+
+    // Invalider TOUS les caches pour forcer le rechargement sur toutes les pages
+    localStorage.removeItem('featuredTracks')
+    localStorage.removeItem('featuredVideos')
+    localStorage.removeItem('featuredPhotos')
+    localStorage.removeItem('featuredTracks_timestamp')
+    localStorage.removeItem('featuredVideos_timestamp')
+    localStorage.removeItem('featuredPhotos_timestamp')
+
+    // Mettre à jour le cache avec le nouveau likeCount
     const cachedData = getCachedData()
     if (cachedData && Array.isArray(cachedData)) {
       const updatedCache = cachedData.map(v =>
@@ -140,7 +153,20 @@ const incrementView = async (video) => {
 
     // Recharger le viewCount depuis le serveur
     const response = await axios.get(`/api/public/videos/${video.id}`)
-    video.viewCount = response.data.viewCount
+
+    // Forcer la réactivité Vue en trouvant l'index et mettant à jour via le tableau
+    const index = videos.value.findIndex(v => v.id === video.id)
+    if (index !== -1) {
+      videos.value[index] = { ...videos.value[index], viewCount: response.data.viewCount }
+    }
+
+    // Invalider TOUS les caches pour synchronisation
+    localStorage.removeItem('featuredTracks')
+    localStorage.removeItem('featuredVideos')
+    localStorage.removeItem('featuredPhotos')
+    localStorage.removeItem('featuredTracks_timestamp')
+    localStorage.removeItem('featuredVideos_timestamp')
+    localStorage.removeItem('featuredPhotos_timestamp')
 
     // Mettre à jour le cache avec le nouveau viewCount
     const cachedData = getCachedData()

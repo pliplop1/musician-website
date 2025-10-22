@@ -34,6 +34,7 @@ public class PhotoInteractionController {
      * Ajouter un like à une photo
      * POST /api/photos/{id}/like
      */
+    @Transactional
     @PostMapping("/{id}/like")
     public ResponseEntity<Map<String, Object>> likePhoto(@PathVariable Long id, Authentication authentication) {
         if (authentication == null) {
@@ -43,6 +44,12 @@ public class PhotoInteractionController {
         try {
             String username = authentication.getName();
             User user = userService.findByUsername(username);
+
+            if (user == null) {
+                return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Utilisateur non trouvé en base de données"));
+            }
+
             Photo photo = photoService.findById(id);
 
             if (photo == null) {
@@ -71,6 +78,7 @@ public class PhotoInteractionController {
      * Retirer un like d'une photo
      * DELETE /api/photos/{id}/like
      */
+    @Transactional
     @DeleteMapping("/{id}/like")
     public ResponseEntity<Map<String, Object>> unlikePhoto(@PathVariable Long id, Authentication authentication) {
         if (authentication == null) {
@@ -80,6 +88,12 @@ public class PhotoInteractionController {
         try {
             String username = authentication.getName();
             User user = userService.findByUsername(username);
+
+            if (user == null) {
+                return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Utilisateur non trouvé en base de données"));
+            }
+
             Photo photo = photoService.findById(id);
 
             if (photo == null) {
