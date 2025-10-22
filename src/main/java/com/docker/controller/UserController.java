@@ -6,6 +6,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -130,15 +134,32 @@ public class UserController {
     }
 
     @GetMapping("/login-history")
-    public String showLoginHistory(Model model, Authentication authentication) {
+    public String showLoginHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "attemptTime") String sort,
+            @RequestParam(defaultValue = "desc") String direction,
+            Model model,
+            Authentication authentication) {
+
         String username = authentication.getName();
         User user = userService.findByUsername(username);
 
-        // Récupérer l'historique des connexions (30 derniers jours)
-        var loginHistory = loginAttemptService.getLoginHistory(username, 30);
+        // Créer le Pageable avec tri
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+
+        // Récupérer l'historique des connexions paginé (30 derniers jours)
+        Page<LoginAttempt> loginHistoryPage = loginAttemptService.getLoginHistoryPaginated(username, 30, pageable);
 
         model.addAttribute("user", user);
-        model.addAttribute("loginHistory", loginHistory);
+        model.addAttribute("loginHistoryPage", loginHistoryPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", loginHistoryPage.getTotalPages());
+        model.addAttribute("totalItems", loginHistoryPage.getTotalElements());
+        model.addAttribute("currentSort", sort);
+        model.addAttribute("currentDirection", direction);
+        model.addAttribute("size", size);
 
         return "user/login-history";
     }
