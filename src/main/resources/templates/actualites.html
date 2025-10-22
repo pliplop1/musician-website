@@ -9,6 +9,10 @@
 <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
 <script th:src="@{/js/comments.js}" defer></script>
+
+<!-- Schema.org Structured Data -->
+<th:block th:replace="~{fragments/schema-org :: organization}"></th:block>
+<th:block th:replace="~{fragments/schema-org :: webpage('Actualités - Duo Black &amp; White', 'Toutes les actualités, annonces et publications du duo.', 'https://duoblackandwhite.com/actualites')}"></th:block>
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -30,14 +34,15 @@
                 <div class="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-gray-700">
                     <div class="flex items-center justify-between mb-3 sm:mb-4">
                         <h4 class="text-base sm:text-lg font-semibold text-gray-300">
-                            💬 Commentaires (<span th:text="${#ctx.getVariable('commentCount_' + article.id) ?: 0}">0</span>)
+                            <span aria-hidden="true">💬</span> Commentaires (<span th:text="${#ctx.getVariable('commentCount_' + article.id) ?: 0}">0</span>)
                         </h4>
                     </div>
 
                     <!-- Formulaire d'ajout de commentaire (si connecté) -->
                     <div sec:authorize="isAuthenticated()" class="mb-3 sm:mb-4">
                         <form th:action="@{/comments/article/{id}(id=${article.id})}" method="post" class="space-y-2" data-comment-form="true">
-                            <textarea name="content" rows="3" maxlength="1000" required
+                            <label th:for="'comment-content-article-' + ${article.id}" class="sr-only">Votre commentaire sur cet article</label>
+                            <textarea th:id="'comment-content-article-' + ${article.id}" name="content" rows="3" maxlength="1000" required
                                       placeholder="Ajouter un commentaire..."
                                       class="w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white text-sm resize-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"></textarea>
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
@@ -65,7 +70,7 @@
                                         <img th:src="@{/uploaded-avatars/{filename}(filename=${comment.user.avatarFilename})}"
                                              alt="Avatar"
                                              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover"
-                                             loading="lazy" decoding="async">
+                                             loading="lazy" decoding="async" width="32" height="32">
                                     </div>
                                     <div th:if="${comment.user.avatarFilename == null}"
                                          class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">

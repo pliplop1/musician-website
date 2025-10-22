@@ -1,0 +1,65 @@
+<th:block th:fragment="organization">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicGroup",
+  "name": "Duo Black & White",
+  "url": "https://duoblackandwhite.com",
+  "logo": "https://duoblackandwhite.com/images/logo.png",
+  "image": "https://duoblackandwhite.com/images/duo-photo.jpg",
+  "description": "Duo musical Black & White - Performances live, concerts et musique originale",
+  "genre": "Musique",
+  "sameAs": [
+    "https://www.facebook.com/duoblackandwhite",
+    "https://www.youtube.com/duoblackandwhite",
+    "https://open.spotify.com/artist/duoblackandwhite"
+  ]
+}
+</script>
+</th:block>
+
+<th:block th:fragment="webpage(title, description, url)">
+<script type="application/ld+json" th:inline="javascript">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": /*[[${title}]]*/ "Duo Black & White",
+  "description": /*[[${description}]]*/ "Site officiel du Duo Black & White",
+  "url": /*[[${url}]]*/ "https://duoblackandwhite.com"
+}
+</script>
+</th:block>
+
+<th:block th:fragment="concert(concert)">
+<script type="application/ld+json" th:inline="javascript">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicEvent",
+  "name": /*[[${concert.location}]]*/ "Concert",
+  "description": /*[[${concert.description}]]*/ "",
+  "startDate": /*[[${#temporals.format(concert.date, 'yyyy-MM-dd')}]]*/ "",
+  "location": {
+    "@type": "Place",
+    "name": /*[[${concert.location}]]*/ "",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": /*[[${concert.location}]]*/ ""
+    }
+  },
+  "performer": {
+    "@type": "MusicGroup",
+    "name": "Duo Black & White"
+  }
+}
+</script>
+</th:block>
+
+<th:block th:fragment="breadcrumb(items)">
+<script type="application/ld+json" th:inline="javascript">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": /*[[${items}]]*/ []
+}
+</script>
+</th:block>

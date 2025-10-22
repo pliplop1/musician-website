@@ -16,6 +16,10 @@
     <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/gallery-page.css}">
+
+    <!-- Schema.org Structured Data -->
+    <th:block th:replace="~{fragments/schema-org :: organization}"></th:block>
+    <th:block th:replace="~{fragments/schema-org :: webpage('Galerie - Duo Black &amp; White', 'Toute notre galerie photo: souvenirs de concerts et moments partagés.', 'https://duoblackandwhite.com/galerie')}"></th:block>
 </head>
 <body>
 
@@ -24,7 +28,7 @@
 <main class="gallery-page">
     <div class="gallery-container">
         <h1 class="page-title">
-            <i class="fas fa-images"></i> Toute notre Galerie
+            <i class="fas fa-images" aria-hidden="true"></i> Toute notre Galerie
         </h1>
         <p class="page-subtitle">Découvrez l'intégralité de nos photos</p>
 
@@ -87,12 +91,21 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
+// Logger conditionnel (dev uniquement)
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const logger = {
+    log: (...args) => isDev && console.log(...args),
+    error: (...args) => isDev && console.error(...args),
+    warn: (...args) => isDev && console.warn(...args)
+};
+
 let allPhotos = [];
 let filteredPhotos = [];
 let currentPage = 1;
 const photosPerPage = 9;
 let isAuthenticated = false;
 let likedPhotos = new Set();
+let photoModalFocusTrap = null;
 
 // Afficher les photos avec pagination
 function displayPhotos(photos) {
@@ -237,6 +250,12 @@ function openPhotoModal(photo) {
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Activer le focus trap (RGAA 12.7)
+    if (window.createFocusTrap) {
+        photoModalFocusTrap = window.createFocusTrap(modal);
+        photoModalFocusTrap.activate();
+    }
 }
 
 // Incrémenter le compteur de vues d'une photo
@@ -248,7 +267,7 @@ async function incrementViewCount(photoId) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(`📸 Vue enregistrée pour la photo ${photoId}: ${data.viewCount} vues`);
+            logger.log(`📸 Vue enregistrée pour la photo ${photoId}: ${data.viewCount} vues`);
 
             // Mettre à jour le compteur local dans allPhotos
             const photo = allPhotos.find(p => p.id === photoId);
@@ -267,7 +286,7 @@ async function incrementViewCount(photoId) {
             }
         }
     } catch (error) {
-        console.error('Erreur lors de l\'incrémentation des vues:', error);
+        logger.error('Erreur lors de l\'incrémentation des vues:', error);
     }
 }
 
@@ -275,6 +294,12 @@ async function incrementViewCount(photoId) {
 function closePhotoModal() {
     const modal = document.getElementById('photoModal');
     const modalImageWrapper = document.getElementById('modalImageWrapper');
+
+    // Désactiver le focus trap
+    if (photoModalFocusTrap) {
+        photoModalFocusTrap.deactivate();
+        photoModalFocusTrap = null;
+    }
 
     modal.classList.remove('active');
     modalImageWrapper.innerHTML = '';
@@ -365,7 +390,7 @@ async function toggleLike(photoId, button) {
             count.textContent = photoData.likeCount || 0;
         }
     } catch (error) {
-        console.error('Erreur lors du like:', error);
+        logger.error('Erreur lors du like:', error);
         alert('Une erreur est survenue');
     }
 }
@@ -376,7 +401,7 @@ async function checkAuth() {
         const response = await fetch('/api/user/current');
         isAuthenticated = response.ok && (await response.json());
     } catch (error) {
-        console.error('Erreur vérification auth:', error);
+        logger.error('Erreur vérification auth:', error);
         isAuthenticated = false;
     }
 }
@@ -395,7 +420,7 @@ async function loadLikeStatuses() {
                 }
             }
         } catch (error) {
-            console.error('Erreur chargement status like:', error);
+            logger.error('Erreur chargement status like:', error);
         }
     }
 }
@@ -451,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
             displayPhotos(photos);
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            logger.error('Erreur:', error);
             loadingMessage.innerHTML = `
                 <i class="fas fa-exclamation-triangle" style="color: #a855f7; font-size: 3rem; margin-bottom: 1rem;"></i>
                 <p style="color: #c084fc;">Impossible de charger la galerie</p>

@@ -10,6 +10,10 @@
     <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/video-page.css}">
+
+    <!-- Schema.org Structured Data -->
+    <th:block th:replace="~{fragments/schema-org :: organization}"></th:block>
+    <th:block th:replace="~{fragments/schema-org :: webpage('Vidéos - Duo Black &amp; White', 'Toutes nos vidéos: performances live et clips officiels.', 'https://duoblackandwhite.com/videos')}"></th:block>
 </head>
 <body>
 
@@ -18,7 +22,7 @@
 <main class="videos-page">
     <div class="videos-container">
         <h1 class="page-title">
-            <i class="fas fa-film"></i> Toutes nos Vidéos
+            <i class="fas fa-film" aria-hidden="true"></i> Toutes nos Vidéos
         </h1>
         <p class="page-subtitle">Découvrez l'intégralité de nos performances</p>
 
@@ -81,12 +85,21 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
+// Logger conditionnel (dev uniquement)
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const logger = {
+    log: (...args) => isDev && console.log(...args),
+    error: (...args) => isDev && console.error(...args),
+    warn: (...args) => isDev && console.warn(...args)
+};
+
 let allVideos = [];
 let filteredVideos = [];
 let currentPage = 1;
 const videosPerPage = 9;
 let isAuthenticated = false;
 let likedVideos = new Set();
+let videoModalFocusTrap = null;
 
 // Extraire l'ID YouTube depuis l'URL embed
 function getYouTubeId(embedCode) {
@@ -100,7 +113,8 @@ function getThumbnailUrl(video) {
     if (video.videoType === 'EMBED' && video.embedCode) {
         const videoId = getYouTubeId(video.embedCode);
         if (videoId) {
-            return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+            // mqdefault.jpg = 320x180 (~20KB) au lieu de maxresdefault.jpg (~200KB)
+            return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
         }
     }
     return '/images/video-placeholder.jpg';
@@ -136,7 +150,7 @@ function displayVideos(videos) {
     grid.innerHTML = videosToShow.map(video => `
         <div class="video-card" data-video-id="${video.id}">
             <div class="video-thumbnail">
-                <img src="${getThumbnailUrl(video)}" alt="${video.title}">
+                <img src="${getThumbnailUrl(video)}" alt="${video.title}" width="320" height="180" loading="lazy" decoding="async">
                 <div class="play-overlay">
                     <i class="fas fa-play-circle"></i>
                 </div>
@@ -265,6 +279,12 @@ function openVideoModal(video) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
+    // Activer le focus trap (RGAA 12.7)
+    if (window.createFocusTrap) {
+        videoModalFocusTrap = window.createFocusTrap(modal);
+        videoModalFocusTrap.activate();
+    }
+
     // Incrémenter le compteur de vues (sans authentification requise)
     incrementViewCount(video.id);
 }
@@ -278,7 +298,7 @@ async function incrementViewCount(videoId) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(`📊 Vue enregistrée pour la vidéo ${videoId}: ${data.viewCount} vues`);
+            logger.log(`📊 Vue enregistrée pour la vidéo ${videoId}: ${data.viewCount} vues`);
 
             // Mettre à jour le compteur local
             const video = allVideos.find(v => v.id === videoId);
@@ -293,7 +313,7 @@ async function incrementViewCount(videoId) {
             }
         }
     } catch (error) {
-        console.error('Erreur lors de l\'incrémentation des vues:', error);
+        logger.error('Erreur lors de l\'incrémentation des vues:', error);
     }
 }
 
@@ -301,6 +321,12 @@ async function incrementViewCount(videoId) {
 function closeVideoModal() {
     const modal = document.getElementById('videoModal');
     const modalVideoWrapper = document.getElementById('modalVideoWrapper');
+
+    // Désactiver le focus trap
+    if (videoModalFocusTrap) {
+        videoModalFocusTrap.deactivate();
+        videoModalFocusTrap = null;
+    }
 
     modal.classList.remove('active');
     modalVideoWrapper.innerHTML = '';
@@ -394,7 +420,7 @@ async function toggleLike(videoId, button) {
             count.textContent = videoData.likeCount || 0;
         }
     } catch (error) {
-        console.error('Erreur lors du like:', error);
+        logger.error('Erreur lors du like:', error);
         alert('Une erreur est survenue');
     }
 }
@@ -423,7 +449,7 @@ async function loadLikeStatuses() {
                 }
             }
         } catch (error) {
-            console.error('Erreur chargement status like:', error);
+            logger.error('Erreur chargement status like:', error);
         }
     }
 }
@@ -481,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
             displayVideos(videos);
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            logger.error('Erreur:', error);
             loadingMessage.innerHTML = `
                 <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 3rem; margin-bottom: 1rem;"></i>
                 <p style="color: #f87171;">Impossible de charger les vidéos</p>

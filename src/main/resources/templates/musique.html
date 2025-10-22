@@ -10,6 +10,10 @@
     <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/music-page.css}">
+
+    <!-- Schema.org Structured Data -->
+    <th:block th:replace="~{fragments/schema-org :: organization}"></th:block>
+    <th:block th:replace="~{fragments/schema-org :: webpage('Musique - Duo Black &amp; White', 'Toute notre musique: écoutes et titres phares.', 'https://duoblackandwhite.com/musique')}"></th:block>
 </head>
 <body>
 
@@ -18,7 +22,7 @@
 <main class="music-page">
     <div class="music-container">
         <h1 class="page-title">
-            <i class="fas fa-music"></i> Toute notre musique
+            <i class="fas fa-music" aria-hidden="true"></i> Toute notre musique
         </h1>
         <p class="page-subtitle">D├®couvrez l'int├®gralit├® de nos morceaux</p>
 
@@ -84,12 +88,21 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
+// Logger conditionnel (dev uniquement)
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const logger = {
+    log: (...args) => isDev && console.log(...args),
+    error: (...args) => isDev && console.error(...args),
+    warn: (...args) => isDev && console.warn(...args)
+};
+
 let allTracks = [];
 let filteredTracks = [];
 let currentPage = 1;
 const tracksPerPage = 9;
 let isAuthenticated = false;
 let likedTracks = new Set();
+let trackModalFocusTrap = null;
 
 // D├®terminer le type de lecteur et l'ic├┤ne
 function getPlayerType(track) {
@@ -336,6 +349,12 @@ function openTrackModal(track) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
+    // Activer le focus trap (RGAA 12.7)
+    if (window.createFocusTrap) {
+        trackModalFocusTrap = window.createFocusTrap(modal);
+        trackModalFocusTrap.activate();
+    }
+
     // Incr├®menter le compteur d'├®coutes (sans authentification requise)
     incrementPlayCount(track.id);
 }
@@ -349,7 +368,7 @@ async function incrementPlayCount(trackId) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(`­ƒÄÁ ├ëcoute enregistr├®e pour le morceau ${trackId}: ${data.playCount} ├®coutes`);
+            logger.log(`­ƒÄÁ ├ëcoute enregistr├®e pour le morceau ${trackId}: ${data.playCount} ├®coutes`);
 
             // Mettre ├á jour le compteur local dans allTracks
             const track = allTracks.find(t => t.id === trackId);
@@ -368,7 +387,7 @@ async function incrementPlayCount(trackId) {
             }
         }
     } catch (error) {
-        console.error('Erreur lors de l\'incr├®mentation des ├®coutes:', error);
+        logger.error('Erreur lors de l\'incr├®mentation des ├®coutes:', error);
     }
 }
 
@@ -376,6 +395,12 @@ async function incrementPlayCount(trackId) {
 function closeTrackModal() {
     const modal = document.getElementById('trackModal');
     const modalPlayerWrapper = document.getElementById('modalPlayerWrapper');
+
+    // Désactiver le focus trap
+    if (trackModalFocusTrap) {
+        trackModalFocusTrap.deactivate();
+        trackModalFocusTrap = null;
+    }
 
     modal.classList.remove('active');
     modalPlayerWrapper.innerHTML = '';
@@ -464,7 +489,7 @@ async function toggleLike(trackId, button) {
             count.textContent = trackData.likeCount || 0;
         }
     } catch (error) {
-        console.error('Erreur lors du like:', error);
+        logger.error('Erreur lors du like:', error);
         alert('Une erreur est survenue');
     }
 }
@@ -475,7 +500,7 @@ async function checkAuth() {
         const response = await fetch('/api/user/current');
         isAuthenticated = response.ok && (await response.json());
     } catch (error) {
-        console.error('Erreur v├®rification auth:', error);
+        logger.error('Erreur v├®rification auth:', error);
         isAuthenticated = false;
     }
 }
@@ -494,7 +519,7 @@ async function loadLikeStatuses() {
                 }
             }
         } catch (error) {
-            console.error('Erreur chargement status like:', error);
+            logger.error('Erreur chargement status like:', error);
         }
     }
 }
@@ -550,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
             displayTracks(tracks);
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            logger.error('Erreur:', error);
             loadingMessage.innerHTML = `
                 <i class="fas fa-exclamation-triangle" style="color: #22c55e; font-size: 3rem; margin-bottom: 1rem;"></i>
                 <p style="color: #4ade80;">Impossible de charger la musique</p>
