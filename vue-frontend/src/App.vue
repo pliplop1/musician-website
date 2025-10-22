@@ -92,23 +92,23 @@ onMounted(() => {
         <ul class="nav-menu desktop-only">
           <li><a href="#hero" @click.prevent="scrollToSection('hero')">Accueil</a></li>
           <li><a href="#videos" @click.prevent="scrollToSection('videos')">Vidéos</a></li>
-          <li><a href="http://localhost:8106/musique">Musique</a></li>
+          <li><a href="/musique">Musique</a></li>
           <li><a href="#biography" @click.prevent="scrollToSection('biography')">Le Duo</a></li>
           <li><a href="#gallery" @click.prevent="scrollToSection('gallery')">Galerie</a></li>
           <li><a href="#concerts" @click.prevent="scrollToSection('concerts')">Événements</a></li>
-          <li><a href="http://localhost:8106/login">Contact</a></li>
+          <li><a href="/login">Contact</a></li>
 
           <!-- Auth Buttons -->
           <li v-if="!authState.authenticated">
-            <a href="http://localhost:8106/login" class="auth-btn login-btn">Connexion</a>
+            <a href="/login" class="auth-btn login-btn">Connexion</a>
           </li>
           <li v-if="authState.authenticated">
-            <a href="http://localhost:8106/user/profile" class="auth-btn profile-btn">
+            <a href="/user/profile" class="auth-btn profile-btn">
               <span class="user-icon">👤</span> {{ authState.username }}
             </a>
           </li>
           <li v-if="authState.isAdmin">
-            <a href="http://localhost:8106/admin/dashboard" class="auth-btn admin-btn">Admin</a>
+            <a href="/admin/dashboard" class="auth-btn admin-btn">Admin</a>
           </li>
         </ul>
 
@@ -124,23 +124,23 @@ onMounted(() => {
           <ul>
             <li><a href="#hero" @click.prevent="scrollToSection('hero')">Accueil</a></li>
             <li><a href="#videos" @click.prevent="scrollToSection('videos')">Vidéos</a></li>
-            <li><a href="http://localhost:8106/musique">Musique</a></li>
+            <li><a href="/musique">Musique</a></li>
             <li><a href="#biography" @click.prevent="scrollToSection('biography')">Le Duo</a></li>
             <li><a href="#gallery" @click.prevent="scrollToSection('gallery')">Galerie</a></li>
             <li><a href="#concerts" @click.prevent="scrollToSection('concerts')">Événements</a></li>
-            <li><a href="http://localhost:8106/login">Contact</a></li>
+            <li><a href="/login">Contact</a></li>
 
             <!-- Auth Buttons Mobile -->
             <li v-if="!authState.authenticated" class="mobile-auth">
-              <a href="http://localhost:8106/login">Connexion</a>
+              <a href="/login">Connexion</a>
             </li>
             <li v-if="authState.authenticated" class="mobile-auth">
-              <a href="http://localhost:8106/user/profile">
+              <a href="/user/profile">
                 <span class="user-icon">👤</span> {{ authState.username }}
               </a>
             </li>
             <li v-if="authState.isAdmin" class="mobile-auth">
-              <a href="http://localhost:8106/admin/dashboard">Admin</a>
+              <a href="/admin/dashboard">Admin</a>
             </li>
           </ul>
         </div>
@@ -168,9 +168,9 @@ onMounted(() => {
           <a href="tel:0601234547" aria-label="Appelez-nous au 06 01 23 45 47">Téléphone</a>
         </div>
         <div class="legal-links">
-          <a href="http://localhost:8106/privacy-policy">Politique de confidentialité</a> |
-          <a href="http://localhost:8106/mentions-legales">Mentions légales</a> |
-          <a href="http://localhost:8106/cookies">Cookies</a>
+          <a href="/privacy-policy">Politique de confidentialité</a> |
+          <a href="/mentions-legales">Mentions légales</a> |
+          <a href="/cookies">Cookies</a>
         </div>
       </div>
     </footer>

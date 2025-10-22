@@ -67,7 +67,7 @@ const handleSubmit = async () => {
 
     // Rediriger vers /login après 2 secondes
     setTimeout(() => {
-      window.location.href = 'http://localhost:8106/login'
+      window.location.href = '/login'
     }, 2000)
 
   } catch (err) {
@@ -170,7 +170,7 @@ onMounted(() => {
 
           <p class="login-link">
             Déjà un compte ?
-            <a href="http://localhost:8106/login">Se connecter</a>
+            <a href="/login">Se connecter</a>
           </p>
         </form>
       </div>

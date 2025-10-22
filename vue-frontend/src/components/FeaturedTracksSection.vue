@@ -304,7 +304,7 @@ function openConsentSettings() {
 
       <!-- Bouton pour voir toutes les musiques -->
       <div class="view-all-tracks">
-        <a href="http://localhost:8106/musique" class="btn-view-all">
+        <a href="/musique" class="btn-view-all">
           <i class="fas fa-compact-disc"></i>
           <span>Voir toute notre musique</span>
           <i class="fas fa-arrow-right"></i>

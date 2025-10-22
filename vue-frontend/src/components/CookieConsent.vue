@@ -52,7 +52,7 @@ onMounted(() => {
         <button class="btn accept" @click="savePreference(true)" aria-label="Accepter les cookies">Accepter</button>
         <button class="btn decline" @click="savePreference(false)" aria-label="Refuser les cookies">Refuser</button>
       </div>
-      <a class="cookie-link" href="http://localhost:8106/cookies">En savoir plus</a>
+      <a class="cookie-link" href="/cookies">En savoir plus</a>
     </div>
   </div>
 </template>

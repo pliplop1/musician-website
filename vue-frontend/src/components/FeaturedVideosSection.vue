@@ -45,6 +45,17 @@ const getThumbnailUrl = (video) => {
   return '/images/video-placeholder.jpg'
 }
 
+// Gérer l'erreur de chargement d'image (évite les boucles infinies)
+const handleImageError = (event) => {
+  const img = event.target
+  const placeholder = '/images/video-placeholder.jpg'
+
+  // Éviter la boucle infinie : ne pas réessayer si on est déjà sur le placeholder
+  if (!img.src.endsWith(placeholder)) {
+    img.src = placeholder
+  }
+}
+
 // Ouvrir la vidéo dans un modal
 const openVideo = (video) => {
   selectedVideo.value = video
@@ -233,7 +244,7 @@ function openConsentSettings() {
               :alt="video.title"
               loading="lazy"
               decoding="async"
-              @error="(e) => e.target.src = '/images/video-placeholder.jpg'" />
+              @error="handleImageError" />
             <div class="play-overlay">
               <i class="fas fa-play-circle"></i>
             </div>
@@ -266,7 +277,7 @@ function openConsentSettings() {
 
       <!-- Bouton pour voir toutes les vidéos -->
       <div class="view-all-videos">
-        <a href="http://localhost:8106/videos" class="btn-view-all">
+        <a href="/videos" class="btn-view-all">
           <i class="fas fa-film"></i>
           <span>Voir toutes nos vidéos</span>
           <i class="fas fa-arrow-right"></i>
