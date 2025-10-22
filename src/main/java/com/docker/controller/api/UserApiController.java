@@ -60,7 +60,7 @@ public class UserApiController {
         // Récupérer l'utilisateur pour avoir l'avatar
         User user = userService.findByUsername(username);
         if (user != null && user.getAvatarFilename() != null && !user.getAvatarFilename().isEmpty()) {
-            response.put("avatarUrl", "/uploads/avatars/" + user.getAvatarFilename());
+            response.put("avatarUrl", "/uploaded-avatars/" + user.getAvatarFilename());
         }
 
         // Roles
