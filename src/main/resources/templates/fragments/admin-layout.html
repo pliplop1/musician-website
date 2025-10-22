@@ -63,67 +63,67 @@
             <li>
                 <a th:href="@{/admin/dashboard}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.equals(currentUri, '/admin/dashboard')} ? 'bg-gray-900 font-semibold' : ''">
-                   📊 Tableau de Bord
+                   <span aria-hidden="true">📊</span> Tableau de Bord
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/security}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/security')} ? 'bg-gray-900 font-semibold' : ''">
-                   🔒 Sécurité
+                   <span aria-hidden="true">🔒</span> Sécurité
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/concerts}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/concerts')} ? 'bg-gray-900 font-semibold' : ''">
-                   🎵 Concerts
+                   <span aria-hidden="true">🎵</span> Concerts
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/articles}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/articles')} ? 'bg-gray-900 font-semibold' : ''">
-                   📰 Actualités
+                   <span aria-hidden="true">📰</span> Actualités
                 </a>
             </li>
              <li>
                 <a th:href="@{/admin/photos}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/photos')} ? 'bg-gray-900 font-semibold' : ''">
-                   🖼️ Galerie
+                   <span aria-hidden="true">🖼️</span> Galerie
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/musique}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/musique')} ? 'bg-gray-900 font-semibold' : ''">
-                   🎶 Musique
+                   <span aria-hidden="true">🎶</span> Musique
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/videos}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/videos')} ? 'bg-gray-900 font-semibold' : ''">
-                   🎬 Vidéos
+                   <span aria-hidden="true">🎬</span> Vidéos
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/biographie}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/biographie')} ? 'bg-gray-900 font-semibold' : ''">
-                   📖 Biographie
+                   <span aria-hidden="true">📖</span> Biographie
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/messages}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/messages')} ? 'bg-gray-900 font-semibold' : ''">
-                   📧 Messages
+                   <span aria-hidden="true">📧</span> Messages
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/users}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/users')} ? 'bg-gray-900 font-semibold' : ''">
-                   👥 Utilisateurs
+                   <span aria-hidden="true">👥</span> Utilisateurs
                 </a>
             </li>
             <li>
                 <a th:href="@{/admin/comments}" class="block py-2 px-3 rounded hover:bg-gray-700"
                    th:classappend="${#strings.startsWith(currentUri, '/admin/comments')} ? 'bg-gray-900 font-semibold' : ''">
-                   💬 Commentaires
+                   <span aria-hidden="true">💬</span> Commentaires
                 </a>
             </li>
             <li>

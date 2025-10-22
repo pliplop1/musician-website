@@ -59,7 +59,7 @@
                 <div class="mt-6 pt-6 border-t border-gray-700">
                     <div class="flex items-center justify-between mb-4">
                         <h4 class="text-base sm:text-lg font-semibold text-gray-300">
-                            💬 Commentaires (<span th:text="${#ctx.getVariable('commentCount_' + concert.id) ?: 0}">0</span>)
+                            <span aria-hidden="true">💬</span> Commentaires (<span th:text="${#ctx.getVariable('commentCount_' + concert.id) ?: 0}">0</span>)
                         </h4>
                     </div>
 
