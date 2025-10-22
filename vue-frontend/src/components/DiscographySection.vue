@@ -63,7 +63,7 @@ onMounted(() => {
           </div>
 
           <!-- Bouton pour voir toutes les musiques -->
-          <a href="http://localhost:8106/musique" class="btn-listen">
+          <a href="/musique" class="btn-listen">
             <i class="fas fa-compact-disc"></i>
             Voir toutes les musiques
           </a>
@@ -72,7 +72,7 @@ onMounted(() => {
 
       <!-- Bouton global pour voir toutes les musiques -->
       <div v-if="albums.length > 0" class="view-all-music">
-        <a href="http://localhost:8106/musique" class="btn-view-all-music">
+        <a href="/musique" class="btn-view-all-music">
           <i class="fas fa-compact-disc"></i>
           Découvrir toute notre musique
         </a>

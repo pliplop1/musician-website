@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { API_BASE_URL } from '../config/api.js'
 
 const concerts = ref([])
 const loading = ref(true)
 
 const fetchConcerts = async () => {
   try {
-    const response = await fetch('http://localhost:8106/api/public/concerts/upcoming')
+    const response = await fetch(`${API_BASE_URL}/api/public/concerts/upcoming`)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }

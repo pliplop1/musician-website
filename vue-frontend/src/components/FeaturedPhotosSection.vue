@@ -201,7 +201,7 @@ onUnmounted(() => {
 
       <!-- Bouton pour voir toutes les photos -->
       <div class="view-all-photos">
-        <a href="http://localhost:8106/galerie" class="btn-view-all">
+        <a href="/galerie" class="btn-view-all">
           <i class="fas fa-images"></i>
           <span>Voir toute la galerie</span>
           <i class="fas fa-arrow-right"></i>

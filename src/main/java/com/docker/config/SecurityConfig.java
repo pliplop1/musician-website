@@ -70,6 +70,7 @@ public class SecurityConfig {
 			.requestMatchers("/css/**")
 			.requestMatchers("/js/**")
 			.requestMatchers("/images/**")
+			.requestMatchers("/vue/**")
 			.requestMatchers("/favicon.ico");
 	}
 
@@ -199,6 +200,7 @@ public class SecurityConfig {
 						"/css/**", // Fichiers CSS
 						"/js/**", // Fichiers JavaScript
 						"/images/**", // Images statiques
+						"/vue/**", // Application Vue.js buildée
 						"/uploaded-photos/**", // Photos uploadées
 						"/uploaded-music/**", // Musique uploadée
 						"/uploaded-videos/**", // Vidéos uploadées
