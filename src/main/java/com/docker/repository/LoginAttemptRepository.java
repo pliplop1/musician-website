@@ -1,6 +1,8 @@
 package com.docker.repository;
 
 import com.docker.entity.LoginAttempt;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -114,4 +116,14 @@ public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, Long
      */
     @Query("SELECT DISTINCT la.username FROM LoginAttempt la WHERE la.success = false AND la.attemptTime >= :since")
     List<String> findDistinctUsernamesBySuccessFalseAndAttemptTimeGreaterThanEqual(@Param("since") LocalDateTime since);
+
+    /**
+     * Récupère l'historique paginé des tentatives pour un utilisateur
+     *
+     * @param username Nom d'utilisateur
+     * @param since Date à partir de laquelle récupérer
+     * @param pageable Paramètres de pagination et tri
+     * @return Page de tentatives
+     */
+    Page<LoginAttempt> findByUsernameAndAttemptTimeGreaterThanEqual(String username, LocalDateTime since, Pageable pageable);
 }

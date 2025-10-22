@@ -8,6 +8,8 @@ import com.docker.entity.LoginAttempt;
 import com.docker.repository.LoginAttemptRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -165,6 +167,20 @@ public class LoginAttemptService {
     public List<LoginAttempt> getLoginHistory(String username, int days) {
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         return loginAttemptRepository.findByUsernameAndAttemptTimeGreaterThanEqualOrderByAttemptTimeDesc(username, since);
+    }
+
+    /**
+     * Récupère l'historique paginé des connexions pour un utilisateur
+     *
+     * @param username Nom d'utilisateur
+     * @param days Nombre de jours d'historique
+     * @param pageable Paramètres de pagination et tri
+     * @return Page de tentatives
+     */
+    @Transactional(readOnly = true)
+    public Page<LoginAttempt> getLoginHistoryPaginated(String username, int days, Pageable pageable) {
+        LocalDateTime since = LocalDateTime.now().minusDays(days);
+        return loginAttemptRepository.findByUsernameAndAttemptTimeGreaterThanEqual(username, since, pageable);
     }
 
     /**
