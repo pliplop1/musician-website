@@ -6,6 +6,7 @@ import com.docker.service.TrackService;
 import com.docker.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -107,6 +108,7 @@ public class TrackInteractionController {
      * Vérifier si l'utilisateur a liké une chanson
      * GET /api/tracks/{id}/like-status
      */
+    @Transactional(readOnly = true)
     @GetMapping("/{id}/like-status")
     public ResponseEntity<Map<String, Object>> getLikeStatus(@PathVariable Long id, Authentication authentication) {
         try {
@@ -167,6 +169,7 @@ public class TrackInteractionController {
      * Obtenir les statistiques complètes d'une chanson
      * GET /api/tracks/{id}/stats
      */
+    @Transactional(readOnly = true)
     @GetMapping("/{id}/stats")
     public ResponseEntity<Map<String, Object>> getTrackStats(@PathVariable Long id, Authentication authentication) {
         try {

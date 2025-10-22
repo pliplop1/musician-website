@@ -3,6 +3,7 @@ package com.docker.service;
 import com.docker.entity.Track;
 import com.docker.entity.TrackType;
 import com.docker.repository.TrackRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,15 +21,17 @@ import java.util.UUID;
 public class TrackService {
 	private static final List<String> ALLOWED_AUDIO_TYPES = List.of("audio/mpeg", "audio/wav", "audio/ogg");
 	private final TrackRepository trackRepository;
-	private final Path rootLocation = Paths.get("uploaded-music");
+	private final Path rootLocation;
 
-	public TrackService(TrackRepository trackRepository) {
+	public TrackService(TrackRepository trackRepository,
+			@Value("${musician.upload.music-dir}") String musicDir) {
 		this.trackRepository = trackRepository;
+		this.rootLocation = Paths.get(musicDir);
 		// Crée le dossier s'il n'existe pas au démarrage
 		try {
 			Files.createDirectories(rootLocation);
 		} catch (IOException e) {
-			throw new RuntimeException("Ne peut pas initialiser le dossier de stockage", e);
+			throw new RuntimeException("Ne peut pas initialiser le dossier de stockage de la musique", e);
 		}
 	}
 

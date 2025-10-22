@@ -3,6 +3,7 @@ package com.docker.service;
 import com.docker.entity.Video;
 import com.docker.entity.VideoType;
 import com.docker.repository.VideoRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,15 +20,17 @@ import java.util.UUID;
 public class VideoService {
 	private static final List<String> ALLOWED_VIDEO_TYPES = List.of("video/mp4", "video/webm", "video/ogg");
 	private final VideoRepository videoRepository;
-	private final Path rootLocation = Paths.get("uploaded-videos");
+	private final Path rootLocation;
 
-	public VideoService(VideoRepository videoRepository) {
+	public VideoService(VideoRepository videoRepository,
+			@Value("${musician.upload.videos-dir}") String videosDir) {
 		this.videoRepository = videoRepository;
+		this.rootLocation = Paths.get(videosDir);
 		// Crée le dossier s'il n'existe pas au démarrage
 		try {
 			Files.createDirectories(rootLocation);
 		} catch (IOException e) {
-			throw new RuntimeException("Ne peut pas initialiser le dossier de stockage", e);
+			throw new RuntimeException("Ne peut pas initialiser le dossier de stockage des vidéos", e);
 		}
 	}
 

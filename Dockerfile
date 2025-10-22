@@ -71,7 +71,7 @@ LABEL version="1.0.0"
 RUN addgroup -S spring && adduser -S spring -G spring
 
 # Créer les répertoires nécessaires
-RUN mkdir -p /app/uploads/photos /app/uploads/music /app/uploads/videos /app/logs && \
+RUN mkdir -p /app/uploads/photos /app/uploads/music /app/uploads/videos /app/uploads/avatars /app/logs && \
     chown -R spring:spring /app
 
 WORKDIR /app

@@ -6,6 +6,7 @@ import com.docker.entity.User;
 import com.docker.repository.ConcertRepository;
 import com.docker.repository.RoleRepository;
 import com.docker.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,14 +38,16 @@ public class UserService {
     private final ConcertRepository concertRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordValidationService passwordValidationService;
+    private final Path avatarLocation;
     private BadgeService badgeService; // Injection tardive pour éviter les dépendances circulaires
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, ConcertRepository concertRepository, PasswordEncoder passwordEncoder, PasswordValidationService passwordValidationService) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, ConcertRepository concertRepository, PasswordEncoder passwordEncoder, PasswordValidationService passwordValidationService, @Value("${musician.upload.avatars-dir}") String avatarsDir) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.concertRepository = concertRepository;
         this.passwordEncoder = passwordEncoder;
         this.passwordValidationService = passwordValidationService;
+        this.avatarLocation = Paths.get(avatarsDir);
     }
 
     // Injection du BadgeService après la construction pour éviter les dépendances circulaires
@@ -183,12 +186,11 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid concert Id:" + concertId));
         user.getFavoriteConcerts().remove(concert);
         userRepository.save(user);
-    } 
+    }
  // ============================================
     // GESTION DE LA PHOTO DE PROFIL ET BIO
     // ============================================
-    
-    private final Path avatarLocation = Paths.get("uploaded-avatars");
+
     private static final List<String> ALLOWED_AVATAR_TYPES = List.of("image/jpeg", "image/png", "image/gif", "image/webp");
     
     @Transactional
