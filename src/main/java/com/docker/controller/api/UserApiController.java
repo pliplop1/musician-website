@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.docker.entity.User;
+import com.docker.service.UserService;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +22,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/user")
 public class UserApiController {
+
+    private final UserService userService;
+
+    public UserApiController(UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * Récupère les informations de l'utilisateur actuellement connecté
@@ -38,12 +47,20 @@ public class UserApiController {
         Map<String, Object> response = new HashMap<>();
 
         // Username
+        String username;
         if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
             org.springframework.security.core.userdetails.UserDetails userDetails =
                 (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
-            response.put("username", userDetails.getUsername());
+            username = userDetails.getUsername();
         } else {
-            response.put("username", authentication.getName());
+            username = authentication.getName();
+        }
+        response.put("username", username);
+
+        // Récupérer l'utilisateur pour avoir l'avatar
+        User user = userService.findByUsername(username);
+        if (user != null && user.getAvatarFilename() != null && !user.getAvatarFilename().isEmpty()) {
+            response.put("avatarUrl", "/uploads/avatars/" + user.getAvatarFilename());
         }
 
         // Roles
@@ -53,7 +70,7 @@ public class UserApiController {
 
         // Vérifier si admin
         boolean isAdmin = authentication.getAuthorities().stream()
-            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || auth.getAuthority().equals("ROLE_SUPERADMIN"));
         response.put("isAdmin", isAdmin);
 
         response.put("authenticated", true);
