@@ -6,6 +6,7 @@ import com.docker.repository.PasswordResetTokenRepository;
 import com.docker.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,9 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
 
     public PasswordResetService(PasswordResetTokenRepository tokenRepository,
                                 UserRepository userRepository,
@@ -64,7 +68,7 @@ public class PasswordResetService {
         tokenRepository.save(resetToken);
 
         // Envoyer l'email avec le lien de réinitialisation
-        String resetUrl = "http://localhost:8106/reset-password?token=" + token;
+        String resetUrl = baseUrl + "/reset-password?token=" + token;
         emailService.sendPasswordResetEmail(user.getEmail(), user.getUsername(), resetUrl);
 
         logger.info("Token de réinitialisation créé pour l'utilisateur: {}", user.getUsername());

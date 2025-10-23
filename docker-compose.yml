@@ -68,6 +68,9 @@ services:
       MAIL_FROM: ${MAIL_FROM:-noreply@duoblackandwhite.com}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-dumoulin.marilyne@gmail.com}
 
+      # Application base URL
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+
       # Upload directories
       UPLOAD_PHOTOS_DIR: /app/uploads/photos
       UPLOAD_MUSIC_DIR: /app/uploads/music
