@@ -43,7 +43,7 @@ public class ContentSecurityPolicyFilter extends OncePerRequestFilter {
         "media-src 'self'; " +
         // Autoriser l'intégration d'iframes externes spécifiques (YouTube, Spotify, SoundCloud)
         "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com https://w.soundcloud.com; " +
-        "frame-ancestors 'none'; " +
+        "frame-ancestors 'self'; " +
         "base-uri 'self'; " +
         "form-action 'self'";
 

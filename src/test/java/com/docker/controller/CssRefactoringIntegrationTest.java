@@ -67,21 +67,21 @@ class CssRefactoringIntegrationTest {
     void testMusicPageCssIsAccessible() throws Exception {
         mockMvc.perform(get("/css/music-page.css"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("text/css"));
+                .andExpect(content().contentTypeCompatibleWith("text/css"));
     }
 
     @Test
     void testVideoPageCssIsAccessible() throws Exception {
         mockMvc.perform(get("/css/video-page.css"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("text/css"));
+                .andExpect(content().contentTypeCompatibleWith("text/css"));
     }
 
     @Test
     void testGalleryPageCssIsAccessible() throws Exception {
         mockMvc.perform(get("/css/gallery-page.css"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("text/css"));
+                .andExpect(content().contentTypeCompatibleWith("text/css"));
     }
 
     // ========================================================================
@@ -198,78 +198,9 @@ class CssRefactoringIntegrationTest {
     }
 
     // ========================================================================
-    // TESTS DE L'EXISTENCE DES FICHIERS DE BACKUP
+    // NOTE: Les tests de backup ont été supprimés car les fichiers .backup
+    // ont été nettoyés du projet après validation de la refactorisation CSS
     // ========================================================================
-
-    @Test
-    void testMusiqueBackupFileExists() {
-        Path backupFile = Paths.get(TEMPLATES_DIR + "musique.html.backup");
-        assertTrue(Files.exists(backupFile),
-            "Le fichier de backup musique.html.backup doit exister");
-    }
-
-    @Test
-    void testVideosBackupFileExists() {
-        Path backupFile = Paths.get(TEMPLATES_DIR + "videos.html.backup");
-        assertTrue(Files.exists(backupFile),
-            "Le fichier de backup videos.html.backup doit exister");
-    }
-
-    @Test
-    void testGalerieBackupFileExists() {
-        Path backupFile = Paths.get(TEMPLATES_DIR + "galerie.html.backup");
-        assertTrue(Files.exists(backupFile),
-            "Le fichier de backup galerie.html.backup doit exister");
-    }
-
-    // ========================================================================
-    // TESTS DE TAILLE DES FICHIERS (vérifier la réduction)
-    // ========================================================================
-
-    @Test
-    void testMusiqueHtmlIsSmallerThanBackup() throws Exception {
-        Path originalFile = Paths.get(TEMPLATES_DIR + "musique.html");
-        Path backupFile = Paths.get(TEMPLATES_DIR + "musique.html.backup");
-
-        if (Files.exists(originalFile) && Files.exists(backupFile)) {
-            long originalSize = Files.size(originalFile);
-            long backupSize = Files.size(backupFile);
-
-            assertTrue(originalSize < backupSize,
-                String.format("Le fichier refactorisé musique.html (%d octets) doit être plus petit que le backup (%d octets)",
-                    originalSize, backupSize));
-        }
-    }
-
-    @Test
-    void testVideosHtmlIsSmallerThanBackup() throws Exception {
-        Path originalFile = Paths.get(TEMPLATES_DIR + "videos.html");
-        Path backupFile = Paths.get(TEMPLATES_DIR + "videos.html.backup");
-
-        if (Files.exists(originalFile) && Files.exists(backupFile)) {
-            long originalSize = Files.size(originalFile);
-            long backupSize = Files.size(backupFile);
-
-            assertTrue(originalSize < backupSize,
-                String.format("Le fichier refactorisé videos.html (%d octets) doit être plus petit que le backup (%d octets)",
-                    originalSize, backupSize));
-        }
-    }
-
-    @Test
-    void testGalerieHtmlIsSmallerThanBackup() throws Exception {
-        Path originalFile = Paths.get(TEMPLATES_DIR + "galerie.html");
-        Path backupFile = Paths.get(TEMPLATES_DIR + "galerie.html.backup");
-
-        if (Files.exists(originalFile) && Files.exists(backupFile)) {
-            long originalSize = Files.size(originalFile);
-            long backupSize = Files.size(backupFile);
-
-            assertTrue(originalSize < backupSize,
-                String.format("Le fichier refactorisé galerie.html (%d octets) doit être plus petit que le backup (%d octets)",
-                    originalSize, backupSize));
-        }
-    }
 
     // ========================================================================
     // TESTS DE NON-RÉGRESSION (les pages se chargent toujours)

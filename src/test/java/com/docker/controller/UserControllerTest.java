@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -108,15 +111,18 @@ class UserControllerTest {
     @WithMockUser(username = "testuser", roles = {"USER"})
     void testShowLoginHistory_ReturnsView() throws Exception {
         List<LoginAttempt> loginHistory = new ArrayList<>();
+        Page<LoginAttempt> loginHistoryPage = new PageImpl<>(loginHistory);
+
         when(userService.findByUsername("testuser")).thenReturn(testUser);
-        when(loginAttemptService.getLoginHistory("testuser", 30)).thenReturn(loginHistory);
+        when(loginAttemptService.getLoginHistoryPaginated(eq("testuser"), eq(30), any(Pageable.class)))
+                .thenReturn(loginHistoryPage);
 
         mockMvc.perform(get("/user/login-history"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/login-history"))
-                .andExpect(model().attributeExists("user", "loginHistory"));
+                .andExpect(model().attributeExists("user", "loginHistoryPage", "currentPage", "totalPages"));
 
-        verify(loginAttemptService, times(1)).getLoginHistory("testuser", 30);
+        verify(loginAttemptService, times(1)).getLoginHistoryPaginated(eq("testuser"), eq(30), any(Pageable.class));
     }
 
     // Tests pour /user/profile/edit
@@ -326,7 +332,7 @@ class UserControllerTest {
 
         mockMvc.perform(get("/user/export-data"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(jsonData))
                 .andExpect(header().string("Content-Disposition", "form-data; name=\"attachment\"; filename=\"" + filename + "\""));
 

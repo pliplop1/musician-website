@@ -45,7 +45,7 @@
                 </button>
 
                 <!-- Menu déroulant des notifications (caché par défaut) -->
-                <div id="notificationDropdown" class="hidden absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 text-gray-800">
+                <div id="notificationDropdown" class="hidden absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 bg-white rounded-lg shadow-xl z-50 text-gray-800">
                     <div class="p-4 border-b border-gray-200">
                         <h3 class="font-bold text-lg">Notifications</h3>
                     </div>
@@ -173,6 +173,11 @@
     <!-- Style et Script pour sidebar mobile -->
     <th:block th:fragment="admin-sidebar-mobile">
         <style>
+            /* Empêcher le scroll automatique lors de la navigation */
+            html {
+                scroll-behavior: auto !important;
+            }
+
             /* Sidebar admin responsive */
             .admin-sidebar {
                 position: relative;

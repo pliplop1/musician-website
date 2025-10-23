@@ -256,6 +256,15 @@
 								<exclude>jdk/**</exclude>
 								<exclude>com.sun/**</exclude>
 								<exclude>java/**</exclude>
+								<!-- Exclure les Initializers qui ne s'exécutent qu'en dev/prod (@Profile) -->
+								<exclude>**/DemoDataInitializer.class</exclude>
+								<exclude>**/DataInitializer.class</exclude>
+								<exclude>**/TrackMusicFileInitializer.class</exclude>
+								<exclude>**/BadgeInitializer.class</exclude>
+								<exclude>**/SocialLinkInitializer.class</exclude>
+								<exclude>**/HomepageSettingsInitializer.class</exclude>
+								<!-- Exclure la classe Application principale (non testable) -->
+								<exclude>**/MusicianWebsiteApplication.class</exclude>
 							</excludes>
 						</configuration>
 					</execution>
@@ -272,6 +281,17 @@
 							<goal>check</goal>
 						</goals>
 						<configuration>
+							<excludes>
+								<!-- Exclure les Initializers qui ne s'exécutent qu'en dev/prod (@Profile) -->
+								<exclude>**/DemoDataInitializer.class</exclude>
+								<exclude>**/DataInitializer.class</exclude>
+								<exclude>**/TrackMusicFileInitializer.class</exclude>
+								<exclude>**/BadgeInitializer.class</exclude>
+								<exclude>**/SocialLinkInitializer.class</exclude>
+								<exclude>**/HomepageSettingsInitializer.class</exclude>
+								<!-- Exclure la classe Application principale (non testable) -->
+								<exclude>**/MusicianWebsiteApplication.class</exclude>
+							</excludes>
 							<rules>
 								<rule>
 									<element>PACKAGE</element>

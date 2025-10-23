@@ -133,8 +133,8 @@ const toggleLike = async (photo, event) => {
 // Vérifier l'authentification et charger les likes
 const checkAuth = async () => {
   try {
-    const response = await axios.get('/api/user/current')
-    isAuthenticated.value = !!response.data
+    const response = await axios.get('/api/public/auth/status')
+    isAuthenticated.value = response.data.authenticated
 
     if (isAuthenticated.value) {
       for (const photo of photos.value) {

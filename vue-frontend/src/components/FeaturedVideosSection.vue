@@ -184,8 +184,8 @@ const incrementView = async (video) => {
 // Vérifier l'authentification et charger les likes
 const checkAuth = async () => {
   try {
-    const response = await axios.get('/api/user/current')
-    isAuthenticated.value = !!response.data
+    const response = await axios.get('/api/public/auth/status')
+    isAuthenticated.value = response.data.authenticated
 
     // Charger les status de like pour chaque vidéo
     if (isAuthenticated.value) {
