@@ -8,7 +8,9 @@
     <th:block th:replace="~{fragments/head :: head('Musique - Duo Black & White','Toute notre musique: ├®coutes et titres phares.', null, null)}"></th:block>
     <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Font Awesome: chargement asynchrone pour ne pas bloquer le rendu -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
     <link rel="stylesheet" th:href="@{/css/music-page.css}">
 
     <!-- Schema.org Structured Data -->
@@ -507,20 +509,22 @@ async function checkAuth() {
 
 // Charger les statuts de like
 async function loadLikeStatuses() {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || allTracks.length === 0) return;
 
-    for (const track of allTracks) {
-        try {
-            const response = await fetch(`/api/tracks/${track.id}/like-status`);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.liked) {
-                    likedTracks.add(track.id);
+    try {
+        const trackIds = allTracks.map(track => track.id).join(',');
+        const response = await fetch(`/api/tracks/like-status/bulk?ids=${trackIds}`);
+
+        if (response.ok) {
+            const statuses = await response.json();
+            for (const [trackId, isLiked] of Object.entries(statuses)) {
+                if (isLiked) {
+                    likedTracks.add(parseInt(trackId));
                 }
             }
-        } catch (error) {
-            logger.error('Erreur chargement status like:', error);
         }
+    } catch (error) {
+        logger.error('Erreur chargement statuts like (bulk):', error);
     }
 }
 

@@ -151,6 +151,52 @@ public class VideoInteractionController {
     }
 
     /**
+     * Vérifier le statut de like pour plusieurs vidéos en une seule requête (bulk)
+     * GET /api/videos/like-status/bulk?ids=1,2,3,4
+     * Résout le problème N+1 queries
+     */
+    @Transactional(readOnly = true)
+    @GetMapping("/like-status/bulk")
+    public ResponseEntity<Map<Long, Boolean>> getBulkLikeStatus(
+            @RequestParam java.util.List<Long> ids,
+            Authentication authentication) {
+        try {
+            Map<Long, Boolean> statuses = new HashMap<>();
+
+            if (authentication == null) {
+                for (Long id : ids) {
+                    statuses.put(id, false);
+                }
+                return ResponseEntity.ok(statuses);
+            }
+
+            String username = authentication.getName();
+            User user = userService.findByUsername(username);
+
+            if (user == null) {
+                for (Long id : ids) {
+                    statuses.put(id, false);
+                }
+                return ResponseEntity.ok(statuses);
+            }
+
+            for (Long id : ids) {
+                Video video = videoService.findById(id);
+                if (video != null) {
+                    statuses.put(id, video.isLikedBy(user));
+                } else {
+                    statuses.put(id, false);
+                }
+            }
+
+            return ResponseEntity.ok(statuses);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
      * Incrémenter le compteur de vues d'une vidéo
      * POST /api/videos/{id}/view
      * Peut être appelé sans authentification

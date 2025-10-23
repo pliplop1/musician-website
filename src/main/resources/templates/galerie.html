@@ -14,7 +14,9 @@
 
     <link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Font Awesome: chargement asynchrone pour ne pas bloquer le rendu -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
     <link rel="stylesheet" th:href="@{/css/gallery-page.css}">
 
     <!-- Schema.org Structured Data -->
@@ -406,22 +408,29 @@ async function checkAuth() {
     }
 }
 
-// Charger les statuts de like
+// Charger les statuts de like (bulk - une seule requête pour toutes les photos)
 async function loadLikeStatuses() {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || allPhotos.length === 0) return;
 
-    for (const photo of allPhotos) {
-        try {
-            const response = await fetch(`/api/photos/${photo.id}/like-status`);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.liked) {
-                    likedPhotos.add(photo.id);
+    try {
+        // Créer la liste des IDs séparés par des virgules
+        const photoIds = allPhotos.map(photo => photo.id).join(',');
+
+        // Une seule requête pour tous les statuts
+        const response = await fetch(`/api/photos/like-status/bulk?ids=${photoIds}`);
+
+        if (response.ok) {
+            const statuses = await response.json();
+
+            // Mettre à jour le Set des photos likées
+            for (const [photoId, isLiked] of Object.entries(statuses)) {
+                if (isLiked) {
+                    likedPhotos.add(parseInt(photoId));
                 }
             }
-        } catch (error) {
-            logger.error('Erreur chargement status like:', error);
         }
+    } catch (error) {
+        logger.error('Erreur chargement statuts like (bulk):', error);
     }
 }
 
