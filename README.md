@@ -1,5 +1,12 @@
 # Duo Black & White - Site Web Officiel
 
+[![CI/CD Pipeline](https://github.com/pliplop1/musician-website/actions/workflows/ci.yml/badge.svg)](https://github.com/pliplop1/musician-website/actions/workflows/ci.yml)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.4-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3-green.svg)](https://vuejs.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Site web professionnel pour le Duo Black & White, groupe musical d'Abbeville composé de Marilyne Dumoulin (chanteuse) et Philippe Prudhomme (guitariste/chanteur).
 
 ## Vue d'ensemble
@@ -42,7 +49,7 @@ Application web moderne combinant un backend Spring Boot robuste avec un fronten
 ## Stack Technique
 
 ### Backend
-- **Java 17**
+- **Java 21**
 - **Spring Boot 3.2.4**
   - Spring Data JPA
   - Spring Security
