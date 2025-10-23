@@ -151,6 +151,52 @@ public class TrackInteractionController {
     }
 
     /**
+     * Vérifier le statut de like pour plusieurs tracks en une seule requête (bulk)
+     * GET /api/tracks/like-status/bulk?ids=1,2,3,4
+     * Résout le problème N+1 queries
+     */
+    @Transactional(readOnly = true)
+    @GetMapping("/like-status/bulk")
+    public ResponseEntity<Map<Long, Boolean>> getBulkLikeStatus(
+            @RequestParam java.util.List<Long> ids,
+            Authentication authentication) {
+        try {
+            Map<Long, Boolean> statuses = new HashMap<>();
+
+            if (authentication == null) {
+                for (Long id : ids) {
+                    statuses.put(id, false);
+                }
+                return ResponseEntity.ok(statuses);
+            }
+
+            String username = authentication.getName();
+            User user = userService.findByUsername(username);
+
+            if (user == null) {
+                for (Long id : ids) {
+                    statuses.put(id, false);
+                }
+                return ResponseEntity.ok(statuses);
+            }
+
+            for (Long id : ids) {
+                Track track = trackService.findById(id);
+                if (track != null) {
+                    statuses.put(id, track.isLikedBy(user));
+                } else {
+                    statuses.put(id, false);
+                }
+            }
+
+            return ResponseEntity.ok(statuses);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
      * Incrémenter le compteur d'écoutes d'une chanson
      * POST /api/tracks/{id}/play
      * Peut être appelé sans authentification

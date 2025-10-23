@@ -151,6 +151,55 @@ public class PhotoInteractionController {
     }
 
     /**
+     * Vérifier le statut de like pour plusieurs photos en une seule requête (bulk)
+     * GET /api/photos/like-status/bulk?ids=1,2,3,4
+     * Résout le problème N+1 queries
+     */
+    @Transactional(readOnly = true)
+    @GetMapping("/like-status/bulk")
+    public ResponseEntity<Map<Long, Boolean>> getBulkLikeStatus(
+            @RequestParam java.util.List<Long> ids,
+            Authentication authentication) {
+        try {
+            Map<Long, Boolean> statuses = new HashMap<>();
+
+            if (authentication == null) {
+                // Si non authentifié, toutes les photos ne sont pas likées
+                for (Long id : ids) {
+                    statuses.put(id, false);
+                }
+                return ResponseEntity.ok(statuses);
+            }
+
+            String username = authentication.getName();
+            User user = userService.findByUsername(username);
+
+            if (user == null) {
+                // Si user non trouvé, toutes les photos ne sont pas likées
+                for (Long id : ids) {
+                    statuses.put(id, false);
+                }
+                return ResponseEntity.ok(statuses);
+            }
+
+            // Récupérer toutes les photos en une seule requête
+            for (Long id : ids) {
+                Photo photo = photoService.findById(id);
+                if (photo != null) {
+                    statuses.put(id, photo.isLikedBy(user));
+                } else {
+                    statuses.put(id, false);
+                }
+            }
+
+            return ResponseEntity.ok(statuses);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
      * Incrémenter le compteur de vues d'une photo
      * POST /api/photos/{id}/view
      * Peut être appelé sans authentification
