@@ -27,7 +27,7 @@ provide('authState', authState)
 // Check authentication status
 const checkAuthStatus = async () => {
   try {
-    const response = await fetch('/api/user/current', {
+    const response = await fetch('/api/public/auth/status', {
       credentials: 'include', // Important pour envoyer les cookies de session
       cache: 'no-store'
     })
@@ -568,10 +568,10 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Skip link (RGAA) */
+/* Skip link (RGAA) - Lien d'évitement pour l'accessibilité */
 .skip-link {
   position: absolute;
-  top: -40px;
+  top: -100px; /* Complètement hors de l'écran */
   left: 0;
   background: #000;
   color: #fff;
@@ -581,10 +581,17 @@ html {
   border-radius: 0 0 8px 0;
   font-weight: bold;
   border: 2px solid #fff;
+  white-space: nowrap; /* Évite le retour à la ligne */
+  overflow: hidden; /* Cache le débordement */
+  clip: rect(0, 0, 0, 0); /* Technique d'accessibilité pour cacher visuellement */
+  transition: all 0.3s ease; /* Animation fluide */
 }
 
 .skip-link:focus {
   top: 0;
+  clip: auto; /* Rend visible au focus */
+  width: auto;
+  height: auto;
 }
 
 /* Auth Section Layout */

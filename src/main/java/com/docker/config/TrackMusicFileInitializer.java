@@ -5,6 +5,7 @@ import com.docker.repository.TrackRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import java.util.List;
  * dans uploaded-music/ aux tracks qui n'ont pas de fichier
  */
 @Component
+@Profile({"dev", "prod"})
 @Order(10) // Après les autres initialiseurs
 public class TrackMusicFileInitializer implements CommandLineRunner {
 

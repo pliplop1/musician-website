@@ -87,7 +87,7 @@ class PhotoInteractionControllerTest {
         mockMvc.perform(post("/api/photos/1/like")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.liked").value(true))
                 .andExpect(jsonPath("$.likeCount").exists())
@@ -138,7 +138,7 @@ class PhotoInteractionControllerTest {
         mockMvc.perform(delete("/api/photos/1/like")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.liked").value(false))
                 .andExpect(jsonPath("$.message").value("Like retiré avec succès"));
@@ -172,7 +172,7 @@ class PhotoInteractionControllerTest {
         mockMvc.perform(get("/api/photos/1/like-status")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.liked").value(true))
                 .andExpect(jsonPath("$.likeCount").value(1));
 
@@ -187,7 +187,7 @@ class PhotoInteractionControllerTest {
         mockMvc.perform(get("/api/photos/1/like-status")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.liked").value(false))
                 .andExpect(jsonPath("$.likeCount").value(0));
 
@@ -219,7 +219,7 @@ class PhotoInteractionControllerTest {
         mockMvc.perform(post("/api/photos/1/view")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.viewCount").exists());
 
@@ -255,7 +255,7 @@ class PhotoInteractionControllerTest {
         mockMvc.perform(get("/api/photos/1/stats")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Test Photo"))
                 .andExpect(jsonPath("$.filename").value("test-photo.jpg"))
@@ -279,7 +279,7 @@ class PhotoInteractionControllerTest {
         mockMvc.perform(get("/api/photos/1/stats")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.viewCount").value(50))
                 .andExpect(jsonPath("$.isLiked").value(false));

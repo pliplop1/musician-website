@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Initialise les réseaux sociaux par défaut au démarrage de l'application.
  */
 @Component
-@Profile("dev")
+@Profile({"dev", "prod"})
 @Slf4j
 public class SocialLinkInitializer implements CommandLineRunner {
 

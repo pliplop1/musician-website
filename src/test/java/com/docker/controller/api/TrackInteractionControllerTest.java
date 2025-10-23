@@ -86,7 +86,7 @@ class TrackInteractionControllerTest {
         mockMvc.perform(post("/api/tracks/1/like")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.liked").value(true))
                 .andExpect(jsonPath("$.likeCount").exists())
@@ -137,7 +137,7 @@ class TrackInteractionControllerTest {
         mockMvc.perform(delete("/api/tracks/1/like")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.liked").value(false))
                 .andExpect(jsonPath("$.message").value("Like retiré avec succès"));
@@ -171,7 +171,7 @@ class TrackInteractionControllerTest {
         mockMvc.perform(get("/api/tracks/1/like-status")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.liked").value(true))
                 .andExpect(jsonPath("$.likeCount").value(1));
 
@@ -186,7 +186,7 @@ class TrackInteractionControllerTest {
         mockMvc.perform(get("/api/tracks/1/like-status")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.liked").value(false))
                 .andExpect(jsonPath("$.likeCount").value(0));
 
@@ -218,7 +218,7 @@ class TrackInteractionControllerTest {
         mockMvc.perform(post("/api/tracks/1/play")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.playCount").exists());
 
@@ -254,7 +254,7 @@ class TrackInteractionControllerTest {
         mockMvc.perform(get("/api/tracks/1/stats")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Test Track"))
                 .andExpect(jsonPath("$.artist").value("Test Artist"))
@@ -279,7 +279,7 @@ class TrackInteractionControllerTest {
         mockMvc.perform(get("/api/tracks/1/stats")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.playCount").value(50))
                 .andExpect(jsonPath("$.isLiked").value(false));

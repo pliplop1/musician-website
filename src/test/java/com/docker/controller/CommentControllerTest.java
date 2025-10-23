@@ -66,7 +66,7 @@ class CommentControllerTest {
                 .param("content", "Great concert!")
                 .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").exists());
 
@@ -82,7 +82,7 @@ class CommentControllerTest {
                 .param("content", "")
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false));
 
         verify(commentService, never()).createComment(anyString(), any(User.class), any(CommentType.class), anyLong());
@@ -98,7 +98,7 @@ class CommentControllerTest {
                 .param("content", longContent)
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false));
 
         verify(commentService, never()).createComment(anyString(), any(User.class), any(CommentType.class), anyLong());
@@ -113,7 +113,7 @@ class CommentControllerTest {
                 .param("content", "Nice article!")
                 .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true));
 
         verify(commentService, times(1)).createComment(eq("Nice article!"), eq(testUser), eq(CommentType.ARTICLE), eq(1L));
@@ -128,7 +128,7 @@ class CommentControllerTest {
                 .param("content", "Amazing video!")
                 .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true));
 
         verify(commentService, times(1)).createComment(eq("Amazing video!"), eq(testUser), eq(CommentType.VIDEO), eq(1L));

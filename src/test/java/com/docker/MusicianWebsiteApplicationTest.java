@@ -2,12 +2,14 @@ package com.docker;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Test pour l'application principale
  * Améliore la couverture du package com.docker de 33% à >50%
  */
 @SpringBootTest
+@ActiveProfiles("test")
 class MusicianWebsiteApplicationTest {
 
     @Test
