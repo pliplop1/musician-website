@@ -8,6 +8,18 @@ import FeaturedPhotosSection from './components/FeaturedPhotosSection.vue'
 import ConcertsSection from './components/ConcertsSection.vue'
 import CookieConsent from './components/CookieConsent.vue'
 
+// Forcer le vidage du cache au démarrage (pour synchronisation)
+const CACHE_VERSION = 'v2'
+if (localStorage.getItem('cache-version') !== CACHE_VERSION) {
+  localStorage.removeItem('featuredTracks')
+  localStorage.removeItem('featuredVideos')
+  localStorage.removeItem('featuredPhotos')
+  localStorage.removeItem('featuredTracks_timestamp')
+  localStorage.removeItem('featuredVideos_timestamp')
+  localStorage.removeItem('featuredPhotos_timestamp')
+  localStorage.setItem('cache-version', CACHE_VERSION)
+}
+
 // Navigation state
 const isScrolled = ref(false)
 const mobileMenuOpen = ref(false)
