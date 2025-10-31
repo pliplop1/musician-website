@@ -50,6 +50,7 @@ public class PerformanceConfig implements WebMvcConfigurer {
                 throws IOException, ServletException {
 
             HttpServletResponse httpResponse = (HttpServletResponse) response;
+            jakarta.servlet.http.HttpServletRequest httpRequest = (jakarta.servlet.http.HttpServletRequest) request;
 
             // Sécurité
             httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
@@ -57,6 +58,14 @@ public class PerformanceConfig implements WebMvcConfigurer {
             httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
             httpResponse.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
             httpResponse.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+
+            // Désactiver le cache pour les API dynamiques (compteurs, likes, etc.)
+            String requestURI = httpRequest.getRequestURI();
+            if (requestURI.startsWith("/api/")) {
+                httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                httpResponse.setHeader("Pragma", "no-cache");
+                httpResponse.setHeader("Expires", "0");
+            }
 
             // HSTS (HTTPS uniquement en production)
             // httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");

@@ -1,6 +1,7 @@
 // /src/main/java/com/docker/entity/Track.java
 package com.docker.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -80,6 +81,7 @@ public class Track {
     private String externalUrl;
 
     // Relations many-to-many avec les utilisateurs qui ont liké
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
         name = "track_likes",
