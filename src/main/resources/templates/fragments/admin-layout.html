@@ -159,6 +159,7 @@
             </li>
              <li>
                 <form th:action="@{/logout}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 					<button type="submit" class="w-full text-left py-2 px-3 rounded hover:bg-red-800 bg-red-600 mt-2">
 					    🚪 Déconnexion
 					</button>
