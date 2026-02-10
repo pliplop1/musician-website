@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700">
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <text x="600" y="50" font-family="Arial" font-size="28" text-anchor="middle">Sécurité — Config (from SecurityConfig.java)</text>
+
+  <!-- Login flow -->
+  <rect x="100" y="120" width="300" height="80" rx="8" ry="8" fill="#F0FFF4" stroke="#38A169"/>
+  <text x="250" y="155" font-size="16" font-family="Arial" text-anchor="middle">/login (form POST)</text>
+  <text x="250" y="175" font-size="12" font-family="Arial" text-anchor="middle">UsernamePasswordAuthenticationFilter</text>
+
+  <rect x="460" y="120" width="300" height="80" rx="8" ry="8" fill="#EBF8FF" stroke="#3182CE"/>
+  <text x="610" y="155" font-size="16" font-family="Arial" text-anchor="middle">DaoAuthenticationProvider</text>
+  <text x="610" y="175" font-size="12" font-family="Arial" text-anchor="middle">UserDetailsService + BCrypt</text>
+
+  <rect x="820" y="120" width="300" height="80" rx="8" ry="8" fill="#FFF5F5" stroke="#E53E3E"/>
+  <text x="970" y="155" font-size="16" font-family="Arial" text-anchor="middle">Handlers</text>
+  <text x="970" y="175" font-size="12" font-family="Arial" text-anchor="middle">success/failure</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+  </defs>
+  <line x1="400" y1="160" x2="460" y2="160" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="760" y1="160" x2="820" y2="160" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Filters and headers -->
+  <rect x="100" y="250" width="1020" height="150" rx="8" ry="8" fill="#F7FAFC" stroke="#CBD5E0"/>
+  <text x="610" y="275" font-size="16" font-family="Arial" text-anchor="middle">Filtres et en-têtes</text>
+  <text x="610" y="300" font-size="12" font-family="Arial" text-anchor="middle">LoginAttemptFilter (anti-brute-force), CsrfTokenLogger (dev), ContentSecurityPolicyFilter</text>
+  <text x="610" y="325" font-size="12" font-family="Arial" text-anchor="middle">HSTS (prod), Referrer-Policy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN), X-Content-Type-Options, X-XSS-Protection, Permissions-Policy</text>
+
+  <!-- CSRF/CORS/Sessions -->
+  <rect x="100" y="440" width="1020" height="180" rx="8" ry="8" fill="#FFF" stroke="#CBD5E0"/>
+  <text x="610" y="470" font-size="16" font-family="Arial" text-anchor="middle">CSRF / CORS / Sessions</text>
+  <text x="610" y="495" font-size="12" font-family="Arial" text-anchor="middle">CSRF actif; ignoré: /uploaded-*/**, /api/**</text>
+  <text x="610" y="520" font-size="12" font-family="Arial" text-anchor="middle">CORS dev: http://localhost:5173, http://localhost:8106; Allow-Credentials</text>
+  <text x="610" y="545" font-size="12" font-family="Arial" text-anchor="middle">Sessions: IF_REQUIRED, max 1, rotation ID, expiredUrl</text>
+</svg>
+

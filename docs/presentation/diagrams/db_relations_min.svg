@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700">
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <text x="600" y="50" font-family="Arial" font-size="28" text-anchor="middle">Relations BDD (factual d'après docs/IDENTIFIANTS_DEMO.md)</text>
+
+  <!-- users -->
+  <rect x="160" y="150" width="240" height="140" rx="8" ry="8" fill="#EBF8FF" stroke="#3182CE"/>
+  <text x="280" y="180" font-size="18" font-family="Arial" text-anchor="middle">users</text>
+  <text x="280" y="205" font-size="12" font-family="Arial" text-anchor="middle">id (PK), username, password, email, role</text>
+
+  <!-- concerts -->
+  <rect x="780" y="120" width="280" height="120" rx="8" ry="8" fill="#F0FFF4" stroke="#38A169"/>
+  <text x="920" y="150" font-size="18" font-family="Arial" text-anchor="middle">concerts</text>
+  <text x="920" y="175" font-size="12" font-family="Arial" text-anchor="middle">id, title, date, location, description,</text>
+  <text x="920" y="195" font-size="12" font-family="Arial" text-anchor="middle">created_by (FK → users.id)</text>
+
+  <!-- password_reset_tokens -->
+  <rect x="780" y="300" width="280" height="120" rx="8" ry="8" fill="#FFF5F5" stroke="#E53E3E"/>
+  <text x="920" y="330" font-size="18" font-family="Arial" text-anchor="middle">password_reset_tokens</text>
+  <text x="920" y="355" font-size="12" font-family="Arial" text-anchor="middle">token, user_id (FK → users.id),</text>
+  <text x="920" y="375" font-size="12" font-family="Arial" text-anchor="middle">expiry_date</text>
+
+  <!-- photos -->
+  <rect x="780" y="480" width="280" height="120" rx="8" ry="8" fill="#FAF5FF" stroke="#805AD5"/>
+  <text x="920" y="510" font-size="18" font-family="Arial" text-anchor="middle">photos</text>
+  <text x="920" y="535" font-size="12" font-family="Arial" text-anchor="middle">filename, url, category, upload_date</text>
+
+  <!-- arrows -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+  </defs>
+  <line x1="400" y1="200" x2="780" y2="170" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="590" y="160" font-size="12" font-family="Arial" text-anchor="middle">users (1) → (*) concerts</text>
+  <line x1="400" y1="220" x2="780" y2="340" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="590" y="300" font-size="12" font-family="Arial" text-anchor="middle">users (1) → (*) password_reset_tokens</text>
+</svg>
+

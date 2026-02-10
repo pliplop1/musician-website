@@ -1,6 +1,8 @@
 # Backups and local env
 backups/
 .env
+backup-*.sql
+cookies.txt
 
 # Node
 node_modules/
@@ -10,4 +12,23 @@ vue-frontend/dist/
 
 # Java/Maven
 target/
+
+# IDE / Tools
+.claude/
+nul
+vue-frontend/nul
+
+# Curl artifacts (Windows)
+C\357\200\272*
+
+# Temp / Debug files
+*.log
+ci_log*.txt
+ci_content_b64.txt
+galerie_check.html
+vue-frontend/eslint_output*.txt
+vue-frontend/eslint_config.json
+.gitignore.PRO
+NETTOYAGE_RAPIDE_AVANT_ORAL.bat
+TODO_APRES_ORAL.md
 

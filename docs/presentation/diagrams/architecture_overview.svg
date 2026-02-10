@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700">
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <!-- Title -->
+  <text x="600" y="50" font-family="Arial" font-size="28" text-anchor="middle">Architecture 3 Tiers — (Factual from repo)</text>
+
+  <!-- Browser -->
+  <rect x="60" y="120" width="320" height="160" rx="8" ry="8" fill="#E8F4FF" stroke="#2B6CB0"/>
+  <text x="220" y="150" font-family="Arial" font-size="18" text-anchor="middle">Navigateur</text>
+  <text x="220" y="180" font-family="Arial" font-size="14" text-anchor="middle">Vue 3 SPA (vite)</text>
+  <text x="220" y="205" font-family="Arial" font-size="14" text-anchor="middle">+ Pages Thymeleaf (admin)</text>
+
+  <!-- Spring Boot -->
+  <rect x="440" y="110" width="320" height="420" rx="8" ry="8" fill="#F7FAF7" stroke="#2F855A"/>
+  <text x="600" y="140" font-family="Arial" font-size="18" text-anchor="middle">Spring Boot 3.2 (Java 17)</text>
+  <text x="600" y="165" font-family="Arial" font-size="14" text-anchor="middle">Web, Security, Data JPA, Validation, Mail</text>
+  <!-- Layers inside Spring -->
+  <rect x="470" y="190" width="260" height="70" rx="6" ry="6" fill="#FFF" stroke="#999"/>
+  <text x="600" y="215" font-family="Arial" font-size="14" text-anchor="middle">Controllers (REST + Thymeleaf)</text>
+  <rect x="470" y="270" width="260" height="70" rx="6" ry="6" fill="#FFF" stroke="#999"/>
+  <text x="600" y="295" font-family="Arial" font-size="14" text-anchor="middle">Services (métier)</text>
+  <rect x="470" y="350" width="260" height="70" rx="6" ry="6" fill="#FFF" stroke="#999"/>
+  <text x="600" y="375" font-family="Arial" font-size="14" text-anchor="middle">Repositories (Spring Data JPA)</text>
+  <rect x="470" y="430" width="260" height="70" rx="6" ry="6" fill="#FFF" stroke="#999"/>
+  <text x="600" y="455" font-family="Arial" font-size="14" text-anchor="middle">SecurityConfig, Filters, Actuator</text>
+
+  <!-- MariaDB -->
+  <rect x="820" y="120" width="320" height="160" rx="8" ry="8" fill="#FFF5F5" stroke="#C53030"/>
+  <text x="980" y="150" font-family="Arial" font-size="18" text-anchor="middle">MariaDB 10.11</text>
+  <text x="980" y="180" font-family="Arial" font-size="14" text-anchor="middle">Flyway migrations (baseline)</text>
+
+  <!-- Arrows -->
+  <line x1="380" y1="200" x2="440" y2="200" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="410" y="190" font-family="Arial" font-size="12" text-anchor="middle">HTTP(S)</text>
+  <line x1="760" y1="385" x2="820" y2="385" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="790" y="375" font-family="Arial" font-size="12" text-anchor="middle">JDBC</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+  </defs>
+</svg>
+

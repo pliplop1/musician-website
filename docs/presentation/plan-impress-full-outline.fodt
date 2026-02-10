@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                 xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+                 xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+                 office:version="1.2"
+                 office:mimetype="application/vnd.oasis.opendocument.text">
+  <office:automatic-styles/>
+  <office:body>
+    <office:text>
+      <text:h text:outline-level="1">1. Titre &amp; Pitch</text:h>
+      <text:h text:outline-level="2">Duo Black &amp; White — Site Web Officiel</text:h>
+      <text:h text:outline-level="2">Spring Boot 3.2 (Java 17) + Vue 3</text:h>
+      <text:h text:outline-level="2">Docker, CI/CD, proxy HTTPS</text:h>
+
+      <text:h text:outline-level="1">2. Vue d'ensemble (README)</text:h>
+      <text:h text:outline-level="2">Site vitrine + admin: biographie, repertoire, galerie, evenements, contact</text:h>
+      <text:h text:outline-level="2">API REST publique pour SPA Vue, admin Thymeleaf, emails, commentaires</text:h>
+      <text:h text:outline-level="2">Responsive, animations, validations</text:h>
+
+      <text:h text:outline-level="1">3. Stack technique (README)</text:h>
+      <text:h text:outline-level="2">Backend: Spring Boot (Web, Data JPA, Security, Validation, Mail)</text:h>
+      <text:h text:outline-level="2">Frontend: Vue 3, Vite, Tailwind CSS, Axios</text:h>
+      <text:h text:outline-level="2">BDD: MariaDB; Outils: Maven, frontend-maven-plugin</text:h>
+
+      <text:h text:outline-level="1">4. Fonctionnalites — Public (README)</text:h>
+      <text:h text:outline-level="2">Accueil, Biographie (Markdown), Galerie responsive</text:h>
+      <text:h text:outline-level="2">Repertoire musical (integration Spotify), Videos</text:h>
+      <text:h text:outline-level="2">Agenda evenements, Formulaire de contact</text:h>
+
+      <text:h text:outline-level="1">5. Fonctionnalites — Administration (README)</text:h>
+      <text:h text:outline-level="2">Dashboard, gestion biographie et concerts</text:h>
+      <text:h text:outline-level="2">Gestion photos (upload, drag-and-drop), musiques, liens sociaux</text:h>
+      <text:h text:outline-level="2">Moderation commentaires, messages, recherche/tri</text:h>
+
+      <text:h text:outline-level="1">6. Architecture 3 tiers (docs/ARCHITECTURE_DIAGRAMS.md)</text:h>
+      <text:h text:outline-level="2">Navigateur (Vue SPA + Thymeleaf admin) -&gt; Spring Boot -&gt; MariaDB</text:h>
+      <text:h text:outline-level="2">REST API pour SPA; templates pour admin</text:h>
+      <text:h text:outline-level="2">Services metier, Repositories JPA</text:h>
+
+      <text:h text:outline-level="1">7. Securite — Apercu (SecurityConfig.java)</text:h>
+      <text:h text:outline-level="2">Auth formulaire, roles ADMIN/USER</text:h>
+      <text:h text:outline-level="2">Routes admin: /admin/** ; user: /user/**</text:h>
+      <text:h text:outline-level="2">Public: pages, assets, /api/**, Swagger, health/info</text:h>
+
+      <text:h text:outline-level="1">8. Securite — Headers (SecurityConfig.java)</text:h>
+      <text:h text:outline-level="2">HSTS (prod), Referrer-Policy STRICT_ORIGIN_WHEN_CROSS_ORIGIN</text:h>
+      <text:h text:outline-level="2">X-Content-Type-Options, X-XSS-Protection (compat)</text:h>
+      <text:h text:outline-level="2">Permissions-Policy; Filtre CSP dedie</text:h>
+
+      <text:h text:outline-level="1">9. Securite — CSRF &amp; Sessions</text:h>
+      <text:h text:outline-level="2">CSRF actif; ignore: /uploaded-*/**, /api/**</text:h>
+      <text:h text:outline-level="2">Sessions: IF_REQUIRED; 1 session max; rotation ID; expiredUrl</text:h>
+      <text:h text:outline-level="2">Filtre anti brute force avant UsernamePasswordAuthenticationFilter</text:h>
+
+      <text:h text:outline-level="1">10. CORS (dev/prod)</text:h>
+      <text:h text:outline-level="2">Dev: origins http://localhost:5173 et http://localhost:8106</text:h>
+      <text:h text:outline-level="2">Prod: origines via propriete CORS_ALLOWED_ORIGINS</text:h>
+      <text:h text:outline-level="2">Allow-Credentials true; methods GET/POST/PUT/DELETE/OPTIONS</text:h>
+
+      <text:h text:outline-level="1">11. API publique (docs/IDENTIFIANTS_DEMO.md)</text:h>
+      <text:h text:outline-level="2">/api/public/concerts/upcoming ; /past</text:h>
+      <text:h text:outline-level="2">/api/public/photos ; /tracks ; /videos</text:h>
+      <text:h text:outline-level="2">App: http://localhost:8080/</text:h>
+
+      <text:h text:outline-level="1">12. Admin &amp; BDD (docs/IDENTIFIANTS_DEMO.md)</text:h>
+      <text:h text:outline-level="2">Adminer: http://localhost:8081/ (server: database)</text:h>
+      <text:h text:outline-level="2">Tables: users, concerts, photos, tracks, contact_messages</text:h>
+      <text:h text:outline-level="2">password_reset_tokens, comments</text:h>
+
+      <text:h text:outline-level="1">13. Docker — Services (docker-compose.yml)</text:h>
+      <text:h text:outline-level="2">database: mariadb:10.11 (3306), volume db-data</text:h>
+      <text:h text:outline-level="2">app: build Dockerfile (8080), volumes uploads/logs</text:h>
+      <text:h text:outline-level="2">adminer: 8081, serveur par defaut: database</text:h>
+
+      <text:h text:outline-level="1">14. Docker — Multi-stage (Dockerfile)</text:h>
+      <text:h text:outline-level="2">Stage 1: Node 22 (Tailwind CSS + Vite)</text:h>
+      <text:h text:outline-level="2">Stage 2: Maven Temurin 17 (package jar)</text:h>
+      <text:h text:outline-level="2">Stage 3: Temurin 17 JRE, user non-root, healthcheck</text:h>
+
+      <text:h text:outline-level="1">15. Deploiement (DEPLOYMENT.md)</text:h>
+      <text:h text:outline-level="2">CI: lint, tests, build &amp; push GHCR, deploy SSH</text:h>
+      <text:h text:outline-level="2">VM: compose -f deploy/docker-compose.prod.yml up -d</text:h>
+      <text:h text:outline-level="2">Proxy Caddy: TLS auto, headers securite, cache</text:h>
+
+      <text:h text:outline-level="1">16. Monitoring (Actuator)</text:h>
+      <text:h text:outline-level="2">Endpoints: /actuator/health, /info, /metrics, /prometheus</text:h>
+      <text:h text:outline-level="2">Logs: fichier et console; patterns et rotation</text:h>
+      <text:h text:outline-level="2">Info app: name, description, version</text:h>
+
+      <text:h text:outline-level="1">17. Performance (properties)</text:h>
+      <text:h text:outline-level="2">Compression GZIP, HTTP/2, encodage UTF-8</text:h>
+      <text:h text:outline-level="2">Cache ressources: max-age, content hashing (prod)</text:h>
+      <text:h text:outline-level="2">Thymeleaf cache: true en prod</text:h>
+
+      <text:h text:outline-level="1">18. Build Frontend (pom.xml)</text:h>
+      <text:h text:outline-level="2">npm install/build (vue-frontend) via frontend-maven-plugin</text:h>
+      <text:h text:outline-level="2">Copie vers static/vue (maven-resources-plugin)</text:h>
+      <text:h text:outline-level="2">Tailwind CSS vers static/css/style.css</text:h>
+
+      <text:h text:outline-level="1">19. Tests (repo)</text:h>
+      <text:h text:outline-level="2">Java: tests controllers/repositories, JaCoCo</text:h>
+      <text:h text:outline-level="2">Vue: Vitest, @vue/test-utils, axe-core</text:h>
+      <text:h text:outline-level="2">E2E: Playwright</text:h>
+
+      <text:h text:outline-level="1">20. RGPD / RGAA (docs)</text:h>
+      <text:h text:outline-level="2">Politiques: privacy, mentions legales, cookies</text:h>
+      <text:h text:outline-level="2">Export/suppression donnees (services)</text:h>
+      <text:h text:outline-level="2">Docs de conformite et checklist</text:h>
+
+      <text:h text:outline-level="1">21. Donnees uploads (prod)</text:h>
+      <text:h text:outline-level="2">Chemins: photos, music, videos, avatars (env)</text:h>
+      <text:h text:outline-level="2">Tailles max requete/fichier</text:h>
+      <text:h text:outline-level="2">Volumes Docker pour persistance</text:h>
+
+      <text:h text:outline-level="1">22. Endpoints publics (SecurityConfig.java)</text:h>
+      <text:h text:outline-level="2">Pages: /, /biographie, /galerie, /musique, /videos, /actualites, /contact</text:h>
+      <text:h text:outline-level="2">Static: /css/**, /js/**, /images/**, /vue/**, /uploaded-*/**</text:h>
+      <text:h text:outline-level="2">Swagger UI et v3 docs (prod: configurable)</text:h>
+
+      <text:h text:outline-level="1">23. Config BDD (properties)</text:h>
+      <text:h text:outline-level="2">URL MariaDB via env; driver mariadb-java-client</text:h>
+      <text:h text:outline-level="2">JPA: ddl-auto=update (prod), show-sql off, batch</text:h>
+      <text:h text:outline-level="2">open-in-view=false (prod)</text:h>
+
+      <text:h text:outline-level="1">24. Email (properties)</text:h>
+      <text:h text:outline-level="2">SMTP: host, port, username, password</text:h>
+      <text:h text:outline-level="2">STARTTLS requis, timeouts definis</text:h>
+      <text:h text:outline-level="2">Expediteur/admin via env</text:h>
+
+      <text:h text:outline-level="1">25. Scripts &amp; sauvegardes</text:h>
+      <text:h text:outline-level="2">backup-db.sh, restore-db.sh</text:h>
+      <text:h text:outline-level="2">backup-uploads.sh, restore-uploads.sh</text:h>
+      <text:h text:outline-level="2">Planification et retention recommandees</text:h>
+
+      <text:h text:outline-level="1">26. Demo — URLs</text:h>
+      <text:h text:outline-level="2">App: http://localhost:8080/ ; Admin: /login, /admin</text:h>
+      <text:h text:outline-level="2">API: /api/public/concerts/photos/tracks/videos</text:h>
+      <text:h text:outline-level="2">Adminer: http://localhost:8081/</text:h>
+
+      <text:h text:outline-level="1">27. Demo — Conseils</text:h>
+      <text:h text:outline-level="2">docker compose ps ; logs -f app</text:h>
+      <text:h text:outline-level="2">Recharger si cache, restart app si besoin</text:h>
+      <text:h text:outline-level="2">Messages clefs (HA, backups)</text:h>
+
+      <text:h text:outline-level="1">28. Deploiement — Variables</text:h>
+      <text:h text:outline-level="2">SPRING_PROFILES_ACTIVE=prod ; DB URL/USER/PASSWORD</text:h>
+      <text:h text:outline-level="2">MAIL_* ; MAIL_FROM ; ADMIN_EMAIL ; JAVA_OPTS</text:h>
+      <text:h text:outline-level="2">Volumes app-uploads, app-logs; caddy-data/config</text:h>
+
+      <text:h text:outline-level="1">29. Qualite du code</text:h>
+      <text:h text:outline-level="2">Checkstyle (config/checkstyle/checkstyle.xml)</text:h>
+      <text:h text:outline-level="2">Organisation controller/service/repository</text:h>
+      <text:h text:outline-level="2">Tests unitaires/integration presents</text:h>
+
+      <text:h text:outline-level="1">30. Conclusion</text:h>
+      <text:h text:outline-level="2">Projet operationnel, documente et conteneurise</text:h>
+      <text:h text:outline-level="2">Fonctionnalites metier + pratiques industrielles</text:h>
+      <text:h text:outline-level="2">Questions</text:h>
+
+    </office:text>
+  </office:body>
+</office:document>
+
