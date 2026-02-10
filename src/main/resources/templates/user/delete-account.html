@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supprimer mon compte - Duo Black &amp; White</title>
+<meta name="description" content="Suppression de compte - Duo Black &amp; White">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preload" as="style" th:href="@{/css/style.css(v=${#dates.createNow().time})}" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().time})}"></noscript>
+<style>
+body {
+	background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+	min-height: 100vh;
+	color: #fff;
+	position: relative;
+	overflow-x: hidden;
+}
+
+.delete-wrapper {
+	min-height: calc(100vh - 140px);
+	padding: 2rem 1rem;
+	position: relative;
+	z-index: 1;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+}
+
+.white-card {
+	background: rgba(255, 255, 255, 0.97);
+	border-radius: 15px;
+	padding: 2rem 1.5rem;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+	color: #1f2937;
+	width: 100%;
+	max-width: 600px;
+}
+
+@media (min-width: 640px) {
+	.white-card { padding: 2.5rem 2rem; }
+}
+
+@media (min-width: 768px) {
+	.white-card { padding: 3rem 2.5rem; }
+}
+
+.alert-success {
+	background: rgba(16, 185, 129, 0.1);
+	border-left: 4px solid #10b981;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1.5rem;
+	color: #10b981;
+}
+
+.alert-error {
+	background: rgba(239, 68, 68, 0.1);
+	border-left: 4px solid #ef4444;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1.5rem;
+	color: #ef4444;
+}
+
+.warning-box {
+	background: rgba(239, 68, 68, 0.08);
+	border: 2px solid #ef4444;
+	border-radius: 12px;
+	padding: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.warning-title {
+	font-size: 1.25rem;
+	font-weight: bold;
+	color: #dc2626;
+	margin: 0 0 0.75rem 0;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.data-list {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1rem 0;
+}
+
+.data-list li {
+	padding: 0.4rem 0;
+	color: #374151;
+	font-size: 0.95rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.data-list li::before {
+	content: '';
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	background: #ef4444;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.form-group {
+	margin-bottom: 1.5rem;
+}
+
+.form-label {
+	display: block;
+	font-weight: 600;
+	color: #374151;
+	margin-bottom: 0.5rem;
+	font-size: 0.95rem;
+}
+
+.form-input {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	border: 2px solid #d1d5db;
+	border-radius: 8px;
+	font-size: 1rem;
+	transition: border-color 0.2s;
+	box-sizing: border-box;
+	color: #1f2937;
+	background: #fff;
+}
+
+.form-input:focus {
+	outline: none;
+	border-color: #ef4444;
+	box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.form-hint {
+	font-size: 0.8rem;
+	color: #6b7280;
+	margin-top: 0.35rem;
+}
+
+.btn-danger {
+	background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+	color: #fff;
+	padding: 0.875rem 1.5rem;
+	border-radius: 8px;
+	font-weight: 700;
+	font-size: 1rem;
+	border: none;
+	cursor: pointer;
+	width: 100%;
+	transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+	background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:focus-visible {
+	outline: 3px solid #ef4444;
+	outline-offset: 2px;
+}
+
+.btn-cancel {
+	background: rgba(107, 114, 128, 0.9);
+	color: #fff;
+	padding: 0.75rem 1.5rem;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: 600;
+	display: block;
+	text-align: center;
+	width: 100%;
+	transition: all 0.3s ease;
+	box-sizing: border-box;
+	font-size: 0.95rem;
+}
+
+.btn-cancel:hover {
+	background: rgba(75, 85, 99, 1);
+	transform: translateY(-2px);
+}
+
+.btn-cancel:focus-visible {
+	outline: 3px solid #4a90e2;
+	outline-offset: 2px;
+}
+
+.export-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	color: #4a90e2;
+	text-decoration: underline;
+	font-weight: 600;
+	font-size: 0.9rem;
+	transition: color 0.2s;
+}
+
+.export-link:hover {
+	color: #2563eb;
+}
+
+.export-link:focus-visible {
+	outline: 3px solid #4a90e2;
+	outline-offset: 2px;
+}
+
+.rgpd-note {
+	background: #f9fafb;
+	border-radius: 8px;
+	padding: 1rem;
+	margin-bottom: 1.5rem;
+	font-size: 0.85rem;
+	color: #6b7280;
+	line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="delete-wrapper" id="main-content">
+	<div class="white-card" role="region" aria-labelledby="delete-heading">
+
+		<h1 id="delete-heading" style="font-size:1.5rem;font-weight:bold;color:#dc2626;margin:0 0 1.5rem 0;text-align:center;">
+			Supprimer mon compte
+		</h1>
+
+		<!-- Messages flash -->
+		<div th:if="${successMessage}" class="alert-success" role="alert">
+			<p style="margin:0;" th:text="${successMessage}"></p>
+		</div>
+		<div th:if="${errorMessage}" class="alert-error" role="alert">
+			<p style="margin:0;" th:text="${errorMessage}"></p>
+		</div>
+
+		<!-- Warning -->
+		<div class="warning-box" role="alert" aria-labelledby="warning-title">
+			<p id="warning-title" class="warning-title">
+				<span aria-hidden="true">&#9888;</span>
+				Attention, cette action est irréversible
+			</p>
+			<p style="color:#374151;margin:0 0 1rem 0;font-size:0.95rem;line-height:1.5;">
+				La suppression de votre compte entraînera l'effacement définitif de toutes vos données personnelles,
+				conformément à l'article 17 du RGPD (droit à l'effacement).
+			</p>
+			<p style="color:#374151;font-weight:600;margin:0 0 0.5rem 0;font-size:0.95rem;">
+				Les données suivantes seront supprimées :
+			</p>
+			<ul class="data-list">
+				<li>Votre profil (nom, email, biographie)</li>
+				<li>Votre photo de profil</li>
+				<li>Vos concerts favoris</li>
+				<li>Vos likes (morceaux, vidéos, photos)</li>
+				<li>Vos commentaires</li>
+				<li>Vos badges débloqués</li>
+				<li>Votre historique de connexion</li>
+			</ul>
+		</div>
+
+		<!-- Lien export avant suppression -->
+		<div style="margin-bottom:1.5rem;text-align:center;">
+			<a th:href="@{/user/export-data}" class="export-link" download
+			   aria-label="Télécharger mes données personnelles avant suppression">
+				<span aria-hidden="true">&#128229;</span> Exporter mes données avant suppression
+			</a>
+		</div>
+
+		<!-- Note RGPD -->
+		<div class="rgpd-note">
+			<strong>RGPD - Article 17 :</strong> Vous avez le droit d'obtenir l'effacement de vos données à caractère personnel.
+			Une fois supprimées, vos données ne pourront pas être récupérées.
+			Pour toute question, contactez-nous à
+			<a href="mailto:privacy@duoblackandwhite.fr" style="color:#4a90e2;">privacy@duoblackandwhite.fr</a>.
+		</div>
+
+		<!-- Formulaire de confirmation -->
+		<form th:action="@{/user/delete-account}" method="post" id="deleteAccountForm">
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+			<div class="form-group">
+				<label for="confirmPassword" class="form-label">
+					Confirmez votre mot de passe pour continuer
+				</label>
+				<input type="password" id="confirmPassword" name="confirmPassword"
+				       class="form-input" required
+				       aria-label="Mot de passe de confirmation"
+				       aria-describedby="password-hint"
+				       autocomplete="current-password"
+				       placeholder="Votre mot de passe actuel">
+				<p id="password-hint" class="form-hint">
+					Entrez votre mot de passe actuel pour confirmer la suppression.
+				</p>
+			</div>
+
+			<div style="display:flex;flex-direction:column;gap:0.75rem;">
+				<button type="submit" class="btn-danger"
+				        onclick="return confirm('Dernière confirmation : voulez-vous vraiment supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.')">
+					Supprimer définitivement mon compte
+				</button>
+				<a th:href="@{/user/profile}" class="btn-cancel">
+					Annuler et retourner au profil
+				</a>
+			</div>
+		</form>
+
+	</div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+</html>

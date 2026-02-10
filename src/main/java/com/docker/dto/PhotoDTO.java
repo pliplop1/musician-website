@@ -10,8 +10,13 @@ public class PhotoDTO {
     private String caption;
     private String category;
     private Integer displayOrder;
-    private int likeCount; // Nombre de likes
-    private int viewCount; // Nombre de vues
+    private int likeCount;
+    private int viewCount;
+    private String title;
+    private String description;
+    private String tags;
+    private String photographer;
+    private String location;
 
     public PhotoDTO() {
     }
@@ -111,5 +116,45 @@ public class PhotoDTO {
 
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public String getPhotographer() {
+        return photographer;
+    }
+
+    public void setPhotographer(String photographer) {
+        this.photographer = photographer;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

@@ -89,30 +89,33 @@ const closeUserDropdown = (event) => {
   }
 }
 
-// Handle logout
+// Handle logout - utilise le formulaire standard Spring Security pour éviter les problèmes de session
 const handleLogout = async () => {
   try {
-    const response = await fetch('/api/user/logout', {
-      method: 'POST',
-      credentials: 'include' // Important pour envoyer les cookies de session
+    // Récupérer le token CSRF depuis l'API
+    const csrfResponse = await fetch('/api/public/csrf', {
+      credentials: 'include'
     })
+    const csrfData = await csrfResponse.json()
 
-    if (response.ok) {
-      // Mettre à jour l'état local immédiatement
-      currentUser.value = null
+    // Créer un formulaire invisible avec le token CSRF et le soumettre
+    const form = document.createElement('form')
+    form.method = 'POST'
+    form.action = '/logout'
+    form.style.display = 'none'
 
-      // Recharger la page pour réinitialiser l'état de l'application
-      // La SPA détectera automatiquement que l'utilisateur n'est plus connecté
-      window.location.reload()
-    } else {
-      console.error('Erreur lors de la déconnexion:', response.status)
-      // En cas d'erreur, recharger quand même la page
-      window.location.reload()
-    }
+    const csrfInput = document.createElement('input')
+    csrfInput.type = 'hidden'
+    csrfInput.name = csrfData.parameterName || '_csrf'
+    csrfInput.value = csrfData.token
+    form.appendChild(csrfInput)
+
+    document.body.appendChild(form)
+    form.submit()
   } catch (error) {
     console.error('Erreur lors de la déconnexion:', error)
-    // En cas d'erreur, recharger quand même la page
-    window.location.reload()
+    // Fallback: rediriger vers /logout directement
+    window.location.href = '/logout'
   }
 }
 

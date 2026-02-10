@@ -89,6 +89,8 @@ public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, Long
      */
     void deleteByUsernameAndSuccessFalse(String username);
 
+    void deleteByUsername(String username);
+
     // ========================================
     // MÉTHODES POUR LE DASHBOARD ADMIN
     // ========================================

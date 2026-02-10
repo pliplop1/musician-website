@@ -33,15 +33,36 @@ public class AdminPhotoController {
     }
 
     @PostMapping("/photos/upload")
-    public String uploadPhoto(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+    public String uploadPhoto(@RequestParam("file") MultipartFile file,
+                              @RequestParam(value = "title", required = false) String title,
+                              @RequestParam(value = "description", required = false) String description,
+                              @RequestParam(value = "tags", required = false) String tags,
+                              @RequestParam(value = "category", required = false) String category,
+                              RedirectAttributes redirectAttributes) {
         try {
-            photoService.savePhoto(file);
+            photoService.savePhoto(file, title, description, tags, category);
             redirectAttributes.addFlashAttribute("successMessage", "Photo ajoutée avec succès !");
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Erreur lors de l'envoi de la photo : " + e.getMessage());
         }
-        return "redirect:/admin/photos"; 
+        return "redirect:/admin/photos";
+    }
+
+    @PostMapping("/photos/edit/{id}")
+    public String editPhoto(@PathVariable Long id,
+                            @RequestParam(value = "title", required = false) String title,
+                            @RequestParam(value = "description", required = false) String description,
+                            @RequestParam(value = "tags", required = false) String tags,
+                            @RequestParam(value = "category", required = false) String category,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            photoService.updatePhotoMetadata(id, title, description, tags, category);
+            redirectAttributes.addFlashAttribute("successMessage", "Photo mise à jour avec succès !");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur : " + e.getMessage());
+        }
+        return "redirect:/admin/photos";
     }
 
     @PostMapping("/photos/delete/{id}")

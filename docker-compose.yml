@@ -50,7 +50,7 @@ services:
         condition: service_healthy
     environment:
       # Spring profiles
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
 
       # Database configuration
       DATABASE_URL: jdbc:mariadb://database:3306/${DB_NAME:-musician_db}?useSSL=false&allowPublicKeyRetrieval=true

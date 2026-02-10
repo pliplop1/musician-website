@@ -434,6 +434,32 @@ body {
 			</div>
 		</section>
 
+		<!-- Données personnelles (RGPD) -->
+		<section style="margin-bottom:2rem;" role="region" aria-labelledby="rgpd-heading">
+			<h2 id="rgpd-heading" style="font-size:1.5rem;font-weight:600;margin-bottom:1rem;color:#fff;">
+				<span aria-hidden="true">🔒</span> Mes données personnelles
+			</h2>
+			<div class="white-card" style="padding:1.5rem;">
+				<p style="color:#374151;margin:0 0 1rem 0;font-size:0.95rem;line-height:1.6;">
+					Conformément au RGPD (Règlement Général sur la Protection des Données), vous pouvez à tout moment
+					exporter l'ensemble de vos données personnelles ou supprimer définitivement votre compte.
+				</p>
+				<div style="display:flex;flex-direction:column;gap:0.75rem;align-items:stretch;max-width:400px;">
+					<a th:href="@{/user/export-data}" class="btn-primary"
+					   style="font-size:0.875rem;text-align:center;"
+					   aria-label="Télécharger mes données personnelles au format JSON"
+					   download>
+						<span aria-hidden="true">📥</span> Exporter mes données (JSON)
+					</a>
+					<a th:href="@{/user/delete-account}"
+					   style="background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);color:#fff;padding:0.75rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;transition:all 0.3s ease;text-align:center;font-size:0.875rem;"
+					   aria-label="Supprimer définitivement mon compte et toutes mes données">
+						<span aria-hidden="true">🗑️</span> Supprimer mon compte
+					</a>
+				</div>
+			</div>
+		</section>
+
 		<!-- Concerts Favoris -->
 		<section>
 			<h2 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem;color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { API_BASE_URL } from '../config/api.js'
 
 const concerts = ref([])
@@ -7,7 +7,7 @@ const loading = ref(true)
 
 const fetchConcerts = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/public/concerts/upcoming`)
+    const response = await fetch(`${API_BASE_URL}/api/public/concerts`)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -19,7 +19,18 @@ const fetchConcerts = async () => {
   }
 }
 
-// L'affichage de la date est géré directement dans le template pour éviter du code inutilisé
+const today = new Date()
+today.setHours(0, 0, 0, 0)
+
+const upcomingConcerts = computed(() =>
+  concerts.value.filter(c => new Date(c.date) >= today)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+)
+
+const pastConcerts = computed(() =>
+  concerts.value.filter(c => new Date(c.date) < today)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+)
 
 onMounted(() => {
   fetchConcerts()
@@ -29,35 +40,59 @@ onMounted(() => {
 <template>
   <section class="concerts-section" aria-labelledby="concerts-heading">
     <div class="container">
-      <h2 id="concerts-heading" class="section-title">Prochains Concerts</h2>
+      <h2 id="concerts-heading" class="section-title">Concerts</h2>
 
       <div v-if="loading" class="loading" role="status" aria-live="polite">Chargement des concerts...</div>
 
       <div v-else-if="concerts.length === 0" class="no-concerts" role="status">
-        <p>Aucun concert prévu pour le moment. Revenez bientôt!</p>
+        <p>Aucun concert pour le moment. Revenez bientôt !</p>
       </div>
 
-      <div v-else class="concerts-list">
-        <article v-for="concert in concerts" :key="concert.id" class="concert-card">
-          <div class="concert-date" aria-label="Date du concert">
-            <div class="date-day" aria-label="Jour">{{ new Date(concert.date).getDate() }}</div>
-            <div class="date-month" aria-label="Mois">{{ new Date(concert.date).toLocaleDateString('fr-FR', { month: 'short' }) }}</div>
+      <template v-else>
+        <!-- Concerts à venir -->
+        <div v-if="upcomingConcerts.length > 0" class="concerts-group" role="region" aria-labelledby="upcoming-heading">
+          <h3 id="upcoming-heading" class="group-title upcoming-label">Prochains concerts</h3>
+          <div class="concerts-list">
+            <article v-for="concert in upcomingConcerts" :key="concert.id" class="concert-card upcoming">
+              <div class="concert-date" aria-label="Date du concert">
+                <div class="date-day">{{ new Date(concert.date).getDate() }}</div>
+                <div class="date-month">{{ new Date(concert.date).toLocaleDateString('fr-FR', { month: 'short' }) }}</div>
+                <div class="date-year">{{ new Date(concert.date).getFullYear() }}</div>
+              </div>
+              <div class="concert-info">
+                <h4>{{ concert.location }}</h4>
+                <p class="description">{{ concert.description }}</p>
+                <p v-if="concert.daysUntil !== null && concert.daysUntil >= 0" class="countdown">
+                  Dans {{ concert.daysUntil }} jour{{ concert.daysUntil > 1 ? 's' : '' }}
+                </p>
+              </div>
+              <div class="concert-action">
+                <a v-if="concert.ticketUrl" :href="concert.ticketUrl" target="_blank" rel="noopener noreferrer" class="btn-ticket" :aria-label="`Acheter des billets pour le concert à ${concert.location} (ouvre dans un nouvel onglet)`">
+                  Billets
+                </a>
+              </div>
+            </article>
           </div>
-          <div class="concert-info">
-            <h3>{{ concert.location }}</h3>
-            <p class="venue">{{ concert.venue }}</p>
-            <p class="description">{{ concert.description }}</p>
-            <p v-if="concert.daysUntil !== null" class="countdown">
-              Dans {{ concert.daysUntil }} jour{{ concert.daysUntil > 1 ? 's' : '' }}
-            </p>
+        </div>
+
+        <!-- Concerts passés -->
+        <div v-if="pastConcerts.length > 0" class="concerts-group" role="region" aria-labelledby="past-heading">
+          <h3 id="past-heading" class="group-title past-label">Concerts passés</h3>
+          <div class="concerts-list">
+            <article v-for="concert in pastConcerts" :key="concert.id" class="concert-card past">
+              <div class="concert-date" aria-label="Date du concert">
+                <div class="date-day">{{ new Date(concert.date).getDate() }}</div>
+                <div class="date-month">{{ new Date(concert.date).toLocaleDateString('fr-FR', { month: 'short' }) }}</div>
+                <div class="date-year">{{ new Date(concert.date).getFullYear() }}</div>
+              </div>
+              <div class="concert-info">
+                <h4>{{ concert.location }}</h4>
+                <p class="description">{{ concert.description }}</p>
+              </div>
+            </article>
           </div>
-          <div class="concert-action">
-            <a v-if="concert.ticketUrl" :href="concert.ticketUrl" target="_blank" rel="noopener noreferrer" class="btn-ticket" :aria-label="`Acheter des billets pour le concert à ${concert.location} (ouvre dans un nouvel onglet)`">
-              Billets
-            </a>
-          </div>
-        </article>
-      </div>
+        </div>
+      </template>
     </div>
   </section>
 </template>
@@ -88,10 +123,31 @@ onMounted(() => {
   padding: 3rem;
 }
 
+.concerts-group {
+  margin-bottom: 3rem;
+}
+
+.group-title {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #333;
+}
+
+.upcoming-label {
+  color: #1db954;
+}
+
+.past-label {
+  color: #888;
+}
+
 .concerts-list {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .concert-card {
@@ -104,9 +160,17 @@ onMounted(() => {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.concert-card:hover {
+.concert-card.upcoming:hover {
   transform: translateX(10px);
   box-shadow: 0 8px 30px rgba(74, 144, 226, 0.3);
+}
+
+.concert-card.past {
+  opacity: 0.7;
+}
+
+.concert-card.past:hover {
+  opacity: 1;
 }
 
 .concert-date {
@@ -121,24 +185,28 @@ onMounted(() => {
   line-height: 1;
 }
 
+.past .date-day {
+  color: #666;
+}
+
 .date-month {
   font-size: 1.2rem;
   text-transform: uppercase;
   color: #888;
 }
 
+.date-year {
+  font-size: 0.9rem;
+  color: #666;
+}
+
 .concert-info {
   flex: 1;
 }
 
-.concert-info h3 {
+.concert-info h4 {
   font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-}
-
-.venue {
-  color: #4a90e2;
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
 }
 
 .description {

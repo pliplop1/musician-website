@@ -180,6 +180,30 @@ public class PublicApiController {
     }
 
     /**
+     * Tous les concerts (à venir + passés)
+     */
+    @Operation(
+        summary = "Récupérer tous les concerts",
+        description = "Retourne tous les concerts triés par date croissante"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Liste de tous les concerts récupérée avec succès",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConcertDTO.class)))
+    })
+    @GetMapping("/concerts")
+    public ResponseEntity<List<ConcertDTO>> getAllConcerts() {
+        List<Concert> concerts = concertService.findAllConcerts().stream()
+            .sorted((c1, c2) -> c1.getDate().compareTo(c2.getDate()))
+            .collect(Collectors.toList());
+
+        List<ConcertDTO> concertDTOs = concerts.stream()
+            .map(this::mapToConcertDTO)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(concertDTOs);
+    }
+
+    /**
      * Prochains concerts (à venir uniquement)
      */
     @Operation(
@@ -669,16 +693,22 @@ public class PublicApiController {
      * @return PhotoDTO avec les URLs correctement construites
      */
     private PhotoDTO mapToPhotoDTO(Photo photo) {
-        return new PhotoDTO(
+        PhotoDTO dto = new PhotoDTO(
             photo.getId(),
             "/uploaded-photos/" + photo.getFilename(),
-            "/uploaded-photos/" + photo.getFilename(), // thumbnail = same for now
-            null, // caption
-            "concert", // category par défaut
+            "/uploaded-photos/" + photo.getFilename(),
+            photo.getDescription(),
+            photo.getCategory(),
             photo.getDisplayOrder(),
             photo.getLikeCount() != null ? photo.getLikeCount() : 0,
             photo.getViewCount() != null ? photo.getViewCount().intValue() : 0
         );
+        dto.setTitle(photo.getTitle());
+        dto.setDescription(photo.getDescription());
+        dto.setTags(photo.getTags());
+        dto.setPhotographer(photo.getPhotographer());
+        dto.setLocation(photo.getLocation());
+        return dto;
     }
 
     /**

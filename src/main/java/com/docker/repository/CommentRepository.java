@@ -35,4 +35,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Compter les commentaires en attente d'approbation
     long countByApprovedFalse();
+
+    void deleteByUserId(Long userId);
 }

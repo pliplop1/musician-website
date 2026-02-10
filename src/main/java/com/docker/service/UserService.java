@@ -3,9 +3,15 @@ package com.docker.service;
 import com.docker.entity.Concert;
 import com.docker.entity.Role;
 import com.docker.entity.User;
+import com.docker.repository.CommentRepository;
 import com.docker.repository.ConcertRepository;
+import com.docker.repository.LoginAttemptRepository;
+import com.docker.repository.PasswordResetTokenRepository;
+import com.docker.repository.PhotoRepository;
 import com.docker.repository.RoleRepository;
+import com.docker.repository.TrackRepository;
 import com.docker.repository.UserRepository;
+import com.docker.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,15 +42,33 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ConcertRepository concertRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final CommentRepository commentRepository;
+    private final LoginAttemptRepository loginAttemptRepository;
+    private final TrackRepository trackRepository;
+    private final VideoRepository videoRepository;
+    private final PhotoRepository photoRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordValidationService passwordValidationService;
     private final Path avatarLocation;
     private BadgeService badgeService; // Injection tardive pour éviter les dépendances circulaires
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, ConcertRepository concertRepository, PasswordEncoder passwordEncoder, PasswordValidationService passwordValidationService, @Value("${musician.upload.avatars-dir}") String avatarsDir) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository,
+                       ConcertRepository concertRepository, PasswordResetTokenRepository passwordResetTokenRepository,
+                       CommentRepository commentRepository, LoginAttemptRepository loginAttemptRepository,
+                       TrackRepository trackRepository, VideoRepository videoRepository,
+                       PhotoRepository photoRepository,
+                       PasswordEncoder passwordEncoder, PasswordValidationService passwordValidationService,
+                       @Value("${musician.upload.avatars-dir}") String avatarsDir) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.concertRepository = concertRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.commentRepository = commentRepository;
+        this.loginAttemptRepository = loginAttemptRepository;
+        this.trackRepository = trackRepository;
+        this.videoRepository = videoRepository;
+        this.photoRepository = photoRepository;
         this.passwordEncoder = passwordEncoder;
         this.passwordValidationService = passwordValidationService;
         this.avatarLocation = Paths.get(avatarsDir);
@@ -150,7 +174,14 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Utilisateur non trouvé: " + id));
+
+        // Supprimer les tokens de réinitialisation de mot de passe avant de supprimer l'utilisateur
+        passwordResetTokenRepository.deleteByUser(user);
+
         userRepository.deleteById(id);
     }
     
@@ -325,21 +356,39 @@ public class UserService {
                 Path avatarFile = avatarLocation.resolve(user.getAvatarFilename());
                 Files.deleteIfExists(avatarFile);
             } catch (IOException e) {
-                // Log mais ne bloque pas la suppression
                 System.err.println("Erreur lors de la suppression de l'avatar: " + e.getMessage());
             }
         }
 
-        // 2. Supprimer les associations (concerts favoris sont gérés par cascade dans l'entité)
+        // 2. Supprimer les likes (tables de jointure ManyToMany non cascadées)
+        for (var track : trackRepository.findLikedByUser(user)) {
+            track.getLikedByUsers().remove(user);
+            trackRepository.save(track);
+        }
+        for (var video : videoRepository.findLikedByUser(user)) {
+            video.getLikedByUsers().remove(user);
+            videoRepository.save(video);
+        }
+        for (var photo : photoRepository.findLikedByUser(user)) {
+            photo.getLikedByUsers().remove(user);
+            photoRepository.save(photo);
+        }
+
+        // 3. Supprimer les commentaires de l'utilisateur
+        commentRepository.deleteByUserId(user.getId());
+
+        // 4. Supprimer les tokens de réinitialisation de mot de passe
+        passwordResetTokenRepository.deleteByUser(user);
+
+        // 5. Supprimer l'historique de connexion (données personnelles RGPD)
+        loginAttemptRepository.deleteByUsername(user.getUsername());
+
+        // 6. Supprimer les concerts favoris (table de jointure)
         user.getFavoriteConcerts().clear();
 
-        // 3. Note: Les autres entités (LoginAttempt, PasswordResetToken, Comment, Badge)
-        // doivent être supprimées via leurs repositories respectifs si elles ne sont pas
-        // configurées avec cascade DELETE dans les relations JPA
-
-        // 4. Supprimer le compte utilisateur (cascade sur les relations configurées)
+        // 7. Supprimer le compte (cascade sur UserBadge + roles)
         userRepository.delete(user);
 
-        System.out.println("✅ RGPD - Compte utilisateur supprimé définitivement: " + user.getUsername());
+        System.out.println("RGPD - Compte utilisateur supprime definitivement: " + user.getUsername());
     }
 }

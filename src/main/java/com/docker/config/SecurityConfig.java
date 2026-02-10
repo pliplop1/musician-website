@@ -162,8 +162,9 @@ public class SecurityConfig {
 			)
 		);
 
-		// Désactiver CSRF pour les fichiers statiques et l'API publique
+		// Configuration CSRF avec CookieCsrfTokenRepository pour éviter les problèmes de session
 		http.csrf(csrf -> csrf
+			.csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
 			.csrfTokenRequestHandler(new org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler())
 			.ignoringRequestMatchers(
 				"/uploaded-music/**",
