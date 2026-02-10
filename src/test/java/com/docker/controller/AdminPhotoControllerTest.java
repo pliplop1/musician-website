@@ -107,16 +107,18 @@ class AdminPhotoControllerTest {
                 "test image content".getBytes()
         );
 
-        doNothing().when(photoService).savePhoto(any());
+        doNothing().when(photoService).savePhoto(any(), any(), any(), any(), any());
 
         mockMvc.perform(multipart("/admin/photos/upload")
                 .file(file)
+                .param("title", "Test Photo")
+                .param("category", "Concert")
                 .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/photos"))
                 .andExpect(flash().attributeExists("successMessage"));
 
-        verify(photoService, times(1)).savePhoto(any());
+        verify(photoService, times(1)).savePhoto(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -133,7 +135,7 @@ class AdminPhotoControllerTest {
                 .file(file))
                 .andExpect(status().isForbidden());
 
-        verify(photoService, never()).savePhoto(any());
+        verify(photoService, never()).savePhoto(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -146,16 +148,18 @@ class AdminPhotoControllerTest {
                 "test image content".getBytes()
         );
 
-        doThrow(new java.io.IOException("Disk full")).when(photoService).savePhoto(any());
+        doThrow(new java.io.IOException("Disk full")).when(photoService).savePhoto(any(), any(), any(), any(), any());
 
         mockMvc.perform(multipart("/admin/photos/upload")
                 .file(file)
+                .param("title", "Test Photo")
+                .param("category", "Concert")
                 .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/photos"))
                 .andExpect(flash().attributeExists("errorMessage"));
 
-        verify(photoService, times(1)).savePhoto(any());
+        verify(photoService, times(1)).savePhoto(any(), any(), any(), any(), any());
     }
 
     // ========================================================================

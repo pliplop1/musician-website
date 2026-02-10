@@ -11,7 +11,8 @@ module.exports = {
   rules: {
     'vue/no-v-html': 'off',
     'no-console': ['warn', { allow: ['error'] }],
-    'no-debugger': 'warn'
+    'no-debugger': 'warn',
+    'no-unused-vars': ['error', { caughtErrors: 'none', argsIgnorePattern: '^_' }]
   },
   ignorePatterns: ['dist/', 'node/', 'node_modules/']
 }

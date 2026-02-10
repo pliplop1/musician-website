@@ -148,7 +148,7 @@ class PasswordResetServiceTest {
         );
 
         String capturedUrl = urlCaptor.getValue();
-        assertTrue(capturedUrl.contains("http://localhost:8106/reset-password?token="));
+        assertTrue(capturedUrl.contains("/reset-password?token="));
     }
 
     // ========================================

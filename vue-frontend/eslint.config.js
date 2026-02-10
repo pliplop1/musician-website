@@ -18,6 +18,7 @@ export default [
       'vue/no-v-html': 'off',
       'no-console': ['warn', { allow: ['error'] }],
       'no-debugger': 'warn',
+      'no-unused-vars': ['error', { caughtErrors: 'none', argsIgnorePattern: '^_' }],
       // Relax strict template formatting rules to reduce noise while focusing on MVP
       'vue/max-attributes-per-line': 'off',
       'vue/singleline-html-element-content-newline': 'off',
