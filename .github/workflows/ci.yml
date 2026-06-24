@@ -192,7 +192,11 @@ jobs:
     name: Deploy to VM (SSH)
     runs-on: ubuntu-latest
     needs: [docker]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    # Déploiement désactivé : aucun serveur cible configuré pour l'instant.
+    # Pour réactiver, remettre la condition ci-dessous et définir les secrets
+    # DEPLOY_HOST / DEPLOY_USER / SSH_PRIVATE_KEY dans les settings du dépôt.
+    # if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: false
     continue-on-error: true
     steps:
       - name: SSH into server and deploy
