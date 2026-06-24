@@ -76,7 +76,7 @@ Pour vous connecter à l'interface admin (`http://localhost:8080/login`) :
 
 ## 📧 CONFIGURATION EMAIL
 
-**Email de test** : plipplop887@gmail.com
+**Email de test** : à configurer via la variable d'environnement `MAIL_USERNAME`
 - Envoi d'emails via Gmail SMTP
 - Utilisé pour : reset de mot de passe, notifications
 

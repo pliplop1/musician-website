@@ -163,7 +163,7 @@ SPRING_PROFILES_ACTIVE=prod
 # Email
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=plipplop887@gmail.com
+MAIL_USERNAME=votre_email@gmail.com
 MAIL_PASSWORD=votre_app_password
 MAIL_FROM=noreply@duoblackandwhite.com
 ADMIN_EMAIL=dumoulin.marilyne@gmail.com
